@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Rubyist Journal]]></title>
+  <title><![CDATA[Ruby Journal]]></title>
   <link href="http://rubyist-journal.com/atom.xml" rel="self"/>
   <link href="http://rubyist-journal.com/"/>
-  <updated>2012-02-20T23:41:04+11:00</updated>
+  <updated>2012-02-20T23:43:28+11:00</updated>
   <id>http://rubyist-journal.com/</id>
   <author>
     <name><![CDATA[Trung LE]]></name>

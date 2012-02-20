@@ -3,8 +3,8 @@
 # ----------------------- #
 
 url: http://rubyist-journal.com
-title: Rubyist Journal
-subtitle: yield Journal::Article.recent
+title: Ruby Journal
+subtitle: for Rubyist by Rubyist
 author: Trung LE
 simple_search: http://google.com/search
 description: Where I write about my journey with Ruby
