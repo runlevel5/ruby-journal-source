@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[My Octopress Blog]]></title>
-  <link href="http://yoursite.com/atom.xml" rel="self"/>
-  <link href="http://yoursite.com/"/>
-  <updated>2012-02-20T19:01:55+11:00</updated>
-  <id>http://yoursite.com/</id>
+  <title><![CDATA[Rubyist Journal]]></title>
+  <link href="http://rubyist-journal.com/atom.xml" rel="self"/>
+  <link href="http://rubyist-journal.com/"/>
+  <updated>2012-02-20T21:22:37+11:00</updated>
+  <id>http://rubyist-journal.com/</id>
   <author>
-    <name><![CDATA[Your Name]]></name>
+    <name><![CDATA[Trung LE]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
