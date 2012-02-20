@@ -9,7 +9,7 @@
   <meta name="author" content="Trung LE">
 
   
-  <meta name="description" content="Blog Archives About Me I am a humble Ruby enthusiast. I love art, reading history book, table tennis, golf Recent Posts Github Repos Status updating &hellip;">
+  <meta name="description" content="Blog Archives About Me I am a humble Ruby enthusiast. I love art, reading history book, table tennis, golf Recent Posts Latest Tweets Status &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -83,35 +83,6 @@
   <ul id="recent_posts">
     
   </ul>
-</section>
-
-<section>
-  <h1>Github Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  
-  <a href="https://github.com/joneslee85">@joneslee85</a> on Github
-  
-  <script type="text/javascript">
-    $.domReady(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'joneslee85',
-            count: 0,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 
