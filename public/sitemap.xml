@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>http://yoursite.com/blog/archives/</loc>
+        <lastmod>2012-02-20T18:32:41+11:00</lastmod>
+    </url>
+    <url>
+        <loc>http://yoursite.com/</loc>
+        <lastmod>2012-02-20T18:32:41+11:00</lastmod>
+    </url>
+</urlset>
