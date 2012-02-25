@@ -25,20 +25,37 @@ body > header h1 a, body > header h1 a:visited, body > header h1 a:hover {
 }
 
 body > header > hgroup {
-  margin-left: 170px;
+  /*margin-left: 170px;*/
 }
 
-body > header h1::after {
+body > header[role="banner"] {
+  padding: 10px 0;
+}
+
+body > header h1 a {
+  display: block;
+  background-image: url('/images/logo.png?1329723161');
+  background-repeat: no-repeat;
+  text-indent: -119988px;
+  width: 490px;
+}
+
+
+body > header h5::after {
   content: "";
   position: absolute;
-  left: -950px;
+  left: -720px;
   right: 0;
   top: 0px;
   height: 222px;
   text-indent: -119988px;
   overflow: hidden;
   text-align: left;
-  background-image: url('/images/logo.gif?1329723161');
+  background-image: url('/images/logo.png?1329723161');
   background-repeat: no-repeat;
   background-position: 50% 50%;
+}
+
+body > header h1 a {
+  content: "";
 }

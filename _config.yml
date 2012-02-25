@@ -5,7 +5,7 @@
 url: http://rubyist-journal.com
 title: Ruby Journal
 subtitle: for Rubyist by Rubyist
-author: Trung LE
+author: Trung Lê
 simple_search: http://google.com/search
 description: Where I write about my journey with Ruby
 
@@ -64,7 +64,7 @@ github_show_profile_link: true
 github_skip_forks: true
 
 # Twitter
-twitter_user: joneslee85
+twitter_user:
 twitter_tweet_count: 4
 twitter_show_replies: false
 twitter_follow_button: true

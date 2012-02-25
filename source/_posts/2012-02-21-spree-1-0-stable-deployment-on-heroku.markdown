@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Spree 1.0 deployment on Heroku Cedar stack
+title: Spree 1.0 deployment on Heroku
 date: 2012-02-21 06:40
 comments: true
 categories: 
@@ -10,9 +10,14 @@ author: "Trung Lê"
 
 # {{ post.title }} #
 
+In this tutorial, I will show you how to create a Spree application and deploy
+it to Heroku.
+
+<!--more-->
+
 ## Prerequisites ##
 
-In this tutorial, all instructions are written for OSX 10.7.x system. However it
+All instructions are written for OSX 10.7.x system. However it
 also works to UNIX and Linux systems with minor adaptations.
 
 #### Heroku ####
