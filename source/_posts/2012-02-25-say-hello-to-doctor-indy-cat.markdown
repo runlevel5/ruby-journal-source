@@ -23,3 +23,5 @@ The Illustrator source file can be found at:
 Please Like or leave comments if you like it.
 
 [gh]: https://github.com/modology
+
+<!--more-->

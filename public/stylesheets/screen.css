@@ -2,7 +2,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 
 /* Custom Rules */
 html {
-  background: none;
+  background: #F8F8F8 url('/images/noise.png');
 }
 
 body > header {
