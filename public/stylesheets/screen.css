@@ -5,6 +5,27 @@ html {
   background: #F8F8F8 url('/images/noise.png');
 }
 
+body > nav {
+  background: #FD0035;
+  border: 0 none;
+}
+
+body > nav a, body > nav a:visited {
+  color: #FFF;
+  text-shadow: none;
+  font-family: "Nixie One";
+}
+
+body > nav a:hover {
+  color: yellow;
+}
+
+body > nav form .search {
+  border-radius: 0;
+  border: 0 none;
+  box-shadow: none;
+}
+
 body > header {
   background-color: transparent;
 }
@@ -58,4 +79,8 @@ body > header h5::after {
 
 body > header h1 a {
   content: "";
+}
+
+#content h1 {
+  font-family: "Nixie One";
 }
