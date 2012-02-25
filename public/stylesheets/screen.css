@@ -10,13 +10,13 @@ body > header {
 }
 body > header h1 {
   font-size: 4em;
-  font-family: 'Just Me Again Down Here', cursive;
+  font-family: 'Just Me Again Down Here', "Georgia", "Helvetica Neue", Arial, sans-serif, cursive;
   text-transform: uppercase;
 }
 
 body > header h2 {
   font-size: 1.6em;
-  font-family: 'Just Me Again Down Here', cursive;
+  font-family: 'Just Me Again Down Here', "Georgia", "Helvetica Neue", Arial, sans-serif, cursive;
   margin: 0.3em 0 0;
 }
 
