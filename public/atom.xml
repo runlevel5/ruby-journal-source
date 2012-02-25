@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://rubyist-journal.com/atom.xml" rel="self"/>
   <link href="http://rubyist-journal.com/"/>
-  <updated>2012-02-25T21:41:52+11:00</updated>
+  <updated>2012-02-25T22:37:14+11:00</updated>
   <id>http://rubyist-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -381,6 +381,58 @@ we append to <code>Gemfile</code>:</p>
 </pre></td><td class="code"><pre><code class=""><span class="line">PATH         =&gt; bin:vendor/bundle/ruby/1.9.1/bin:/usr/local/bin:/usr/bin:/bin
 </span><span class="line">RUBY_VERSION =&gt; ruby-1.9.3-p0</span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<h4 id="add-ssl-certificate">Add SSL certificate</h4>
+
+<p>By default, Spree production mode enforce SSL. This step is very optional, 
+please read <a href="#disable-ssl-in-production-mode">Disable SSL in Production</a> section if you want to disable SSL in Production mode. </p>
+
+<p>A Piggyback SSL is a now standard feature on all Heroku apps so you don’t have
+to enable. We are not going to buy a certificate for this test app. Instead, we are
+going to set up a <a href="http://devcenter.heroku.com/articles/ssl-certificate-self" title="Creating a Self-Signed SSL Certificate">Self-Signed SSL Certificate</a>.</p>
+
+<p>A private key and certificate signing request can be generated:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ openssl genrsa -des3 -out site.key 2048
+</span><span class="line">    ...
+</span><span class="line">   Enter pass phrase for site.key:
+</span><span class="line">   Verifying - Enter pass phrase for site.key:
+</span><span class="line">$ mv site.key site.orig.key
+</span><span class="line">$ openssl rsa -in site.orig.key -out site.key
+</span><span class="line">   Enter pass phrase for site.orig.key:
+</span><span class="line">   writing RSA key
+</span><span class="line">$ openssl req -new -key site.key -out site.csr
+</span><span class="line">   ...
+</span><span class="line">   Country Name (2 letter code) [AU]:US
+</span><span class="line">   State or Province Name (full name) [Some-State]:California
+</span><span class="line">   ...</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and now the self-signed SSL certificate is generated from the <code>site.key</code> private key and <code>site.csr</code> files:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ openssl x509 -req -days 365 -in site.csr -signkey site.key -out final.crt</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>final.crt</code> file is your site certificate suitable for use with Heroku’s SSL add-on along with the <code>site.key</code> private key.</p>
+
+<p>Now we upload those two files to Heroku:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku domains:add smooth-autumn-7451.herokuapp.com
+</span><span class="line">$ heroku ssl:add final.crt site.key</span></code></pre></td></tr></table></div></figure></notextile></div>
+
 <h4 id="bootstraping-spree-on-heroku">Bootstraping Spree on Heroku</h4>
 
 <p>Now we could push our app to Heroku:</p>
@@ -459,10 +511,6 @@ we append to <code>Gemfile</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">$ heroku apps:open</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Unfortunately we get an error screen, it is because Spree always use HTTPS
-for production. So for this tutorial, we need to disable it. Please see
-<a href="#disable-ssl-in-production-mode">Disable SSL in Production</a> section.</p>
 
 <h4 id="custom-domain">Custom Domain</h4>
 

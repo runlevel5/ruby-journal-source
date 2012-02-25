@@ -346,6 +346,48 @@ PATH         => bin:vendor/bundle/ruby/1.9.1/bin:/usr/local/bin:/usr/bin:/bin
 RUBY_VERSION => ruby-1.9.3-p0
 ```
 
+#### Add SSL certificate ####
+
+By default, Spree production mode enforce SSL. This step is very optional, 
+please read [Disable SSL in Production] [disable_ssl] section if you want to disable SSL in Production mode. 
+
+A Piggyback SSL is a now standard feature on all Heroku apps so you don't have
+to enable. We are not going to buy a certificate for this test app. Instead, we are
+going to set up a [Self-Signed SSL Certificate] [self-signed-ssl].
+
+A private key and certificate signing request can be generated:
+
+```
+$ openssl genrsa -des3 -out site.key 2048
+    ...
+   Enter pass phrase for site.key:
+   Verifying - Enter pass phrase for site.key:
+$ mv site.key site.orig.key
+$ openssl rsa -in site.orig.key -out site.key
+   Enter pass phrase for site.orig.key:
+   writing RSA key
+$ openssl req -new -key site.key -out site.csr
+   ...
+   Country Name (2 letter code) [AU]:US
+   State or Province Name (full name) [Some-State]:California
+   ...
+```
+
+and now the self-signed SSL certificate is generated from the `site.key` private key and `site.csr` files:
+
+```
+$ openssl x509 -req -days 365 -in site.csr -signkey site.key -out final.crt
+```
+
+The `final.crt` file is your site certificate suitable for use with Heroku’s SSL add-on along with the `site.key` private key.
+
+Now we upload those two files to Heroku:
+
+```
+$ heroku domains:add smooth-autumn-7451.herokuapp.com
+$ heroku ssl:add final.crt site.key
+```
+
 #### Bootstraping Spree on Heroku ####
 
 Now we could push our app to Heroku:
@@ -404,9 +446,8 @@ Now we could open app:
 $ heroku apps:open
 ```
 
-Unfortunately we get an error screen, it is because Spree always use HTTPS
-for production. So for this tutorial, we need to disable it. Please see
-[Disable SSL in Production] [disable_ssl] section.
+
+
 
 #### Custom Domain ####
 
@@ -531,3 +572,4 @@ I'd like to extend my gratitude to the Spree community for the hardwork.
 [a]: http://devcenter.heroku.com/articles/rails31_heroku_cedar/ "Rails 3.1 Heroku Cedar"
 [assets-precompiling]: #assets-precompiling
 [disable_ssl]: #disable-ssl-in-production-mode
+[self-signed-ssl]: http://devcenter.heroku.com/articles/ssl-certificate-self "Creating a Self-Signed SSL Certificate"
