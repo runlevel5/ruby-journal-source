@@ -1,2 +1,47 @@
 // This File is imported last, and will override other styles in the cascade
 // Add styles here to make changes without digging in too much
+
+html {
+  background: $noise-bg;
+}
+
+// Header
+
+body > header {
+  padding: 10px 0;
+  h1 {
+    a {
+      display: block;
+      background: transparent image-url('logo.png') no-repeat;
+      width: 490px;
+      height: 110px;
+      text-indent: -119988px;
+    }
+  }
+}
+
+// Navigation
+
+body > nav {
+  a {
+    font-family: $nav-font-family;
+  }
+  form {
+    .search {
+      border: 0 none;
+      box-shadow: none;
+      background-color: #FFF;
+    }
+  }
+}
+
+// Footer
+
+body > footer {
+  font-family: $footer-font-family;
+  @include border-bottom-radius(0em);
+  color: $footer-text-color;
+  a {
+    font-family: $footer-font-family;
+  }
+}
