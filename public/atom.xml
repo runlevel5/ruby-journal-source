@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-02-26T00:33:00+11:00</updated>
+  <updated>2012-02-26T00:53:43+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -45,10 +45,13 @@ featured in the Octodex.</p>
 
 <h1 id="section"></h1>
 
-<p>In this tutorial, I will show you how to create a Spree application and deploy
-it to Heroku.</p>
+<p>In this tutorial, I will show you how to create a Spree application on your local
+box, configure and push it to Heroku.</p>
 
-<!--more-->
+<p><br />
+<br />
+<br />
+<!--more--></p>
 
 <h2 id="prerequisites">Prerequisites</h2>
 
@@ -334,7 +337,8 @@ stored. The workaround is to use Cloud storage service like Amazon S3.</p>
 <p>The <code>spree_heroku</code> gem lets you store images and data to Amazon S3, to install it
 we append to <code>Gemfile</code>:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>Gemfile </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">gem 'spree_heroku', :git =&gt; 'git://github.com/joneslee85/spree-heroku.git', :branch =&gt; '1-0-stable'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>then</p>
@@ -563,12 +567,14 @@ to set up Heroku to respond to requests at custom domains:</p>
 <p>We also need to let Spree know of our custom domain by append <code>site_url</code> in our
 <code>config/initializers/spree.rb</code></p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Spree.config do |config|
-</span><span class="line">  config.site_url = 'fool-man-chew.com'
-</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Spree</span><span class="o">.</span><span class="n">config</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class="line">  <span class="n">config</span><span class="o">.</span><span class="n">site_url</span> <span class="o">=</span> <span class="s1">&#39;fool-man-chew.com&#39;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Add, commit and push again:</p>
 
@@ -587,12 +593,14 @@ to set up Heroku to respond to requests at custom domains:</p>
 
 <p>Edit file <code>config/initializers/spree.rb</code>:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Spree.config do |config|
-</span><span class="line">  config.allow_ssl_in_production = false
-</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Spree</span><span class="o">.</span><span class="n">config</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class="line">  <span class="n">config</span><span class="o">.</span><span class="n">allow_ssl_in_production</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Make sure you commit the changes to app repository.</p>
 
@@ -616,30 +624,26 @@ the error:</p>
 <span class="line-number">13</span>
 <span class="line-number">14</span>
 <span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">....
-</span><span class="line">...
-</span><span class="line">       Injecting rails_log_stdout
-</span><span class="line">       Injecting rails3_serve_static_assets
+</pre></td><td class="code"><pre><code class=""><span class="line">   Injecting rails_log_stdout
+</span><span class="line">   Injecting rails3_serve_static_assets
 </span><span class="line">-----&gt; Preparing app for Rails asset pipeline
-</span><span class="line">       Running: rake assets:precompile
-</span><span class="line">       rake aborted!
-</span><span class="line">       could not connect to server: Connection refused
-</span><span class="line">       Is the server running on host "127.0.0.1" and accepting
-</span><span class="line">       TCP/IP connections on port 5432?
+</span><span class="line">   Running: rake assets:precompile
+</span><span class="line">   rake aborted!
+</span><span class="line">   could not connect to server: Connection refused
+</span><span class="line">   Is the server running on host "127.0.0.1" and accepting
+</span><span class="line">   TCP/IP connections on port 5432?
 </span><span class="line">
-</span><span class="line">       Tasks: TOP =&gt; environment
-</span><span class="line">       (See full trace by running task with --trace)
-</span><span class="line">       Precompiling assets failed, enabling runtime asset compilation
-</span><span class="line">       Injecting rails31_enable_runtime_asset_compilation
-</span><span class="line">       Please see this article for troubleshooting help:
-</span><span class="line">       http://devcenter.heroku.com/articles/rails31_heroku_cedar#troubleshooting</span></code></pre></td></tr></table></div></figure></notextile></div>
+</span><span class="line">   Tasks: TOP =&gt; environment
+</span><span class="line">   (See full trace by running task with --trace)
+</span><span class="line">   Precompiling assets failed, enabling runtime asset compilation
+</span><span class="line">   Injecting rails31_enable_runtime_asset_compilation
+</span><span class="line">   Please see this article for troubleshooting help:
+</span><span class="line">   http://devcenter.heroku.com/articles/rails31_heroku_cedar#troubleshooting</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>It make some sense though because Spree requires access to DB to complete this task and yet before you push to Heroku the environment config is not present. To workaround this issue, the only way I could think of is to locally precompile assets.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec rake assets:precompile RAILS_ENV=development</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec rake assets:precompile RAILS_ENV=development</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>What will happen next is Sprocket will compile our assets and place them in <code>public/assets</code> folder. What Heroku really care is the <code>public/assets/manifest.yml</code>. This file contains all MD5 checksums of our assets and Heroku will check the existence of the file to tell if we compile our assets locally or not.</p>
 
@@ -648,9 +652,9 @@ the error:</p>
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">git add -A public/assets
-</span><span class="line">git commit -m 'Added precompiled assets'
-</span><span class="line">git push heroku master</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ git add -A public/assets
+</span><span class="line">$ git commit -m 'Added precompiled assets'
+</span><span class="line">$ git push heroku master</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>you would see:</p>
 

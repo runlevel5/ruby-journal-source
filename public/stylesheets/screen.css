@@ -5,18 +5,19 @@ html {
   background: #F8F8F8 url('/images/noise.png');
 }
 
-body > nav {
+body > nav, body > footer {
   background: #FD0035;
   border: 0 none;
+  border-radius: 0;
 }
 
-body > nav a, body > nav a:visited {
+body > nav a, body > nav a:visited, body > footer, body > footer a, body > footer a:visited {
   color: #FFF;
   text-shadow: none;
   font-family: "Nixie One";
 }
 
-body > nav a:hover {
+body > nav a:hover, body > footer a:hover {
   color: yellow;
 }
 

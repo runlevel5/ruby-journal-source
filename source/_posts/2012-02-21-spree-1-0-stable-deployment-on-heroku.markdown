@@ -12,9 +12,12 @@ author: "Trung Lê"
 
 # {{ post.title }} #
 
-In this tutorial, I will show you how to create a Spree application and deploy
-it to Heroku.
+In this tutorial, I will show you how to create a Spree application on your local
+box, configure and push it to Heroku.
 
+<br/>
+<br/>
+<br/>
 <!--more-->
 
 ## Prerequisites ##
@@ -277,9 +280,9 @@ stored. The workaround is to use Cloud storage service like Amazon S3.
 The `spree_heroku` gem lets you store images and data to Amazon S3, to install it
 we append to `Gemfile`:
 
-```
+{% codeblock Gemfile %}
 gem 'spree_heroku', :git => 'git://github.com/joneslee85/spree-heroku.git', :branch => '1-0-stable'
-```
+{% endcodeblock %}
 
 then
 
@@ -475,11 +478,11 @@ Then I point the domain DNS to Heroku. Please read more at [Heroku Custom Domain
 We also need to let Spree know of our custom domain by append `site_url` in our
 `config/initializers/spree.rb`
 
-```
+{% codeblock config/initializers/spree.rb lang:ruby %}
 Spree.config do |config|
   config.site_url = 'fool-man-chew.com'
 end
-```
+{% endcodeblock %}
 
 Add, commit and push again:
 
@@ -498,11 +501,12 @@ $ git heroku:restart
 
 Edit file `config/initializers/spree.rb`:
 
-```
+{% codeblock config/initializers/spree.rb lang:ruby %}
 Spree.config do |config|
   config.allow_ssl_in_production = false
 end
-```
+{% endcodeblock %}
+
 
 Make sure you commit the changes to app repository.
 
@@ -512,8 +516,6 @@ Heroku would fail precompiling assets in slug compilation. Following output show
 the error:
 
 ```
-....
-...
        Injecting rails_log_stdout
        Injecting rails3_serve_static_assets
 -----> Preparing app for Rails asset pipeline
@@ -535,7 +537,7 @@ the error:
 It make some sense though because Spree requires access to DB to complete this task and yet before you push to Heroku the environment config is not present. To workaround this issue, the only way I could think of is to locally precompile assets.
 
 ```
-bundle exec rake assets:precompile RAILS_ENV=development
+$ bundle exec rake assets:precompile RAILS_ENV=development
 ```
 
 What will happen next is Sprocket will compile our assets and place them in `public/assets` folder. What Heroku really care is the `public/assets/manifest.yml`. This file contains all MD5 checksums of our assets and Heroku will check the existence of the file to tell if we compile our assets locally or not.
@@ -543,9 +545,9 @@ What will happen next is Sprocket will compile our assets and place them in `pub
 If we push this file to our server:
 
 ```
-git add -A public/assets
-git commit -m 'Added precompiled assets'
-git push heroku master
+$ git add -A public/assets
+$ git commit -m 'Added precompiled assets'
+$ git push heroku master
 ```
 
 you would see:
