@@ -85,12 +85,12 @@ pinboard_user:
 pinboard_count: 3
 
 # Delicious
-delicious_user: ruby-journal
+delicious_user: 
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name:
-disqus_show_comment_count: false
+disqus_short_name: ruby-journal
+disqus_show_comment_count: true
 
 # Google Analytics
 google_analytics_tracking_id:
