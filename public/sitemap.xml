@@ -1,19 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
-        <loc>http://rubyist-journal.com/spree-1-0-stable-deployment-on-heroku/</loc>
-        <lastmod>2012-02-25T22:36:11+11:00</lastmod>
+        <loc>http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/</loc>
+        <lastmod>2012-02-25T23:47:37+11:00</lastmod>
     </url>
     <url>
-        <loc>http://rubyist-journal.com/artwork/say-hello-to-doctor-indy-cat/</loc>
+        <loc>http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/</loc>
         <lastmod>2012-02-25T23:44:01+11:00</lastmod>
     </url>
     <url>
-        <loc>http://rubyist-journal.com/blog/archives/</loc>
-        <lastmod>2012-02-25T23:44:01+11:00</lastmod>
+        <loc>http://ruby-journal.com/blog/archives/</loc>
+        <lastmod>2012-02-25T23:47:37+11:00</lastmod>
     </url>
     <url>
-        <loc>http://rubyist-journal.com/</loc>
-        <lastmod>2012-02-25T23:44:01+11:00</lastmod>
+        <loc>http://ruby-journal.com/</loc>
+        <lastmod>2012-02-25T23:47:37+11:00</lastmod>
     </url>
 </urlset>

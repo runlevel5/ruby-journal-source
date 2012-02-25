@@ -8,6 +8,8 @@ tags: spree, heroku, ruby, deployment, cedar stack
 author: "Trung Lê"
 ---
 
+{% img left /images/spree-1.0.0-release-ribbon.png %}
+
 # {{ post.title }} #
 
 In this tutorial, I will show you how to create a Spree application and deploy
