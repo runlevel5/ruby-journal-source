@@ -292,7 +292,18 @@ $ bundle install
 
 Next, we create a new bucket 'fool-man-chew_production' under US Standard region via AWS Management Console.
 
-a new file under `config/s3.yml` and modify the key in accordance to your S3 account:
+We need to tell Spree how to access our bucket, there are 2 ways to configure S3
+settings.
+
+First one is to create Heroku config vars (recommended):
+
+```
+$ heroku config:add S3_KEY='your_access_key'
+$ heroku config:add S3_SECRET='secret_access_key'
+$ heroku config:add S3_BUCKET='fool-man-chew_production'
+```
+
+The second is to create a new file under `config/s3.yml` and modify the key in accordance to your S3 account:
 
 ```
 production:

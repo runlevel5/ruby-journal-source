@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-02-26T09:49:22+11:00</updated>
+  <updated>2012-02-27T00:43:20+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -348,7 +348,19 @@ we append to <code>Gemfile</code>:</p>
 
 <p>Next, we create a new bucket ‘fool-man-chew_production’ under US Standard region via AWS Management Console.</p>
 
-<p>a new file under <code>config/s3.yml</code> and modify the key in accordance to your S3 account:</p>
+<p>We need to tell Spree how to access our bucket, there are 2 ways to configure S3
+settings.</p>
+
+<p>First one is to create Heroku config vars (recommended):</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku config:add S3_KEY='your_access_key'
+</span><span class="line">$ heroku config:add S3_SECRET='secret_access_key'
+</span><span class="line">$ heroku config:add S3_BUCKET='fool-man-chew_production'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The second is to create a new file under <code>config/s3.yml</code> and modify the key in accordance to your S3 account:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
