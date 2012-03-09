@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: rails | Ruby Journal]]></title>
+  <link href="http://ruby-journal.com/blog/categories/rails/atom.xml" rel="self"/>
+  <link href="http://ruby-journal.com/"/>
+  <updated>2012-03-09T15:37:04+11:00</updated>
+  <id>http://ruby-journal.com/</id>
+  <author>
+    <name><![CDATA[Trung Lê]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Define Fixtures with Polymorphic Association]]></title>
+    <link href="http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/"/>
+    <updated>2012-03-09T15:16:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association</id>
+    <content type="html"><![CDATA[<h1 id="posttitle-"></h1>
+
+<p>It is more than often that you have to write a fixtures for models with polymorphic
+association. In this short tutorial, I will show you how to use few shortcut trick
+to create fixtures.</p>
+
+<p>Assume we have following code:</p>
+
+<p>```ruby
+class Car &lt; ActiveRecord::Base
+  belongs_to :borrowable, :polymorphic =&gt; true
+end</p>
+
+<p>class Company &lt; ActiveRecord::Base
+  has_many :cars, :as =&gt; :borrowable
+end</p>
+
+<p>```</p>
+
+<p>Above is just a very simple code declaring a polymorphic association between
+Company to Car. Next, we will write some fixtures for the sake
+of testing.</p>
+
+<p>```
+# Company fixtures
+google:
+  id: 1
+  name: Google</p>
+
+<h1 id="car-fixtures">car fixtures</h1>
+<p>ferrari:
+  name: F430
+  borrowable_id: 1
+  borrowable_type: Company
+```</p>
+
+<p>We could do better by referencing to Company fixture via named fixture, so
+the above car fixture would be:</p>
+
+<p><code>
+ferrari:
+  name: F430
+  borrowable: google (Company)
+</code></p>
+
+<p>Please be noted that the syntax of line <code>borrowable</code> now has an additonal <code>(Company)</code>
+keyword. This is to tell rails that the <code>borrowable_type</code> is of <code>Company</code> class.
+Without that, the fixtures will set <code>borrowable_type</code> to <code>nil</code>, thus invalid.</p>
+
+<p>Hope you find this tutorial useful. See you in the next tutorial.</p>
+]]></content>
+  </entry>
+  
+</feed>
