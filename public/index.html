@@ -9,9 +9,12 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Liquid is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. &hellip;">
+  <meta name="description" content="Today I found out that Heroku does ship an old version of ghotscript: 1
+2
+3
+$ heroku run bash
+$ /usr/bin/gs --version
+8.71 However, my app requires &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +80,92 @@ to liquid. &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/heroku/install-ghostscript-on-heroku/">Install Ghostscript on Heroku</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-12T16:57:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+        
+         | <a href="/heroku/install-ghostscript-on-heroku/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1 id="section"></h1>
+
+<p>Today I found out that Heroku does ship an old version of ghotscript:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
+</span><span class="line">$ /usr/bin/gs --version
+</span><span class="line">8.71</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>However, my app requires version 9.05, so I decided to compile version 9.05 on
+Heroku. Here’s how:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
+</span><span class="line">$ curl -O http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz
+</span><span class="line">$ tar xzvf ghostscript-9.05.tar.gz
+</span><span class="line">$ cd ghostscript-9.05
+</span><span class="line">$ ./configure --disable-cups --disable-gtk --with-drivers=FILES
+</span><span class="line">$ make
+</span><span class="line">$ cp bin/gs ~/bin</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Let me break it down those above steps, I fetch the source and compile the source
+without printers devices by specifying <code>--with-drivers=FILES</code>. Once the compilation
+is completed, I copy the binary <code>ghostscript-9.05/bin/gs</code> to <code>~/bin</code>.</p>
+
+<p>All binaries in <code>~/bin</code> will be available for your Heroku app now. You can verify
+if the binary works by:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ gs --version
+</span><span class="line">9.05</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And please do not forget to clean up:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ cd ~
+</span><span class="line">$ rm -rf ghostscript-9.05*</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If you feel lazy, you could download my Ruby-wrapper of gs at <a href="https://github.com/joneslee85/ruby-ghostscript">https://github.com/joneslee85/ruby-ghostscript</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -390,6 +479,10 @@ box, configure and push it to Heroku.</p>
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/heroku/install-ghostscript-on-heroku/">Install Ghostscript on Heroku</a>
+      </li>
     
       <li class="post">
         <a href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">Exposing ActiveRecord model attributes to Liquid dynamically</a>

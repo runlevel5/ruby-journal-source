@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: heroku | Ruby Journal]]></title>
+  <link href="http://ruby-journal.com/blog/categories/heroku/atom.xml" rel="self"/>
+  <link href="http://ruby-journal.com/"/>
+  <updated>2012-03-12T17:10:34+11:00</updated>
+  <id>http://ruby-journal.com/</id>
+  <author>
+    <name><![CDATA[Trung Lê]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Install Ghostscript on Heroku]]></title>
+    <link href="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/"/>
+    <updated>2012-03-12T16:57:00+11:00</updated>
+    <id>http://ruby-journal.com/heroku/install-ghostscript-on-heroku</id>
+    <content type="html"><![CDATA[<h1 id="posttitle-"></h1>
+
+<p>Today I found out that Heroku does ship an old version of ghotscript:</p>
+
+<p><code>
+$ heroku run bash
+$ /usr/bin/gs --version
+8.71
+</code></p>
+
+<p>However, my app requires version 9.05, so I decided to compile version 9.05 on
+Heroku. Here’s how:</p>
+
+<p><code>
+$ heroku run bash
+$ curl -O http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz
+$ tar xzvf ghostscript-9.05.tar.gz
+$ cd ghostscript-9.05
+$ ./configure --disable-cups --disable-gtk --with-drivers=FILES
+$ make
+$ cp bin/gs ~/bin
+</code></p>
+
+<p>Let me break it down those above steps, I fetch the source and compile the source
+without printers devices by specifying <code>--with-drivers=FILES</code>. Once the compilation
+is completed, I copy the binary <code>ghostscript-9.05/bin/gs</code> to <code>~/bin</code>.</p>
+
+<p>All binaries in <code>~/bin</code> will be available for your Heroku app now. You can verify
+if the binary works by:</p>
+
+<p><code>
+$ gs --version
+9.05
+</code></p>
+
+<p>And please do not forget to clean up:</p>
+
+<p><code>
+$ cd ~
+$ rm -rf ghostscript-9.05*
+</code></p>
+
+<p>If you feel lazy, you could download my Ruby-wrapper of gs at <a href="https://github.com/joneslee85/ruby-ghostscript">https://github.com/joneslee85/ruby-ghostscript</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>
