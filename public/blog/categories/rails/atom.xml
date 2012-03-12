@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Ruby Journal]]></title>
   <link href="http://ruby-journal.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-03-09T15:37:04+11:00</updated>
+  <updated>2012-03-12T13:14:24+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,52 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Exposing ActiveRecord model attributes to Liquid dynamically]]></title>
+    <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
+    <updated>2012-03-12T12:52:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
+    <content type="html"><![CDATA[<h1 id="posttitle-"></h1>
+
+<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
+used with rails. It is quite common that you have to expose ActiveRecord attributes
+to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
+model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
+to tell which attributes / call-able methods of the instance that could be passed
+with the liquid_methods call. In most of cases, people tend to use the latter method
+because they could narrow the exposure scope to liquid.</p>
+
+<p>However, what if your model has so many attributes and typing all them out for
+the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
+creating a module:</p>
+
+<p><code>ruby
+# lib/attributes_to_liquid_methods_mapper.rb
+module AttributesToLiquidMethodsMapper
+  def self.included(base)
+    base.class_eval do
+      base.attribute_names.each do |attribute|
+        liquid_methods attribute.to_sym
+      end
+    end
+  end
+end
+</code></p>
+
+<p>And you also need to include the above module in the ActiveRecord classes that
+you want to be exposed to Liquid:</p>
+
+<p><code>ruby
+class MyObject &lt; ActiveRecord::Base
+  require 'attributes_to_liquid_methods_mapper'
+  include AttributesToLiquidMethodsMapper
+end
+</code></p>
+
+<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Define Fixtures with Polymorphic Association]]></title>

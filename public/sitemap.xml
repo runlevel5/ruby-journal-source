@@ -13,11 +13,17 @@
         <lastmod>2012-03-09T15:37:03+11:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/
+        </loc>
+        <lastmod>2012-03-12T13:14:24+11:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2012-03-09T15:37:03+11:00</lastmod>
+        <lastmod>2012-03-12T13:14:24+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2012-03-09T15:37:03+11:00</lastmod>
+        <lastmod>2012-03-12T13:14:24+11:00</lastmod>
     </url>
 </urlset>

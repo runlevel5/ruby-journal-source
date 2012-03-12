@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-03-09T15:37:04+11:00</updated>
+  <updated>2012-03-12T13:14:24+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,64 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Exposing ActiveRecord model attributes to Liquid dynamically]]></title>
+    <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
+    <updated>2012-03-12T12:52:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
+    <content type="html"><![CDATA[<h1 id="section"></h1>
+
+<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
+used with rails. It is quite common that you have to expose ActiveRecord attributes
+to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
+model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
+to tell which attributes / call-able methods of the instance that could be passed
+with the liquid_methods call. In most of cases, people tend to use the latter method
+because they could narrow the exposure scope to liquid.</p>
+
+<p>However, what if your model has so many attributes and typing all them out for
+the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
+creating a module:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span /></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># lib/attributes_to_liquid_methods_mapper.rb</span>
+</span><span class="line"><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+</span><span class="line">    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class="line">      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
+</span><span class="line">        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
+</span><span class="line">      <span class="k">end</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And you also need to include the above module in the ActiveRecord classes that
+you want to be exposed to Liquid:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span /></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class="line">  <span class="nb">require</span> <span class="s1">&#39;attributes_to_liquid_methods_mapper&#39;</span>
+</span><span class="line">  <span class="kp">include</span> <span class="no">AttributesToLiquidMethodsMapper</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Define Fixtures with Polymorphic Association]]></title>
