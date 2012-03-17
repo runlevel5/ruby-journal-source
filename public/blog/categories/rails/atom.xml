@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: rails | Ruby Journal]]></title>
+  <link href="http://ruby-journal.com/blog/categories/rails/atom.xml" rel="self"/>
+  <link href="http://ruby-journal.com/"/>
+  <updated>2012-03-18T00:00:56+11:00</updated>
+  <id>http://ruby-journal.com/</id>
+  <author>
+    <name><![CDATA[Trung Lê]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Exposing ActiveRecord model attributes to Liquid dynamically]]></title>
+    <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
+    <updated>2012-03-12T12:52:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
+    <content type="html"><![CDATA[<h1 id="posttitle-"></h1>
+
+<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
+used with rails. It is quite common that you have to expose ActiveRecord attributes
+to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
+model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
+to tell which attributes / call-able methods of the instance that could be passed
+with the <code>liquid_methods</code> call. In most of cases, people tend to use the latter method
+because they could narrow the exposure scope to liquid.</p>
+
+<p>However, what if your model has so many attributes and typing all them out for
+the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
+creating a module:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>And you also need to include the above module in the ActiveRecord classes that
+you want to be exposed to Liquid:</p>
+
+<p><code>ruby
+class MyObject &lt; ActiveRecord::Base
+  require 'attributes_to_liquid_methods_mapper'
+  include AttributesToLiquidMethodsMapper
+end
+</code></p>
+
+<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Define Fixtures with Polymorphic Association]]></title>
+    <link href="http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/"/>
+    <updated>2012-03-09T15:16:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association</id>
+    <content type="html"><![CDATA[<h1 id="posttitle-"></h1>
+
+<p>It is more than often that you have to write a fixtures for models with polymorphic
+association. In this short tutorial, I will show you how to use few shortcut trick
+to create fixtures.</p>
+
+<p>Assume we have following code:</p>
+
+<p>```ruby
+class Car &lt; ActiveRecord::Base
+  belongs_to :borrowable, :polymorphic =&gt; true
+end</p>
+
+<p>class Company &lt; ActiveRecord::Base
+  has_many :cars, :as =&gt; :borrowable
+end</p>
+
+<p>```</p>
+
+<p>Above is just a very simple code declaring a polymorphic association between
+Company to Car. Next, we will write some fixtures for the sake
+of testing.</p>
+
+<p>```
+# Company fixtures
+google:
+  id: 1
+  name: Google</p>
+
+<h1 id="car-fixtures">car fixtures</h1>
+<p>ferrari:
+  name: F430
+  borrowable_id: 1
+  borrowable_type: Company
+```</p>
+
+<p>We could do better by referencing to Company fixture via named fixture, so
+the above car fixture would be:</p>
+
+<p><code>
+ferrari:
+  name: F430
+  borrowable: google (Company)
+</code></p>
+
+<p>Please be noted that the syntax of line <code>borrowable</code> now has an additonal <code>(Company)</code>
+keyword. This is to tell rails that the <code>borrowable_type</code> is of <code>Company</code> class.
+Without that, the fixtures will set <code>borrowable_type</code> to <code>nil</code>, thus invalid.</p>
+
+<p>Hope you find this tutorial useful. See you in the next tutorial.</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,242 +1,110 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Ruby Journal]]></title>
-  <link href="http://ruby-journal.com/atom.xml" rel="self"/>
-  <link href="http://ruby-journal.com/"/>
-  <updated>2012-03-18T00:00:56+11:00</updated>
-  <id>http://ruby-journal.com/</id>
-  <author>
-    <name><![CDATA[Trung Lê]]></name>
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Spree 1.0 deployment on Heroku - Ruby Journal</title>
+  <meta name="author" content="Trung Lê">
+
+  
+  <meta name="description" content="In this tutorial, I will show you how to create a Spree application on your local
+box, configure and push it to Heroku. Prerequisites All &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Ruby Journal" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5442688-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ruby Journal</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:ruby-journal.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
     
-  </author>
-  <generator uri="http://octopress.org/">Octopress</generator>
+      <h1 class="entry-title">Spree 1.0 Deployment on Heroku</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
 
   
-  <entry>
-    <title type="html"><![CDATA[Install Ghostscript on Heroku Cedar]]></title>
-    <link href="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/"/>
-    <updated>2012-03-12T16:57:00+11:00</updated>
-    <id>http://ruby-journal.com/heroku/install-ghostscript-on-heroku</id>
-    <content type="html"><![CDATA[<h1 id="section"></h1>
 
-<p>In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
-As you might have known that Heroku virtual machine does come with a system-wide
-ghostscript version which is located at <code>/usr/bin/gs</code>. You can find out the
-location of this version:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
-</span><span class="line">$ /usr/bin/gs --version
-</span><span class="line">8.71</span></code></pre></td></tr></table></div></figure></notextile></div>
+<time datetime="2012-02-21T06:40:00+11:00" pubdate data-updated="true">Feb 21<span>st</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
 
-<p>However, explicit dependencies is not recommended, you could read 12 Factor Approach
-on dependencies at <a href="http://www.12factor.net/dependencies">http://www.12factor.net/dependencies</a>. Credit to <a href="https://github.com/rwdaigle">Ryan Daigle</a> who pointed it out for me and I agree with him.</p>
 
-<p>To install ghostscript, we fetch the source under heroku console, fetch the source,
-configure and compile the software:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
-</span><span class="line">$ curl -O http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz
-</span><span class="line">$ tar xzvf ghostscript-9.05.tar.gz
-</span><span class="line">$ cd ghostscript-9.05
-</span><span class="line">$ ./configure --disable-cups --disable-gtk --with-drivers=FILES
-</span><span class="line">$ make
-</span><span class="line">$ cp bin/gs ~/bin</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>You might notice that I only specify configuration parameters <code>--with-drivers=FILES</code>.
-It is because I don’t need printer drivers for my app which only does think like
-images and PDF manipulation.</p>
-
-<p>Once the compilation is completed, copy the binary <code>ghostscript-9.05/bin/gs</code> to <code>~/bin</code>.
-All binaries in <code>~/bin</code> will be available for your Heroku app now. You can verify
-if the binary works by:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gs --version
-</span><span class="line">9.05</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And please do not forget to clean up:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ cd ~
-</span><span class="line">$ rm -rf ghostscript-9.05*</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>If you feel lazy, you could download my Ruby-wrapper of gs at <a href="https://github.com/joneslee85/ruby-ghostscript">https://github.com/joneslee85/ruby-ghostscript</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Exposing ActiveRecord model attributes to Liquid dynamically]]></title>
-    <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
-    <updated>2012-03-12T12:52:00+11:00</updated>
-    <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
-    <content type="html"><![CDATA[<h1 id="section"></h1>
-
-<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
-model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
-to tell which attributes / call-able methods of the instance that could be passed
-with the <code>liquid_methods</code> call. In most of cases, people tend to use the latter method
-because they could narrow the exposure scope to liquid.</p>
-
-<p>However, what if your model has so many attributes and typing all them out for
-the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
-creating a module:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb  </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class="line">    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
-</span><span class="line">        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And you also need to include the above module in the ActiveRecord classes that
-you want to be exposed to Liquid:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span /></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-</span><span class="line">  <span class="nb">require</span> <span class="s1">&#39;attributes_to_liquid_methods_mapper&#39;</span>
-</span><span class="line">  <span class="kp">include</span> <span class="no">AttributesToLiquidMethodsMapper</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Define Fixtures with Polymorphic Association]]></title>
-    <link href="http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/"/>
-    <updated>2012-03-09T15:16:00+11:00</updated>
-    <id>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association</id>
-    <content type="html"><![CDATA[<h1 id="section"></h1>
-
-<p>It is more than often that you have to write a fixtures for models with polymorphic
-association. In this short tutorial, I will show you how to use few shortcut trick
-to create fixtures.</p>
-
-<p>Assume we have following code:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span /></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Car</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-</span><span class="line">  <span class="n">belongs_to</span> <span class="ss">:borrowable</span><span class="p">,</span> <span class="ss">:polymorphic</span> <span class="o">=&gt;</span> <span class="kp">true</span>
-</span><span class="line"><span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">class</span> <span class="nc">Company</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-</span><span class="line">  <span class="n">has_many</span> <span class="ss">:cars</span><span class="p">,</span> <span class="ss">:as</span> <span class="o">=&gt;</span> <span class="ss">:borrowable</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Above is just a very simple code declaring a polymorphic association between
-Company to Car. Next, we will write some fixtures for the sake
-of testing.</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span /></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># Company fixtures</span>
-</span><span class="line"><span class="n">google</span><span class="p">:</span>
-</span><span class="line">  <span class="nb">id</span><span class="p">:</span> <span class="mi">1</span>
-</span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">Google</span>
-</span><span class="line">
-</span><span class="line"><span class="c1"># car fixtures</span>
-</span><span class="line"><span class="n">ferrari</span><span class="p">:</span>
-</span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">F430</span>
-</span><span class="line">  <span class="n">borrowable_id</span><span class="p">:</span> <span class="mi">1</span>
-</span><span class="line">  <span class="n">borrowable_type</span><span class="p">:</span> <span class="no">Company</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>We could do better by referencing to Company fixture via named fixture, so
-the above car fixture would be:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span /></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">ferrari</span><span class="p">:</span>
-</span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">F430</span>
-</span><span class="line">  <span class="n">borrowable</span><span class="p">:</span> <span class="n">google</span> <span class="p">(</span><span class="no">Company</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Please be noted that the syntax of line <code>borrowable</code> now has an additonal <code>(Company)</code>
-keyword. This is to tell rails that the <code>borrowable_type</code> is of <code>Company</code> class.
-Without that, the fixtures will set <code>borrowable_type</code> to <code>nil</code>, thus invalid.</p>
-
-<p>Hope you find this tutorial useful. See you in the next tutorial.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Say Hello to Dr.Indy Cat]]></title>
-    <link href="http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/"/>
-    <updated>2012-02-25T23:24:00+11:00</updated>
-    <id>http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://ruby-journal.com/images/octocat/dr-octocat.png" width="448" height="448" title="'Dr. Indy Cat'" /></p>
-
-<h1 id="section"></h1>
-
-<p>I&rsquo;ve been a fan of Indiana Jones and GitHub. So I made a request for
-my brother <a href="https://github.com/modology">Huey</a> and guess what he gave me. I just hope this artwork could be
-featured in the Octodex.</p>
-
-<p>The Illustrator source file can be found at:</p>
-
-<p><a href="https://github.com/modology/octocats">https://github.com/modology/octocats</a></p>
-
-<p>Please Like or leave comments if you like it.</p>
-
-<!--more-->
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Spree 1.0 deployment on Heroku]]></title>
-    <link href="http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/"/>
-    <updated>2012-02-21T06:40:00+11:00</updated>
-    <id>http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku</id>
-    <content type="html"><![CDATA[<p><img class="left" src="http://ruby-journal.com/images/spree-1.0.0-release-ribbon.png" /></p>
+<div class="entry-content"><p><img class="left" src="/images/spree-1.0.0-release-ribbon.png" /></p>
 
 <h1 id="section"></h1>
 
@@ -884,7 +752,178 @@ there are possibly issues that I am not aware of, so please file a ticket on <a 
 
 <p>I’d like to extend my gratitude to the Spree community for the hardwork. </p>
 
-]]></content>
-  </entry>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
   
-</feed>
+
+<span class="byline author vcard">Posted by <span class="fn">Trung Lê</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-21T06:40:00+11:00" pubdate data-updated="true">Feb 21<span>st</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/" data-via="" data-counturl="http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/artwork/say-hello-to-doctor-indy-cat/" title="Next Post: Say Hello to Dr.Indy Cat">Say Hello to Dr.Indy Cat &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>I am a humble Ruby enthusiast.</p>
+  <p>I love art, reading history book, table tennis, golf</p>
+</section>
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/heroku/install-ghostscript-on-heroku/">Install Ghostscript on Heroku Cedar</a>
+      </li>
+    
+      <li class="post">
+        <a href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">Exposing ActiveRecord model attributes to Liquid dynamically</a>
+      </li>
+    
+      <li class="post">
+        <a href="/rails/define-fixtures-with-polymorphic-association/">Define Fixtures with Polymorphic Association</a>
+      </li>
+    
+      <li class="post">
+        <a href="/artwork/say-hello-to-doctor-indy-cat/">Say Hello to Dr.Indy Cat</a>
+      </li>
+    
+      <li class="post">
+        <a href="/spree-1-0-stable-deployment-on-heroku/">Spree 1.0 deployment on Heroku</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/joneslee85?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Trung Lê -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ruby-journal';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/';
+        var disqus_url = 'http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
