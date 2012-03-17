@@ -15,15 +15,14 @@ used with rails. It is quite common that you have to expose ActiveRecord attribu
 to liquid. You can achieve that by implement `to_liquid` method in your ActiveRecord
 model so it acts as if it were `Liquid::Drop`, OR you can use the helper `liquid_methods`
 to tell which attributes / call-able methods of the instance that could be passed
-with the liquid_methods call. In most of cases, people tend to use the latter method
+with the `liquid_methods` call. In most of cases, people tend to use the latter method
 because they could narrow the exposure scope to liquid.
 
 However, what if your model has so many attributes and typing all them out for
 the `liquid_methods` seems arduous, you can dynamically mapping attributes by
 creating a module:
 
-```ruby
-# lib/attributes_to_liquid_methods_mapper.rb
+{% codeblock lib/attributes_to_liquid_methods_mapper.rb lang:ruby %}
 module AttributesToLiquidMethodsMapper
   def self.included(base)
     base.class_eval do
@@ -33,7 +32,7 @@ module AttributesToLiquidMethodsMapper
     end
   end
 end
-```
+{% endcodeblock %}
 
 And you also need to include the above module in the ActiveRecord classes that
 you want to be exposed to Liquid:
