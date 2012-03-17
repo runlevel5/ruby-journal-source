@@ -1,16 +1,19 @@
 ---
 layout: post
-title: "Install Ghostscript on Heroku"
+title: "Install Ghostscript on Heroku Cedar"
 date: 2012-03-12 16:57
 comments: true
 categories: heroku
-tags: install, heroku, gs, ghostscript
+tags: install, heroku, gs, ghostscript, cedar
 author: "Trung Lê"
 ---
 
 # {{ post.title }} #
 
-Today I found out that Heroku does ship an old version of ghotscript:
+In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
+As you might have known that Heroku virtual machine does come with a system-wide
+ghostscript version which is located at `/usr/bin/gs`. You can find out the
+location of this version:
 
 ```
 $ heroku run bash
@@ -18,8 +21,11 @@ $ /usr/bin/gs --version
 8.71
 ```
 
-However, my app requires version 9.05, so I decided to compile version 9.05 on
-Heroku. Here's how:
+However, explicit dependencies is not recommended, you could read 12 Factor Approach
+on dependencies at [http://www.12factor.net/dependencies](http://www.12factor.net/dependencies). Credit to [Ryan Daigle](https://github.com/rwdaigle) who pointed it out for me and I agree with him.
+
+To install ghostscript, we fetch the source under heroku console, fetch the source,
+configure and compile the software:
 
 ```
 $ heroku run bash
@@ -31,10 +37,11 @@ $ make
 $ cp bin/gs ~/bin
 ```
 
-Let me break it down those above steps, I fetch the source and compile the source
-without printers devices by specifying `--with-drivers=FILES`. Once the compilation
-is completed, I copy the binary `ghostscript-9.05/bin/gs` to `~/bin`.
+You might notice that I only specify configuration parameters `--with-drivers=FILES`.
+It is because I don't need printer drivers for my app which only does think like
+images and PDF manipulation.
 
+Once the compilation is completed, copy the binary `ghostscript-9.05/bin/gs` to `~/bin`.
 All binaries in `~/bin` will be available for your Heroku app now. You can verify
 if the binary works by:
 
