@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-03-18T00:00:56+11:00</updated>
+  <updated>2012-04-05T22:20:07+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -847,7 +847,14 @@ the error:</p>
 </span><span class="line">   Please see this article for troubleshooting help:
 </span><span class="line">   http://devcenter.heroku.com/articles/rails31_heroku_cedar#troubleshooting</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>It make some sense though because Spree requires access to DB to complete this task and yet before you push to Heroku the environment config is not present. To workaround this issue, the only way I could think of is to locally precompile assets.</p>
+<p>It make some sense though because Spree requires access to DB to complete this task and yet before you push to Heroku the environment config is not present. </p>
+
+<p>So we have to disable precompile on intialize by set <code>config.assets.initialize_on_precompile</code> to <code>false</code> in <code>config/application.rb</code></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">config.assets.initialize_on_precompile = false</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Then workaround this issue by locally precompile assets.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec rake assets:precompile RAILS_ENV=development</span></code></pre></td></tr></table></div></figure></notextile></div>
