@@ -545,7 +545,15 @@ the error:
 ```
 
 
-It make some sense though because Spree requires access to DB to complete this task and yet before you push to Heroku the environment config is not present. To workaround this issue, the only way I could think of is to locally precompile assets.
+It make some sense though because Spree requires access to DB to complete this task and yet before you push to Heroku the environment config is not present. 
+
+So we have to disable precompile on intialize by set `config.assets.initialize_on_precompile` to `false` in `config/application.rb`
+
+```
+config.assets.initialize_on_precompile = false
+```
+
+Then workaround this issue by locally precompile assets.
 
 ```
 $ bundle exec rake assets:precompile RAILS_ENV=development
