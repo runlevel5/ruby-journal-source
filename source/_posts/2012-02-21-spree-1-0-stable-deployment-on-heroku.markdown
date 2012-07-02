@@ -42,32 +42,32 @@ $ rvm install 1.9.3-p0
 
 #### Ruby On Rails ####
 
-Spree 1.0 leaves the choice of rails version to you. You can choose version
-`3.1.1` to `3.1.3`. It is highly recommended that you go for `3.1.3`
+Spree 1.0.x leaves the choice of rails version to you. You can choose version
+`3.1.1` to `3.1.6`. It is highly recommended that you go for `3.1.6`
 unless you have reasons not to.
 
 ```
-$ gem install rails -v=3.1.3
+$ gem install rails -v=3.1.6
 ```
 
 #### Spree ####
 
 ```
-$ gem install spree -v=1.0
+$ gem install spree -v=1.0.4
 ```
 
 Check installed spree gems:
 
 ```
 $ gem list | grep 'spree'
-spree (1.0.0)
-spree_api (1.0.0)
-spree_auth (1.0.0)
-spree_cmd (1.0.0)
-spree_core (1.0.0)
-spree_dash (1.0.0)
-spree_promo (1.0.0)
-spree_sample (1.0.0)
+spree (1.0.4)
+spree_api (1.0.4)
+spree_auth (1.0.4)
+spree_cmd (1.0.4)
+spree_core (1.0.4)
+spree_dash (1.0.4)
+spree_promo (1.0.4)
+spree_sample (1.0.4)
 ```
 
 `spree` gem consists of many components, however you only need `spree_core`
@@ -101,7 +101,7 @@ $ brew install imagemagick
 Create a new rails app default to postgreSQL
 
 ```
-rails _3.1.3_ new fool-man-chew -d postgresql
+rails _3.1.6_ new fool-man-chew -d postgresql
 ```
 Configure database setting by editing `config/database.yml`.
 
@@ -197,7 +197,7 @@ precompiling  assets
 You could manually append `spree` gem into the end of your `Gemfile`:
 
 ```
-gem 'spree', '1.0'
+gem 'spree', '~> 1.0.4'
 ```
 
 If you have not yet run `bundle install`, please run it now:
@@ -238,7 +238,7 @@ By default, Heroku use the Thin server. However in this tutorial, we are going t
 use Unicorn instead, just to show you the great new process types system that
 Cedar support.
 
-Add `unicorn` gem to `Gemfile`:
+Append to `Gemfile`:
 
 ```
 gem 'unicorn'
