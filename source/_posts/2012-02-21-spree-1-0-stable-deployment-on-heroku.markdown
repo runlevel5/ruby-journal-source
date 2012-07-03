@@ -27,17 +27,28 @@ also works to UNIX and Linux systems with minor adaptations.
 
 #### Heroku ####
 
+If you have not yet installed Heroku, you can install it via Rubygem:
+
 ```
 $ gem install heroku
 ```
 
+If you have installed Heroku, please make sure you update to version 2.1.0 or higher
+for Cedar support:
+
+```
+$ heroku update
+$ heroku --version
+heroku-gem/2.28.7 (x86_64-darwin12.0.0) ruby/1.9.3
+```
+
 #### Ruby ####
 
-Because we are going to deploy on Heroku Cedar stack with experimental `ruby-1.9.3-p0`,
+Because we are going to deploy on Heroku Cedar stack with `ruby-1.9.3-p194`,
 we should use the same Ruby version on our local box for consistency.
 
 ```
-$ rvm install 1.9.3-p0
+$ rvm install 1.9.3-p194
 ```
 
 #### Ruby On Rails ####
@@ -241,7 +252,9 @@ Cedar support.
 Append to `Gemfile`:
 
 ```
-gem 'unicorn'
+group :production do
+  gem 'unicorn'
+end
 ```
 
 and install the gem with:
@@ -314,10 +327,10 @@ production:
 
 #### Create Heroku app ####
 
-For ruby19 support, we are going to create an Cedar stack based app:
+We are going to create an Cedar stack based app:
 
 ```
-$ heroku create --stack cedar
+$ heroku apps:create smooth-autumn-7451
 ```
 
 If success, you would see below output:
@@ -335,32 +348,56 @@ $ git remote show
 heroku
 ```
 
-#### Install ruby-1.9.3-p0 for Heroku ####
+#### Install ruby-1.9.3 for Heroku ####
 
 Cedar stack default to ruby-1.9.2, however Spree has been tested with
-`ruby-1.9.3-p0` so I highly recommended you to use same version for production.
+`ruby-1.9.3` so I highly recommended you to use same version for production.
 
-In order to use `ruby 1.9.3-p0` on Heroku, you need to set it up:
+*UPDATE*: After March 19, 2012, Heroku has deprecated installing Ruby 1.9.3 using
+heroku-labs plugin. So it is uncesssary to setup RUBY_VERSION variable or to set up
+PATH config variable to include 'bin' when you specify the default Ruby 1.9.3 with:
 
 ```
-$ heroku plugins:install https://github.com/heroku/heroku-labs.git
-$ heroku labs:enable user_env_compile -a smooth-autumn-7451 # use your app name here instead
-$ heroku config:add RUBY_VERSION=ruby-1.9.3-p0
+$ heroku config:add RUBY_VERSION=ruby-1.9.3-p194
 $ heroku config:add PATH=bin:vendor/bundle/ruby/1.9.1/bin:/usr/local/bin:/usr/bin:/bin
 ```
 
-You can check if everything working with:
+To configure Heroku to use Ruby 1.9.3, we specify the Ruby version in the Gemfile.
+Unfortunately, as of 3 July 2012, the unreleased version 1.2.0.pre.1 is the only
+version that support the feature. So we will go with this unrelease version.
+
+First, we install latest version of Rubygems-bunder:
 
 ```
-$ heroku config
+$ gem update rubygems-bundler
 ```
 
-and should give:
+Then install pre-release version of Bunlder 1.2.0, we have to uninstall the
+current version before installing:
 
 ```
-PATH         => bin:vendor/bundle/ruby/1.9.1/bin:/usr/local/bin:/usr/bin:/bin
-RUBY_VERSION => ruby-1.9.3-p0
+$ gem uninstall -ax bundler
+$ gem install bundler --pre
 ```
+
+Now we specify Ruby version in the Gemfile:
+
+```
+source 'http://rubygems.org'
+
+ruby '1.9.3'
+```
+
+then
+
+```
+bundle install
+```
+
+*NOTE*: It is no longer possible to explicitly specify a patch level for a Ruby
+version (such as ruby-1.9.3-p194), Heroku provides the most secure patch level of
+whatever minor version you expect.
+
 
 #### Add SSL certificate ####
 
@@ -428,7 +465,7 @@ If all goes well, you would see following output:
 ```
 -----> Heroku receiving push
 -----> Ruby/Rails app detected
------> Using RUBY_VERSION: ruby-1.9.3-p0
+-----> Using RUBY_VERSION: ruby-1.9.3-p194
 -----> Installing dependencies using Bundler version 1.1.rc.7
        Running: bundle install --without development:test --path vendor/bundle --binstubs bin/ --deployment
        Fetching gem metadata from http://rubygems.org/.......
@@ -553,7 +590,7 @@ So we have to disable precompile on intialize by set `config.assets.initialize_o
 config.assets.initialize_on_precompile = false
 ```
 
-Then workaround this issue by locally precompile assets.
+Then workaround this issue by locally precompile assets before deployment:
 
 ```
 $ bundle exec rake assets:precompile RAILS_ENV=development
