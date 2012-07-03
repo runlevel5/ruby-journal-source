@@ -366,6 +366,8 @@ To configure Heroku to use Ruby 1.9.3, we specify the Ruby version in the Gemfil
 Unfortunately, as of 3 July 2012, the unreleased version 1.2.0.pre.1 is the only
 version that support the feature. So we will go with this unrelease version.
 
+You could read more about [Selecting a version of Ruby] [55].
+
 First, we install latest version of Rubygems-bunder:
 
 ```
@@ -630,6 +632,7 @@ I'd like to extend my gratitude to the Spree community for the hardwork.
 [2]: http://devcenter.heroku.com/articles/custom-domains "Heroku Custom Domains"
 [3]: https://github.com/spree/spree/issues "Spree Issues"
 [a]: http://devcenter.heroku.com/articles/rails31_heroku_cedar/ "Rails 3.1 Heroku Cedar"
+[55]: https://devcenter.heroku.com/articles/ruby-versions#selecting_a_version_of_ruby "Selecting a version of Ruby"
 [assets-precompiling]: #assets-precompiling
 [disable_ssl]: #disable-ssl-in-production-mode
 [self-signed-ssl]: http://devcenter.heroku.com/articles/ssl-certificate-self "Creating a Self-Signed SSL Certificate"

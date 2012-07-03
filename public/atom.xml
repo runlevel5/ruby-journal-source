@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-07-03T18:31:28+10:00</updated>
+  <updated>2012-07-03T18:34:45+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -622,6 +622,8 @@ PATH config variable to include ‘bin’ when you specify the default Ruby 1.9.
 <p>To configure Heroku to use Ruby 1.9.3, we specify the Ruby version in the Gemfile.
 Unfortunately, as of 3 July 2012, the unreleased version 1.2.0.pre.1 is the only
 version that support the feature. So we will go with this unrelease version.</p>
+
+<p>You could read more about <a href="https://devcenter.heroku.com/articles/ruby-versions#selecting_a_version_of_ruby" title="Selecting a version of Ruby">Selecting a version of Ruby</a>.</p>
 
 <p>First, we install latest version of Rubygems-bunder:</p>
 
