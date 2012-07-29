@@ -16,4 +16,8 @@ group :development do
   gem 'liquid', '~> 2.3.0'
 end
 
+group :production do
+  gem 'puma'
+end
+
 gem 'sinatra', '~> 1.3.2'
