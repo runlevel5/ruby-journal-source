@@ -1,14 +1,12 @@
 ---
 layout: post
-title: Spree 1.0 deployment on Heroku
-date: 2012-02-21 06:40
+title: Spree 1.1 deployment on Heroku
+date: 2012-07-6 07:31
 comments: true
 categories: 
 tags: spree, heroku, ruby, deployment, cedar stack
 author: "Trung Lê"
 ---
-
-{% img left /images/spree-1.0.0-release-ribbon.png %}
 
 # {{ post.title }} #
 
@@ -22,7 +20,7 @@ box, configure and push it to Heroku.
 
 ## Prerequisites ##
 
-All instructions are written for OSX 10.7.x system. However it
+All instructions are written for OSX 10.8.x system. However it
 also works to UNIX and Linux systems with minor adaptations.
 
 #### Heroku ####
@@ -53,32 +51,32 @@ $ rvm install 1.9.3-p194
 
 #### Ruby On Rails ####
 
-Spree 1.0.x leaves the choice of rails version to you. You can choose version
-`3.1.1` to `3.1.6`. It is highly recommended that you go for `3.1.6`
+Spree 1.0.x leaves the choice of rails version to you. You can choose version any
+minor version of `3.2.x`. It is highly recommended that you go for `3.2.6`
 unless you have reasons not to.
 
 ```
-$ gem install rails -v=3.1.6
+$ gem install rails -v=3.2.6
 ```
 
 #### Spree ####
 
 ```
-$ gem install spree -v=1.0.4
+$ gem install spree -v=1.1.2
 ```
 
 Check installed spree gems:
 
 ```
 $ gem list | grep 'spree'
-spree (1.0.4)
-spree_api (1.0.4)
-spree_auth (1.0.4)
-spree_cmd (1.0.4)
-spree_core (1.0.4)
-spree_dash (1.0.4)
-spree_promo (1.0.4)
-spree_sample (1.0.4)
+spree (1.1.2)
+spree_api (1.1.2)
+spree_auth (1.1.2)
+spree_cmd (1.1.2)
+spree_core (1.1.2)
+spree_dash (1.1.2)
+spree_promo (1.1.2)
+spree_sample (1.1.2)
 ```
 
 `spree` gem consists of many components, however you only need `spree_core`
@@ -112,7 +110,7 @@ $ brew install imagemagick
 Create a new rails app default to postgreSQL
 
 ```
-rails _3.1.6_ new fool-man-chew -d postgresql
+rails _3.2.6_ new fool-man-chew -d postgresql
 ```
 Configure database setting by editing `config/database.yml`.
 
@@ -208,7 +206,7 @@ precompiling  assets
 You could manually append `spree` gem into the end of your `Gemfile`:
 
 ```
-gem 'spree', '~> 1.0.4'
+gem 'spree', '~> 1.1.2'
 ```
 
 If you have not yet run `bundle install`, please run it now:
@@ -246,14 +244,14 @@ $ bundle exec rake assets:precompile:nondigest
 ### Configure web server ###
 
 By default, Heroku use the Thin server. However in this tutorial, we are going to
-use Unicorn instead, just to show you the great new process types system that
+use Puma instead, just to show you the great new process types system that
 Cedar support.
 
 Append to `Gemfile`:
 
 ```
 group :production do
-  gem 'unicorn'
+  gem 'puma'
 end
 ```
 
@@ -263,13 +261,11 @@ and install the gem with:
 $ bundle install
 ```
 
-Then we set up Unicorn to use 4 workers processes, according to [Michael’s blog][0],
-this is the optimal configuration. You can scale up to more Dynos should the app
-need more processing power. Create a new file `config/unicorn.rb`:
+Then we set up Puma to use minium 4 threads. You can scale up to more Dynos should the app
+need more processing power. Create a new file `config/puma.rb`:
 
 ```
-worker_processes 4 # amount of unicorn workers to spin up
-timeout 30         # restarts workers that hang for 30 seconds
+threads 4, 16
 ```
 
 The great about Cedar stack is that Heroku introduces a new way to scale your app,
@@ -280,64 +276,24 @@ We configure our unicorn which is of type `web` by creating new file in `Rails.r
 folder `Procfile`:
 
 ```
-web: bundle exec unicorn -p $PORT -c ./config/unicorn.rb
+web: bundle exec puma -p $PORT -C ./config/puma.rb
 ```
 
 ### Heroku setup ###
-
-#### Install spree-heroku extension ####
-
-Because Heroku is disk-less therefore assets like images are not persistently
-stored. The workaround is to use Cloud storage service like Amazon S3.
-
-The `spree_heroku` gem lets you store images and data to Amazon S3, to install it
-we append to `Gemfile`:
-
-{% codeblock Gemfile %}
-gem 'spree_heroku', :git => 'git://github.com/joneslee85/spree-heroku.git', :branch => '1-0-stable'
-{% endcodeblock %}
-
-then
-
-```
-$ bundle install
-```
-
-Next, we create a new bucket 'fool-man-chew_production' under US Standard region via AWS Management Console.
-
-We need to tell Spree how to access our bucket, there are 2 ways to configure S3
-settings.
-
-First one is to create Heroku config vars (recommended):
-
-```
-$ heroku config:add S3_KEY='your_access_key'
-$ heroku config:add S3_SECRET='secret_access_key'
-$ heroku config:add S3_BUCKET='fool-man-chew_production'
-```
-
-The second is to create a new file under `config/s3.yml` and modify the key in accordance to your S3 account:
-
-```
-production:
-  bucket: fool-man-chew_production
-  access_key_id: your_access_key
-  secret_access_key: secret_access_key
-```
 
 #### Create Heroku app ####
 
 We are going to create an Cedar stack based app:
 
 ```
-$ heroku apps:create smooth-autumn-7451
+$ heroku apps:create fool-man-chew
 ```
 
 If success, you would see below output:
 
 ```
-Creating smooth-autumn-7451... done, stack is cedar
-http://smooth-autumn-7451.herokuapp.com/ | git@heroku.com:smooth-autumn-7451.git
+Creating fool-man-chew... done, stack is cedar
+http://fool-man-chew.herokuapp.com/ | git@heroku.com:fool-man-chew.git
 Git remote heroku added
 ```
 
@@ -400,6 +356,11 @@ bundle install
 version (such as ruby-1.9.3-p194), Heroku provides the most secure patch level of
 whatever minor version you expect.
 
+#### Set up Amazon S3 ####
+
+Heroku is diskless, thus assets storage is delegated to third-party cloud storage
+service like Amazon S3. 
+
 
 #### Add SSL certificate ####
 
@@ -439,7 +400,7 @@ The `final.crt` file is your site certificate suitable for use with Heroku’s S
 Now we upload those two files to Heroku:
 
 ```
-$ heroku domains:add smooth-autumn-7451.herokuapp.com
+$ heroku domains:add fool-man-chew.herokuapp.com
 $ heroku ssl:add final.crt site.key
 ```
 
@@ -486,7 +447,7 @@ If all goes well, you would see following output:
        Default types for Ruby/Rails -> console, rake, worker
 -----> Compiled slug size is 39.4MB
 -----> Launching... done, v9
-       http://smooth-autumn-7451.herokuapp.com deployed to Heroku
+       http://fool-man-chew.herokuapp.com deployed to Heroku
 ```
 
 Next we could repeat the same bootstraping step on our remote heroku:
@@ -511,16 +472,16 @@ to set up Heroku to respond to requests at custom domains:
 
 ```
 $ heroku addons:add custom_domains
-Adding custom_domains to smooth-autumn-7451...done.
+Adding custom_domains to fool-man-chew...done.
 ```
 
 And inform Heroku our beautiful `fool-man-chew.com` domain
 
 ```
 $ heroku domains:add www.fool-man-chew.com
-Added www.example.com as a custom domain name to smooth-autumn-7451.heroku.com
+Added www.example.com as a custom domain name to fool-man-chew.heroku.com
 $ heroku domains:add fool-man-chew.com
-Added example.com as a custom domain name to smooth-autumn-7451.heroku.com
+Added example.com as a custom domain name to fool-man-chew.heroku.com
 ```
 
 Then I point the domain DNS to Heroku. Please read more at [Heroku Custom Domain] [2]
@@ -592,13 +553,13 @@ So we have to disable precompile on intialize by set `config.assets.initialize_o
 config.assets.initialize_on_precompile = false
 ```
 
-Then workaround this issue by locally precompile production assets before deployment:
+Then workaround this issue by locally precompile assets before deployment:
 
 ```
-$ RAILS_ENV=production bundle exec rake assets:precompile
+$ bundle exec rake assets:precompile RAILS_ENV=development
 ```
 
-What will happen next is Sprocket will compile our assets and place them in `public/assets` folder. What Heroku really care is the `public/assets/manifest.yml`. This file contains all MD5 checksums of our assets and Heroku will check the existence of the file to tell if we compile our assets locally or not. Make sure you double check your .gitignore and remove the `public/assets` if there is one so git won't omit this path.
+What will happen next is Sprocket will compile our assets and place them in `public/assets` folder. What Heroku really care is the `public/assets/manifest.yml`. This file contains all MD5 checksums of our assets and Heroku will check the existence of the file to tell if we compile our assets locally or not.
 
 If we push this file to our server:
 
