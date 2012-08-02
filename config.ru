@@ -6,6 +6,8 @@ $root = ::File.dirname(__FILE__)
 
 class SinatraStaticServer < Sinatra::Base  
 
+  set :server, 'puma'
+
   get(/.+/) do
     send_sinatra_file(request.path) {404}
   end
