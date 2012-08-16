@@ -2,7 +2,7 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/</loc>
-        <lastmod>2012-07-29T11:41:09+10:00</lastmod>
+        <lastmod>2012-08-17T00:21:52+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/</loc>
@@ -28,10 +28,10 @@
     </url>
     <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2012-07-29T11:41:09+10:00</lastmod>
+        <lastmod>2012-08-17T00:21:52+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2012-07-29T11:41:09+10:00</lastmod>
+        <lastmod>2012-08-17T00:21:52+10:00</lastmod>
     </url>
 </urlset>
