@@ -2,36 +2,40 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/</loc>
-        <lastmod>2012-08-17T00:21:52+10:00</lastmod>
+        <lastmod>2012-08-23T16:10:15+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/</loc>
-        <lastmod>2012-07-03T00:16:29+10:00</lastmod>
+        <lastmod>2012-08-23T16:10:15+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/</loc>
-        <lastmod>2012-07-03T00:16:29+10:00</lastmod>
+        <lastmod>2012-08-23T16:10:15+10:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/
         </loc>
-        <lastmod>2012-07-03T00:16:29+10:00</lastmod>
+        <lastmod>2012-08-23T16:10:15+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/heroku/install-ghostscript-on-heroku/</loc>
-        <lastmod>2012-07-03T00:16:29+10:00</lastmod>
+        <lastmod>2012-08-23T16:10:15+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/spree-1-1-stable-deployment-on-heroku/</loc>
-        <lastmod>2012-07-05T00:23:30+10:00</lastmod>
+        <lastmod>2012-08-23T16:10:15+10:00</lastmod>
+    </url>
+    <url>
+        <loc>http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/</loc>
+        <lastmod>2012-08-23T16:25:10+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2012-08-17T00:21:52+10:00</lastmod>
+        <lastmod>2012-08-23T16:25:10+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2012-08-17T00:21:52+10:00</lastmod>
+        <lastmod>2012-08-23T16:25:10+10:00</lastmod>
     </url>
 </urlset>

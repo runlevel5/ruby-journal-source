@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Say Hello to Dr.Indy Cat - Ruby Journal</title>
+  <title>Install Postgres.app on OSX 10.7+ - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="I&rsquo;ve been a fan of Indiana Jones and GitHub. So I made a request for
-my brother Huey and guess what he gave me. I just hope this artwork could &hellip;">
+  <meta name="description" content="Traditionally, pogstgresql is installed manually with MacPort or Homebrew on Mac OSX 10.7+. I used
+to have lots of problem with the setup for the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ my brother Huey and guess what he gave me. I just hope this artwork could &helli
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/">
+  <link rel="canonical" href="http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +79,7 @@ my brother Huey and guess what he gave me. I just hope this artwork could &helli
   
   <header>
     
-      <h1 class="entry-title">Say Hello to Dr.Indy Cat</h1>
+      <h1 class="entry-title">Install Postgres.app on OSX 10.7+</h1>
     
     
       <p class="meta">
@@ -95,7 +95,7 @@ my brother Huey and guess what he gave me. I just hope this artwork could &helli
   
 
 
-<time datetime="2012-02-25T23:24:00+11:00" pubdate data-updated="true">Feb 25<span>th</span>, 2012</time>
+<time datetime="2012-08-23T16:21:00+10:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -104,21 +104,69 @@ my brother Huey and guess what he gave me. I just hope this artwork could &helli
   </header>
 
 
-<div class="entry-content"><p><img class="left" src="/images/octocat/dr-octocat.png" width="448" height="448" title="'Dr. Indy Cat'" /></p>
+<div class="entry-content"><p><img class="left" src="/images/netsuke.png" /></p>
 
 <h1 id="section"></h1>
 
-<p>I&rsquo;ve been a fan of Indiana Jones and GitHub. So I made a request for
-my brother <a href="https://github.com/modology">Huey</a> and guess what he gave me. I just hope this artwork could be
-featured in the Octodex.</p>
+<p>Traditionally, pogstgresql is installed manually with MacPort or Homebrew on Mac OSX 10.7+. I used
+to have lots of problem with the setup for the installation as it requires Xcode, this libs and that libs, etc.
+In summary, it is not convenient enough and I want something as simple as dragging an OS app to my /Application.
+Thanks to Heroku, they took the heed and create Postgres.app. A wrapper bundled with binary postgresql server.
+It is not only easy to install but also easy to setup config file if you are using Rails.</p>
 
-<p>The Illustrator source file can be found at:</p>
+<p><br />
+<br />
+<br />
+<!--more--></p>
 
-<p><a href="https://github.com/modology/octocats">https://github.com/modology/octocats</a></p>
+<h2 id="installation">Installation</h2>
 
-<p>Please Like or leave comments if you like it.</p>
+<p>If you have installed postgres using Homebrew or Macport, please make sure you uninstall it first.</p>
 
-<!--more-->
+<p>Head to [http://postgresapp.com/][postgres.app] and download DMG into your localbox. Mount the DMG and drag the Postgres.app
+icon into your Applications folder.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>No configuration at all! Simply click on Postgres.app to start it and the app will reside in your top bar tray (elephant icon).
+You can set it to start on start up by click on Elephant Icon on top bar tray and click Automatically Start on Login. That&rsquo;s it, dead simple compare to
+setting up plist launcher file.</p>
+
+<p>PostgreSQL ships with a constellation of useful binaries, like <code>pg_dump</code> or <code>pg_restore</code>, that you will likely want to use.
+Go ahead and add the <code>/bin</code> directory that ships with Postgres.app to your <code>PATH</code>. Add this to your <code>.bash_profile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">PATH="/Applications/Postgres.app/Contents/MacOS/bin:$PATH"</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Once setup, you could refresh your terminal session with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ source .bash_profile</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And try to run <code>psql</code> without a host, if everything is correct, you should be able to get into the the postgres console</p>
+
+<h2 id="configure-rails-database-connection">Configure Rails database connection</h2>
+
+<p>Use following settings in <code>config/database.yml</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">development:
+</span><span class="line">  adapter: postgresql
+</span><span class="line">  database: [YOUR_DATABASE_NAME]
+</span><span class="line">  host: localhost</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="install-pg-gem">Install pg gem</h2>
+
+<p>In order to install <code>pg</code> gem, we need to uninstall <code>pg</code> first and re-installed with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ gem uninstall pg
+</span><span class="line">$ gem install pg -- --with-pg-lib=/Applications/Postgres.app/Contents/MacOS/lib</span></code></pre></td></tr></table></div></figure></notextile></div>
+
 </div>
 
 
@@ -127,7 +175,7 @@ featured in the Octodex.</p>
       
   
 
-<span class="byline author vcard">Posted by <span class="fn">Hiếu Lê</span></span>
+<span class="byline author vcard">Posted by <span class="fn">Trung Lê</span></span>
 
       
 
@@ -141,21 +189,15 @@ featured in the Octodex.</p>
   
 
 
-<time datetime="2012-02-25T23:24:00+11:00" pubdate data-updated="true">Feb 25<span>th</span>, 2012</time>
+<time datetime="2012-08-23T16:21:00+10:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2012</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/artwork/'>artwork</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/" data-via="" data-counturl="http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/" data-via="" data-counturl="http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -168,10 +210,8 @@ featured in the Octodex.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/spree-1-0-stable-deployment-on-heroku/" title="Previous Post: Spree 1.0 deployment on Heroku">&laquo; Spree 1.0 deployment on Heroku</a>
+        <a class="basic-alignment left" href="/spree-1-1-stable-deployment-on-heroku/" title="Previous Post: Spree 1.1 deployment on Heroku">&laquo; Spree 1.1 deployment on Heroku</a>
       
-      
-        <a class="basic-alignment right" href="/rails/define-fixtures-with-polymorphic-association/" title="Next Post: Define Fixtures with Polymorphic Association">Define Fixtures with Polymorphic Association &raquo;</a>
       
     </p>
   </footer>
@@ -252,8 +292,8 @@ featured in the Octodex.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/';
-        var disqus_url = 'http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/';
+        var disqus_identifier = 'http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/';
+        var disqus_url = 'http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/';
         var disqus_script = 'embed.js';
       
     (function () {
