@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-08-23T16:25:31+10:00</updated>
+  <updated>2012-08-23T16:32:17+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -37,7 +37,7 @@ It is not only easy to install but also easy to setup config file if you are usi
 
 <p>If you have installed postgres using Homebrew or Macport, please make sure you uninstall it first.</p>
 
-<p>Head to [http://postgresapp.com/][postgres.app] and download DMG into your localbox. Mount the DMG and drag the Postgres.app
+<p>Head to <a href="http://postgresapp.com/">http://postgresapp.com/</a> and download DMG into your localbox. Mount the DMG and drag the Postgres.app
 icon into your Applications folder.</p>
 
 <h2 id="configuration">Configuration</h2>

@@ -72,3 +72,4 @@ $ gem uninstall pg
 $ gem install pg -- --with-pg-lib=/Applications/Postgres.app/Contents/MacOS/lib
 ```
 
+[postgres.app]: http://postgresapp.com/
