@@ -54,11 +54,11 @@ Please note that those files are large in size ~> 3GB
 
 Head to http://vagrantup.com/ and download the package for your OS.
 
-# Install Virtualbox
+## Install Virtualbox
 
 Head to https://www.virtualbox.org/ and download the app for your OS.
 
-# Import the VM box
+## Import the VM box
 
 Once you have downloaded the VM box, the image can be imported to your system. In my case:
 
@@ -72,7 +72,7 @@ If imported successfully, you should be able to see `travis-ruby` in the box lis
 $ vagrant box list
 ```
 
-# Bootstrap
+## Bootstrap
 
 Let's get our box up so we could SSH and start playing around with it:
 
@@ -101,7 +101,7 @@ $ sh ./postinstall.sh
 
 This script install all essential packages like compilers, libraries.
 
-# Debug your test
+## Debug your test
 
 Copy your application to this VM box via `scp` or `git clone` and debug the test like you debug it on your local box.
 

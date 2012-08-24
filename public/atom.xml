@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-08-24T13:27:51+10:00</updated>
+  <updated>2012-08-24T13:30:40+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -61,11 +61,11 @@ to VMs.</p>
 
 <p>Head to http://vagrantup.com/ and download the package for your OS.</p>
 
-<h1 id="install-virtualbox">Install Virtualbox</h1>
+<h2 id="install-virtualbox">Install Virtualbox</h2>
 
 <p>Head to https://www.virtualbox.org/ and download the app for your OS.</p>
 
-<h1 id="import-the-vm-box">Import the VM box</h1>
+<h2 id="import-the-vm-box">Import the VM box</h2>
 
 <p>Once you have downloaded the VM box, the image can be imported to your system. In my case:</p>
 
@@ -77,7 +77,7 @@ to VMs.</p>
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant box list</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<h1 id="bootstrap">Bootstrap</h1>
+<h2 id="bootstrap">Bootstrap</h2>
 
 <p>Let’s get our box up so we could SSH and start playing around with it:</p>
 
@@ -102,7 +102,7 @@ We could bring the box up with:</p>
 
 <p>This script install all essential packages like compilers, libraries.</p>
 
-<h1 id="debug-your-test">Debug your test</h1>
+<h2 id="debug-your-test">Debug your test</h2>
 
 <p>Copy your application to this VM box via <code>scp</code> or <code>git clone</code> and debug the test like you debug it on your local box.</p>
 
