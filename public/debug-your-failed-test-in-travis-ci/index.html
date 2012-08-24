@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Install Ghostscript on Heroku Cedar - Ruby Journal</title>
+  <title>Debug your failed test in Travis CI - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
-As you might have known that Heroku virtual machine does come with a &hellip;">
+  <meta name="description" content="Ever wondering why some tests passed locally but failed on Travis?
+Ever questioning how could I go about to debug why that failed test on remote &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ As you might have known that Heroku virtual machine does come with a &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/">
+  <link rel="canonical" href="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +79,7 @@ As you might have known that Heroku virtual machine does come with a &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Install Ghostscript on Heroku Cedar</h1>
+      <h1 class="entry-title">Debug Your Failed Test in Travis CI</h1>
     
     
       <p class="meta">
@@ -95,7 +95,7 @@ As you might have known that Heroku virtual machine does come with a &hellip;">
   
 
 
-<time datetime="2012-03-12T16:57:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2012-08-24T13:04:00+10:00" pubdate data-updated="true">Aug 24<span>th</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -106,60 +106,92 @@ As you might have known that Heroku virtual machine does come with a &hellip;">
 
 <div class="entry-content"><h1 id="section"></h1>
 
-<p>In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
-As you might have known that Heroku virtual machine does come with a system-wide
-ghostscript version which is located at <code>/usr/bin/gs</code>. You can find out the
-location of this version:</p>
+<p>Ever wondering why some tests passed locally but failed on Travis?
+Ever questioning how could I go about to debug why that failed test on remote Travis?
+Read on as I show you how</p>
+
+<p><br />
+<br />
+<br />
+<!--more--></p>
+
+<p>In one occassion, I had a failed Ruby test on Travis which infact passed on my local box. So I tried
+to put in <code>debugger</code> and see if Travis could let me drop into Irb or not. It turns out Travis hang
+for quite a while until timed out. So debug remotely doesn’t work.</p>
+
+<p>Right, plan B then. I spent some time dig into Travis documentation and learned that Travis server
+provisioned new VM image for every test. So if I could get my hand on the VMs, I could replicate the
+same environment that Travis run the test locally. Sound rational, doesn’t it? Unfortunately, I could
+not find any traces nor URL where to download those VMs. Thanks to Josh at Travis, he sent me the URL
+to VMs.</p>
+
+<h2 id="download-vm">Download VM</h2>
+
+<p>Travis VM are packaged Vagrant box.</p>
+
+<p>You coud download VM here at:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
-</span><span class="line">$ /usr/bin/gs --version
-</span><span class="line">8.71</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">files.travis-ci.org/boxes/provisioned/travis-(box_name).box</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>However, explicit dependencies is not recommended, you could read 12 Factor Approach
-on dependencies at <a href="http://www.12factor.net/dependencies">http://www.12factor.net/dependencies</a>. Credit to <a href="https://github.com/rwdaigle">Ryan Daigle</a> who pointed it out for me and I agree with him.</p>
+<p>in which <code>(box_name)</code> is the language you use, <code>ruby</code>, <code>php</code>, etc.</p>
 
-<p>To install ghostscript, we fetch the source under heroku console, fetch the source,
-configure and compile the software:</p>
+<p>For my case, I was testing a Rails app, so I downloaded the ruby box:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
-</span><span class="line">$ curl -O http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz
-</span><span class="line">$ tar xzvf ghostscript-9.05.tar.gz
-</span><span class="line">$ cd ghostscript-9.05
-</span><span class="line">$ ./configure --disable-cups --disable-gtk --with-drivers=FILES
-</span><span class="line">$ make
-</span><span class="line">$ cp bin/gs ~/bin</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">wget files.travis-ci.org/boxes/provisioned/travis-ruby.box</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>You might notice that I only specify configuration parameters <code>--with-drivers=FILES</code>.
-It is because I don’t need printer drivers for my app which only does think like
-images and PDF manipulation.</p>
+<p>Please note that those files are large in size ~&gt; 3GB</p>
 
-<p>Once the compilation is completed, copy the binary <code>ghostscript-9.05/bin/gs</code> to <code>~/bin</code>.
-All binaries in <code>~/bin</code> will be available for your Heroku app now. You can verify
-if the binary works by:</p>
+<h2 id="install-vagrant">Install Vagrant</h2>
+
+<p>Head to http://vagrantup.com/ and download the package for your OS.</p>
+
+<h1 id="install-virtualbox">Install Virtualbox</h1>
+
+<p>Head to https://www.virtualbox.org/ and download the app for your OS.</p>
+
+<h1 id="import-the-vm-box">Import the VM box</h1>
+
+<p>Once you have downloaded the VM box, the image can be imported to your system. In my case:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gs --version
-</span><span class="line">9.05</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant box add travis-ruby travis-ruby.box</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>And please do not forget to clean up:</p>
+<p>If imported successfully, you should be able to see <code>travis-ruby</code> in the box list with:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ cd ~
-</span><span class="line">$ rm -rf ghostscript-9.05*</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant box list</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>If you feel lazy, you could download my Ruby-wrapper of gs at <a href="https://github.com/joneslee85/ruby-ghostscript">https://github.com/joneslee85/ruby-ghostscript</a>.</p>
+<h1 id="bootstrap">Bootstrap</h1>
+
+<p>Let’s get our box up so we could SSH and start playing around with it:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant init travis-ruby</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>A new <code>Vargrantfile</code> will be created for you in the current folder.
+We could bring the box up with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant up</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And now you can SSH into with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant ssh</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Once you are in the box terminal, we run the post-install script:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sh ./postinstall.sh</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This script install all essential packages like compilers, libraries.</p>
+
+<h1 id="debug-your-test">Debug your test</h1>
+
+<p>Copy your application to this VM box via <code>scp</code> or <code>git clone</code> and debug the test like you debug it on your local box.</p>
+
 </div>
 
 
@@ -182,21 +214,15 @@ if the binary works by:</p>
   
 
 
-<time datetime="2012-03-12T16:57:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2012-08-24T13:04:00+10:00" pubdate data-updated="true">Aug 24<span>th</span>, 2012</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/heroku/'>heroku</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/" data-via="" data-counturl="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/" data-via="" data-counturl="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -209,10 +235,8 @@ if the binary works by:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/" title="Previous Post: Exposing ActiveRecord model attributes to Liquid dynamically">&laquo; Exposing ActiveRecord model attributes to Liquid dynamically</a>
+        <a class="basic-alignment left" href="/install-postgres-dot-app-on-osx-10-dot-7-plus/" title="Previous Post: Install Postgres.app on OSX 10.7+">&laquo; Install Postgres.app on OSX 10.7+</a>
       
-      
-        <a class="basic-alignment right" href="/spree-1-1-stable-deployment-on-heroku/" title="Next Post: Spree 1.1 deployment on Heroku">Spree 1.1 deployment on Heroku &raquo;</a>
       
     </p>
   </footer>
@@ -293,8 +317,8 @@ if the binary works by:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/heroku/install-ghostscript-on-heroku/';
-        var disqus_url = 'http://ruby-journal.com/heroku/install-ghostscript-on-heroku/';
+        var disqus_identifier = 'http://ruby-journal.com/debug-your-failed-test-in-travis-ci/';
+        var disqus_url = 'http://ruby-journal.com/debug-your-failed-test-in-travis-ci/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-08-23T16:32:17+10:00</updated>
+  <updated>2012-08-24T13:27:51+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,102 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Debug your failed test in Travis CI]]></title>
+    <link href="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/"/>
+    <updated>2012-08-24T13:04:00+10:00</updated>
+    <id>http://ruby-journal.com/debug-your-failed-test-in-travis-ci</id>
+    <content type="html"><![CDATA[<h1 id="section"></h1>
+
+<p>Ever wondering why some tests passed locally but failed on Travis?
+Ever questioning how could I go about to debug why that failed test on remote Travis?
+Read on as I show you how</p>
+
+<p><br />
+<br />
+<br />
+<!--more--></p>
+
+<p>In one occassion, I had a failed Ruby test on Travis which infact passed on my local box. So I tried
+to put in <code>debugger</code> and see if Travis could let me drop into Irb or not. It turns out Travis hang
+for quite a while until timed out. So debug remotely doesn’t work.</p>
+
+<p>Right, plan B then. I spent some time dig into Travis documentation and learned that Travis server
+provisioned new VM image for every test. So if I could get my hand on the VMs, I could replicate the
+same environment that Travis run the test locally. Sound rational, doesn’t it? Unfortunately, I could
+not find any traces nor URL where to download those VMs. Thanks to Josh at Travis, he sent me the URL
+to VMs.</p>
+
+<h2 id="download-vm">Download VM</h2>
+
+<p>Travis VM are packaged Vagrant box.</p>
+
+<p>You coud download VM here at:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">files.travis-ci.org/boxes/provisioned/travis-(box_name).box</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>in which <code>(box_name)</code> is the language you use, <code>ruby</code>, <code>php</code>, etc.</p>
+
+<p>For my case, I was testing a Rails app, so I downloaded the ruby box:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">wget files.travis-ci.org/boxes/provisioned/travis-ruby.box</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please note that those files are large in size ~&gt; 3GB</p>
+
+<h2 id="install-vagrant">Install Vagrant</h2>
+
+<p>Head to http://vagrantup.com/ and download the package for your OS.</p>
+
+<h1 id="install-virtualbox">Install Virtualbox</h1>
+
+<p>Head to https://www.virtualbox.org/ and download the app for your OS.</p>
+
+<h1 id="import-the-vm-box">Import the VM box</h1>
+
+<p>Once you have downloaded the VM box, the image can be imported to your system. In my case:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant box add travis-ruby travis-ruby.box</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If imported successfully, you should be able to see <code>travis-ruby</code> in the box list with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant box list</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h1 id="bootstrap">Bootstrap</h1>
+
+<p>Let’s get our box up so we could SSH and start playing around with it:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant init travis-ruby</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>A new <code>Vargrantfile</code> will be created for you in the current folder.
+We could bring the box up with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant up</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And now you can SSH into with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant ssh</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Once you are in the box terminal, we run the post-install script:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sh ./postinstall.sh</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This script install all essential packages like compilers, libraries.</p>
+
+<h1 id="debug-your-test">Debug your test</h1>
+
+<p>Copy your application to this VM box via <code>scp</code> or <code>git clone</code> and debug the test like you debug it on your local box.</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Install Postgres.app on OSX 10.7+]]></title>

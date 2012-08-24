@@ -28,14 +28,18 @@
     </url>
     <url>
         <loc>http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/</loc>
-        <lastmod>2012-08-23T16:32:06+10:00</lastmod>
+        <lastmod>2012-08-24T13:27:18+10:00</lastmod>
+    </url>
+    <url>
+        <loc>http://ruby-journal.com/debug-your-failed-test-in-travis-ci/</loc>
+        <lastmod>2012-08-24T13:27:23+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2012-08-23T16:32:06+10:00</lastmod>
+        <lastmod>2012-08-24T13:27:23+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2012-08-23T16:32:06+10:00</lastmod>
+        <lastmod>2012-08-24T13:27:23+10:00</lastmod>
     </url>
 </urlset>
