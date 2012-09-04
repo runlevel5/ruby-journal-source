@@ -3,7 +3,7 @@ layout: post
 title: Spree 1.1 deployment on Heroku
 date: 2012-07-6 07:31
 comments: true
-categories: 
+categories:
 tags: spree, heroku, ruby, deployment, cedar stack
 author: "Trung Lê"
 ---
@@ -192,11 +192,11 @@ if nothing goes wrong, you would see:
       insert  config/routes.rb
 **************************************************
 We added the following line to your application's config/routes.rb file:
- 
+
     mount Spree::Core::Engine, :at => '/'
 **************************************************
 Spree has been installed successfully. You're all ready to go!
- 
+
 Enjoy!
 precompiling  assets
 ```
@@ -330,12 +330,12 @@ First, we install latest version of Rubygems-bunder:
 $ gem update rubygems-bundler
 ```
 
-Then install pre-release version of Bunlder 1.2.0, we have to uninstall the
+Then install Bundler 1.2.0 or newer, we have to uninstall the
 current version before installing:
 
 ```
 $ gem uninstall -ax bundler
-$ gem install bundler --pre
+$ gem install bundler
 ```
 
 Now we specify Ruby version in the Gemfile:
@@ -359,13 +359,13 @@ whatever minor version you expect.
 #### Set up Amazon S3 ####
 
 Heroku is diskless, thus assets storage is delegated to third-party cloud storage
-service like Amazon S3. 
+service like Amazon S3.
 
 
 #### Add SSL certificate ####
 
-By default, Spree production mode enforce SSL. This step is very optional, 
-please read [Disable SSL in Production] [disable_ssl] section if you want to disable SSL in Production mode. 
+By default, Spree production mode enforce SSL. This step is very optional,
+please read [Disable SSL in Production] [disable_ssl] section if you want to disable SSL in Production mode.
 
 A Piggyback SSL is a now standard feature on all Heroku apps so you don't have
 to enable. We are not going to buy a certificate for this test app. Instead, we are
@@ -545,7 +545,7 @@ the error:
 ```
 
 
-It make some sense though because Spree requires access to DB to complete this task and yet before you push to Heroku the environment config is not present. 
+It make some sense though because Spree requires access to DB to complete this task and yet before you push to Heroku the environment config is not present.
 
 So we have to disable precompile on intialize by set `config.assets.initialize_on_precompile` to `false` in `config/application.rb`
 
@@ -586,7 +586,7 @@ Spree 1.0 is a big major leap to previous versions. It is faster, more robust an
 much easier to install. Outstanding issue such as 'Superclass mistmach bug with Calculator::PriceBucket', 'Bootstraping migration run failed' are resolved. Yet
 there are possibly issues that I am not aware of, so please file a ticket on [GitHub Issues] [3] and I'll make sure it has my utmost attention.
 
-I'd like to extend my gratitude to the Spree community for the hardwork. 
+I'd like to extend my gratitude to the Spree community for the hardwork.
 
 [0]: http://michaelvanrooijen.com/articles/2011/06/01-more-concurrency-on-a-single-heroku-dyno-with-the-new-celadon-cedar-stack/ "More concurrency on a single Heroku dyno with the new Celadon Cedar stack"
 [1]: http://adam.heroku.com/past/2011/5/9/applying_the_unix_process_model_to_web_apps/ "Heroku Process Model"
