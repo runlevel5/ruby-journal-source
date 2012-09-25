@@ -58,13 +58,13 @@ default_asides: [custom/asides/about.html, asides/recent_posts.html, asides/gith
 # ----------------------- #
 
 # Github repositories
-github_user:
+github_user: joneslee85
 github_repo_count: 0
 github_show_profile_link: true
 github_skip_forks: true
 
 # Twitter
-twitter_user:
+twitter_user: joneslee85
 twitter_tweet_count: 4
 twitter_show_replies: false
 twitter_follow_button: true
