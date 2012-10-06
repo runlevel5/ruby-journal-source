@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-09-04T10:08:11+10:00</updated>
+  <updated>2012-10-06T16:08:38+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,177 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Install Ubuntu with PXE via OSX]]></title>
+    <link href="http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/"/>
+    <updated>2012-10-06T14:21:00+10:00</updated>
+    <id>http://ruby-journal.com/install-ubuntu-with-pxe-via-osx</id>
+    <content type="html"><![CDATA[<h1 id="section"></h1>
+
+<p>In this tutorial, I’ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts.</p>
+
+<!--more-->
+
+<h2 id="introduction">Introduction</h2>
+
+<p><a href="http://en.wikipedia.org/wiki/Preboot_Execution_Environment" title="Preboot Execution Environment on Wikipedia">The Preboot Execution Environment (PXE)</a> is widely used in enterprise environment for mass deployment, however it is not well-known in home and office environment because it is always easier to install Ubuntu Linux using traditional CD/DVD or USB storage devices method.</p>
+
+<p>If your box doesn’t have CD/DVD or USB storage devices, you can install Ubuntu using PXE. The concept is very simple, a computer that host TFTP server and the to-be-installed host support PXE.</p>
+
+<p>I adapt the concept to OSX to show you that you could achieve the same result with Mac OSX. In this tutorial, I use OSX 10.8.2. However, it should also work with older versions.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li><a href="http://cdimage.ubuntu.com/netboot/">Netboot installer for Ubuntu</a></li>
+  <li>TFTP Server</li>
+  <li>A PC that is to be installed to supports PXE</li>
+  <li>Fast and reliable Internet connection</li>
+  <li>Time and patience</li>
+</ul>
+
+<h2 id="download-ubuntu-netboot-installer">Download Ubuntu Netboot installer</h2>
+
+<p>We only need the netboot installer of Ubuntu, you don’t have to download a full ISO for the purpose. The file that we need to download is the <code>netboot.tar.gz</code> which can be found at <a href="http://cdimage.ubuntu.com/netboot/">http://cdimage.ubuntu.com/netboot/</a>.</p>
+
+<ol>
+  <li>Open your <em>Terminal.app</em></li>
+  <li>Use <em>curl</em> command to download the netboot installer:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ cd /tmp
+</span><span class="line">$ curl -O http://archive.ubuntu.com/ubuntu/dists/precise/main/installer-i386/current/images/netboot/netboot.tar.gz</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Extract <code>netboot.tar.gz</code> to suitable folder that we are going to use as TFTP root folder</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ mkdir ~/Downloads/tftp
+</span><span class="line">$ tar -xvzf netboot.tar.gz -C ~/Downloads/tftp</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Fix folder permissions:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo chown -R nobody:nogroup ~/Downloads/tftp</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="set-up-tftp-server">Set up TFTP server</h2>
+
+<h3 id="easy-setup-with-tftp-server-software">Easy setup with TFTP Server software</h3>
+
+<p>Though OSX comes with <code>tftp</code> command line, it still takes more steps to setup manually. Alternatively, you can download the TFTP Server. It provides a GUI to configure the built-in tftp server on OSX.</p>
+
+<ol>
+  <li>Download the <a href="http://ww2.unime.it/flr/tftpserver/">TFTP Server</a>.</li>
+  <li>Open the DMG file and drag the application into your Applications folder.</li>
+  <li>Open the <em>TftpServer.app</em>.</li>
+  <li>
+    <p>We will NOT use the default <code>/private/tftpboot</code> as root for TFTP server. From <em>TftpServer.app</em>’s screen, click on <em>Change Path</em> icon and select <code>Downloads/tftp</code> and you should see the path bar change to <code>/Users/yourusername/Downloads/tftp</code>.</p>
+  </li>
+  <li>
+    <p>Fixing folder permission by click on <em>Fix</em> buttons of both <code>Working path permission</code> and <code>Parentals folders permissions</code>. You should see <code>Attributes OK</code> if all goes well.</p>
+  </li>
+  <li>Start the server by clicking on <em>Start TFTP</em>. You should see <em>Server Status</em> change to <code>Running</code>.</li>
+</ol>
+
+<h3 id="hard-setup-using-built-in-tftp-server">Hard setup using built-in tftp server</h3>
+
+<p>For whom who want to set up the <code>tftp</code> manually via CLI.</p>
+
+<ol>
+  <li>Configure the server by modify the <code>tftp.plist</code> into a suitable folder for modification:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ cp /System/Library/LaunchDaemons/tftp.plist /tmp</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Edit the file <code>/tmp/tftp.plist</code> and change:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;key&gt;Disabled&lt;/key&gt;
+</span><span class="line">&lt;true/&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>to</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;key&gt;Disabled&lt;/key&gt;
+</span><span class="line">&lt;false/&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>also modify your TFTP root folder into the <code>&lt;array&gt;</code> section:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;array&gt;
+</span><span class="line">  &lt;string&gt;/usr/libexec/tftpd&lt;/string&gt;
+</span><span class="line">  &lt;string&gt;-s&lt;/string&gt;
+</span><span class="line">  &lt;string&gt;/Users/yourusername/Downloads/tftp&lt;/string&gt;
+</span><span class="line">&lt;/array&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Backup the existing configuration file:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo mv /System/Library/LaunchDaemons/tftp.plist /System/Library/LaunchDaemons/tftp.plist.backup</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Copy our configuration file into <code>/System/Library/LaunchDaemons/</code>:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo mv /tmp/tftp.plist /System/Library/LaunchDaemons</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Start the server with:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo launchctl load -F /System/Library/LaunchDaemons/tftp.plist</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>OR</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo launchctl start com.apple.tftpd</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Once installation is finished, you could disable it with:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo launchctl unload -F /System/Library/LaunchDaemons/tftp.plist</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>OR</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo launchctl stop com.apple.tftpd</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="set-up-dhcp-server-optional">Set up DHCP server (Optional)</h2>
+
+<p>In concept, PXE-bootable device will look for DHCP service in order to receive available PXE boot server. If you don’t have a DHCP servive running locally in router or in your LAN, you have to set up a DHCP server.</p>
+
+<p>If you are using OSX Server, it’ll be relatively easy to setup DHCP server. If you are using non-server version, OSX does come with a built-in DHCP server called <code>bootpd</code>, which offer services for DHCP and BOOTP. In fact, this technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. You can read more about this from <a href="http://www.jacquesf.com/2011/04/mac-os-x-dhcp-server/" title="Mac OSX DHCP Server">Jacques Fortier’s blog</a>.</p>
+
+<h2 id="booting-ubuntu">Booting Ubuntu</h2>
+
+<p>To boot from TFTP, you need to configure your PC to boot from the network interface in the BIOS.</p>
+
+<p>Once booting into the installer, you can install Ubuntu by having sources download for a mirror.</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Debug your failed test in Travis CI]]></title>

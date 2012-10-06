@@ -9,8 +9,7 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Ever wondering why some tests passed locally but failed on Travis?
-Ever questioning how could I go about to debug why that failed test on remote &hellip;">
+  <meta name="description" content=" In this tutorial, I’ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts. ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +75,51 @@ Ever questioning how could I go about to debug why that failed test on remote &h
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/install-ubuntu-with-pxe-via-osx/">Install Ubuntu With PXE via OSX</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-06T14:21:00+10:00" pubdate data-updated="true">Oct 6<span>th</span>, 2012</time>
+        
+         | <a href="/install-ubuntu-with-pxe-via-osx/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1 id="section"></h1>
+
+<p>In this tutorial, I’ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/install-ubuntu-with-pxe-via-osx/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -640,6 +684,10 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/install-ubuntu-with-pxe-via-osx/">Install Ubuntu with PXE via OSX</a>
+      </li>
+    
+      <li class="post">
         <a href="/debug-your-failed-test-in-travis-ci/">Debug your failed test in Travis CI</a>
       </li>
     
@@ -655,13 +703,54 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
         <a href="/heroku/install-ghostscript-on-heroku/">Install Ghostscript on Heroku Cedar</a>
       </li>
     
-      <li class="post">
-        <a href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">Exposing ActiveRecord model attributes to Liquid dynamically</a>
-      </li>
-    
   </ul>
 </section>
 
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/joneslee85">@joneslee85</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'joneslee85',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("joneslee85", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/joneslee85" class="twitter-follow-button" data-show-count="false">Follow @joneslee85</a>
+  
+</section>
 
 
 

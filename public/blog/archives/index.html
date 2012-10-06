@@ -9,10 +9,10 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Blog Archive 2012 Debug your failed test in Travis CI
+  <meta name="description" content="Blog Archive 2012 Install Ubuntu with PXE via OSX
+Oct 06 2012 Debug your failed test in Travis CI
 Aug 24 2012 Install Postgres.app on OSX 10.7+
-Aug 23 2012 Spree 1.1 deployment on Heroku
-Jul &hellip;">
+Aug &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,6 +90,16 @@ Jul &hellip;">
 
   
   <h2>2012</h2>
+
+<article>
+  
+<h1><a href="/install-ubuntu-with-pxe-via-osx/">Install Ubuntu with PXE via OSX</a></h1>
+<time datetime="2012-10-06T14:21:00+10:00" pubdate><span class='month'>Oct</span> <span class='day'>06</span> <span class='year'>2012</span></time>
+
+
+</article>
+
+
 
 <article>
   
@@ -204,6 +214,10 @@ Jul &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/install-ubuntu-with-pxe-via-osx/">Install Ubuntu with PXE via OSX</a>
+      </li>
+    
+      <li class="post">
         <a href="/debug-your-failed-test-in-travis-ci/">Debug your failed test in Travis CI</a>
       </li>
     
@@ -219,13 +233,54 @@ Jul &hellip;">
         <a href="/heroku/install-ghostscript-on-heroku/">Install Ghostscript on Heroku Cedar</a>
       </li>
     
-      <li class="post">
-        <a href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">Exposing ActiveRecord model attributes to Liquid dynamically</a>
-      </li>
-    
   </ul>
 </section>
 
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/joneslee85">@joneslee85</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'joneslee85',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("joneslee85", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/joneslee85" class="twitter-follow-button" data-show-count="false">Follow @joneslee85</a>
+  
+</section>
 
 
 
