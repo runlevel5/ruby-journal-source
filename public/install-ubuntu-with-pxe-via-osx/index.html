@@ -254,11 +254,123 @@
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">$ sudo launchctl stop com.apple.tftpd</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<h2 id="set-up-dhcp-server-optional">Set up DHCP server (Optional)</h2>
+<h2 id="set-up-dhcp-server">Set up DHCP server</h2>
 
 <p>In concept, PXE-bootable device will look for DHCP service in order to receive available PXE boot server. If you don’t have a DHCP servive running locally in router or in your LAN, you have to set up a DHCP server.</p>
 
-<p>If you are using OSX Server, it’ll be relatively easy to setup DHCP server. If you are using non-server version, OSX does come with a built-in DHCP server called <code>bootpd</code>, which offer services for DHCP and BOOTP. In fact, this technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. You can read more about this from <a href="http://www.jacquesf.com/2011/04/mac-os-x-dhcp-server/" title="Mac OSX DHCP Server">Jacques Fortier’s blog</a>.</p>
+<p>OSX does come with a built-in BOOTP server called <code>bootpd</code>, which offer also offer DHCP service. This technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. I adapt instructions at <a href="http://www.jacquesf.com/2011/04/mac-os-x-dhcp-server/" title="Mac OSX DHCP Server">Jacques Fortier’s blog</a> for this tutorial.</p>
+
+<ol>
+  <li>Create <code>/etc/bootpd.plist</code> with content:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+</span><span class="line">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+</span><span class="line">&lt;plist version="1.0"&gt;
+</span><span class="line">&lt;dict&gt;
+</span><span class="line">    &lt;key&gt;bootp_enabled&lt;/key&gt;
+</span><span class="line">    &lt;false/&gt;
+</span><span class="line">    &lt;key&gt;detect_other_dhcp_server&lt;/key&gt;
+</span><span class="line">    &lt;integer&gt;1&lt;/integer&gt;
+</span><span class="line">    &lt;key&gt;dhcp_enabled&lt;/key&gt;
+</span><span class="line">    &lt;array&gt;
+</span><span class="line">        &lt;string&gt;en0&lt;/string&gt;
+</span><span class="line">    &lt;/array&gt;
+</span><span class="line">    &lt;key&gt;reply_threshold_seconds&lt;/key&gt;
+</span><span class="line">    &lt;integer&gt;0&lt;/integer&gt;
+</span><span class="line">    &lt;key&gt;Subnets&lt;/key&gt;
+</span><span class="line">    &lt;array&gt;
+</span><span class="line">        &lt;dict&gt;
+</span><span class="line">            &lt;key&gt;allocate&lt;/key&gt;
+</span><span class="line">            &lt;true/&gt;
+</span><span class="line">            &lt;key&gt;lease_max&lt;/key&gt;
+</span><span class="line">            &lt;integer&gt;86400&lt;/integer&gt;
+</span><span class="line">            &lt;key&gt;lease_min&lt;/key&gt;
+</span><span class="line">            &lt;integer&gt;86400&lt;/integer&gt;
+</span><span class="line">            &lt;key&gt;name&lt;/key&gt;
+</span><span class="line">            &lt;string&gt;192.168.1&lt;/string&gt;
+</span><span class="line">            &lt;key&gt;net_address&lt;/key&gt;
+</span><span class="line">            &lt;string&gt;192.168.1.0&lt;/string&gt;
+</span><span class="line">            &lt;key&gt;net_mask&lt;/key&gt;
+</span><span class="line">            &lt;string&gt;255.255.255.0&lt;/string&gt;
+</span><span class="line">            &lt;key&gt;net_range&lt;/key&gt;
+</span><span class="line">            &lt;array&gt;
+</span><span class="line">                &lt;string&gt;192.168.1.101&lt;/string&gt;
+</span><span class="line">                &lt;string&gt;192.168.1.202&lt;/string&gt;
+</span><span class="line">            &lt;/array&gt;
+</span><span class="line">        &lt;/dict&gt;
+</span><span class="line">    &lt;/array&gt;
+</span><span class="line">&lt;/dict&gt;
+</span><span class="line">&lt;/plist&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The config file assume that the network address is 192.168.1.0 and the DHCP allocation pool is from .101 to .102.</p>
+
+<ol>
+  <li>To assign static IP address to our to-be-installed host, we create file <code>/etc/bootptab</code>:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">%%
+</span><span class="line"># machine entries have the following format:
+</span><span class="line">#
+</span><span class="line"># hostname      hwtype  hwaddr              ipaddr          bootfile
+</span><span class="line">client1         1       00:1f:16:08:61:96   192.168.1.105   pxelinux.0</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>To start the server, run the following command:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo /bin/launchctl load -w /System/Library/LaunchDaemons/bootps.plist</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Once done, stop the server with command:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo /bin/launchctl unload -w /System/Library/LaunchDaemons/bootps.plist</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h2 id="booting-ubuntu">Booting Ubuntu</h2>
 
