@@ -175,7 +175,7 @@ host netbook {
 }
 ```
 
-in which `X.X.X` is your network address, 'Y.Y.Y' is your subnet mask, `??:??:??:??:??:??` is the MAC address of the box you want to install to and finally Z.Z.Z.Z is the address of TFTP server.
+in which `X.X.X` is your network address, `Y.Y.Y` is your subnet mask, `??:??:??:??:??:??` is the MAC address of the box you want to install to and finally `Z.Z.Z.Z` is the address of TFTP server.
 
 3. Start the server with:
 
