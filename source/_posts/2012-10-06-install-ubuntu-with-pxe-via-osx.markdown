@@ -144,6 +144,53 @@ $ sudo launchctl stop com.apple.tftpd
 
 In concept, PXE-bootable device will look for DHCP service in order to receive available PXE boot server. If you don't have a DHCP servive running locally in router or in your LAN, you have to set up a DHCP server.
 
+### With isc-dchpd
+
+1. Install isc-dhcpd with Homebrew:
+
+```
+$ brew install isc-dhcp
+```
+
+2. Create configuration file at `/usr/local/etc/dhcpd.conf`:
+
+```
+default-lease-time 600;
+max-lease-time 7200;
+
+subnet X.X.X.0 netmask Y.Y.Y.0 {
+  range X.X.X.151 X.X.X.205;
+}
+
+option domain-name-servers 8.8.8.8;
+
+host netbook {
+  hardware ethernet ??:??:??:??:??:??;
+  filename "pxelinux.0";
+  next-server Z.Z.Z.Z; # the IP address of your TFTP server
+  fixed-address X.X.X.202;
+  option subnet-mask Y.Y.Y.0;
+  option broadcast-address X.X.X.255;
+  option routers X.X.X.1;
+}
+```
+
+in which `X.X.X` is your network address, 'Y.Y.Y' is your subnet mask, `??:??:??:??:??:??` is the MAC address of the box you want to install to and finally Z.Z.Z.Z is the address of TFTP server.
+
+3. Start the server with:
+
+```
+$ sudo /usr/local/sbin/dhcpd -f -d -cf /usr/local/etc/dhcpd.conf
+```
+
+4. Once the installation finished, clean up with:
+
+```
+$ homebrew uninstall isc-dhcp
+```
+
+### With built-in bootpd
+
 OSX does come with a built-in BOOTP server called `bootpd`, which offer also offer DHCP service. This technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. I adapt instructions at [Jacques Fortier's blog][0] for this tutorial.
 
 1. Create `/etc/bootpd.plist` with content:
