@@ -140,11 +140,78 @@ OR
 $ sudo launchctl stop com.apple.tftpd
 ```
 
-## Set up DHCP server (Optional)
+## Set up DHCP server
 
 In concept, PXE-bootable device will look for DHCP service in order to receive available PXE boot server. If you don't have a DHCP servive running locally in router or in your LAN, you have to set up a DHCP server.
 
-If you are using OSX Server, it'll be relatively easy to setup DHCP server. If you are using non-server version, OSX does come with a built-in DHCP server called `bootpd`, which offer services for DHCP and BOOTP. In fact, this technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. You can read more about this from [Jacques Fortier's blog][0].
+OSX does come with a built-in BOOTP server called `bootpd`, which offer also offer DHCP service. This technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. I adapt instructions at [Jacques Fortier's blog][0] for this tutorial.
+
+1. Create `/etc/bootpd.plist` with content:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>bootp_enabled</key>
+    <false/>
+    <key>detect_other_dhcp_server</key>
+    <integer>1</integer>
+    <key>dhcp_enabled</key>
+    <array>
+        <string>en0</string>
+    </array>
+    <key>reply_threshold_seconds</key>
+    <integer>0</integer>
+    <key>Subnets</key>
+    <array>
+        <dict>
+            <key>allocate</key>
+            <true/>
+            <key>lease_max</key>
+            <integer>86400</integer>
+            <key>lease_min</key>
+            <integer>86400</integer>
+            <key>name</key>
+            <string>192.168.1</string>
+            <key>net_address</key>
+            <string>192.168.1.0</string>
+            <key>net_mask</key>
+            <string>255.255.255.0</string>
+            <key>net_range</key>
+            <array>
+                <string>192.168.1.101</string>
+                <string>192.168.1.202</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
+```
+
+The config file assume that the network address is 192.168.1.0 and the DHCP allocation pool is from .101 to .102.
+
+2. To assign static IP address to our to-be-installed host, we create file `/etc/bootptab`:
+
+```
+%%
+# machine entries have the following format:
+#
+# hostname      hwtype  hwaddr              ipaddr          bootfile
+client1         1       00:1f:16:08:61:96   192.168.1.105   pxelinux.0
+```
+
+2. To start the server, run the following command:
+
+```
+$ sudo /bin/launchctl load -w /System/Library/LaunchDaemons/bootps.plist
+```
+
+3. Once done, stop the server with command:
+
+```
+$ sudo /bin/launchctl unload -w /System/Library/LaunchDaemons/bootps.plist
+```
 
 ## Booting Ubuntu
 
