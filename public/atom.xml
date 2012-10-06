@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-10-06T17:24:22+10:00</updated>
+  <updated>2012-10-06T17:25:41+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -237,7 +237,7 @@
 </ol>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ homebrew uninstall isc-dhcp</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ brew uninstall isc-dhcp</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h3 id="with-built-in-bootpd">With built-in bootpd</h3>
 

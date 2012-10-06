@@ -186,7 +186,7 @@ $ sudo /usr/local/sbin/dhcpd -f -d -cf /usr/local/etc/dhcpd.conf
 4. Once the installation finished, clean up with:
 
 ```
-$ homebrew uninstall isc-dhcp
+$ brew uninstall isc-dhcp
 ```
 
 ### With built-in bootpd
