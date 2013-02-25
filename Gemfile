@@ -1,4 +1,5 @@
-source "http://rubygems.org"
+source 'http://rubygems.org'
+ruby '2.0.0'
 
 group :development do
   gem 'rake', '~> 0.9'
@@ -19,4 +20,4 @@ group :production do
   gem 'puma'
 end
 
-gem 'sinatra', '~> 1.3.3'
+gem 'sinatra', '~> 1.3.5'

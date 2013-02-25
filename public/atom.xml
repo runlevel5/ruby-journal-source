@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2012-10-06T17:25:41+10:00</updated>
+  <updated>2013-02-26T00:21:17+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -18,7 +18,7 @@
     <link href="http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/"/>
     <updated>2012-10-06T14:21:00+10:00</updated>
     <id>http://ruby-journal.com/install-ubuntu-with-pxe-via-osx</id>
-    <content type="html"><![CDATA[<h1 id="section"></h1>
+    <content type="html"><![CDATA[<p>#  #</p>
 
 <p>In this tutorial, I’ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts.</p>
 
@@ -369,7 +369,7 @@
     <link href="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/"/>
     <updated>2012-08-24T13:04:00+10:00</updated>
     <id>http://ruby-journal.com/debug-your-failed-test-in-travis-ci</id>
-    <content type="html"><![CDATA[<h1 id="section"></h1>
+    <content type="html"><![CDATA[<p>#  #</p>
 
 <p>Ever wondering why some tests passed locally but failed on Travis?
 Ever questioning how could I go about to debug why that failed test on remote Travis?
@@ -467,7 +467,7 @@ We could bring the box up with:</p>
     <id>http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus</id>
     <content type="html"><![CDATA[<p><img class="left" src="http://ruby-journal.com/images/netsuke.png" /></p>
 
-<h1 id="section"></h1>
+<p>#  #</p>
 
 <p>Traditionally, pogstgresql is installed manually with MacPort or Homebrew on Mac OSX 10.7+. I used
 to have lots of problem with the setup for the installation as it requires Xcode, this libs and that libs, etc.
@@ -490,7 +490,7 @@ icon into your Applications folder.</p>
 <h2 id="configuration">Configuration</h2>
 
 <p>No configuration at all! Simply click on Postgres.app to start it and the app will reside in your top bar tray (elephant icon).
-You can set it to start on start up by click on Elephant Icon on top bar tray and click Automatically Start on Login. That&rsquo;s it, dead simple compare to
+You can set it to start on start up by click on Elephant Icon on top bar tray and click Automatically Start on Login. That’s it, dead simple compare to
 setting up plist launcher file.</p>
 
 <p>PostgreSQL ships with a constellation of useful binaries, like <code>pg_dump</code> or <code>pg_restore</code>, that you will likely want to use.
@@ -536,7 +536,7 @@ Go ahead and add the <code>/bin</code> directory that ships with Postgres.app to
     <link href="http://ruby-journal.com/spree-1-1-stable-deployment-on-heroku/"/>
     <updated>2012-07-06T07:31:00+10:00</updated>
     <id>http://ruby-journal.com/spree-1-1-stable-deployment-on-heroku</id>
-    <content type="html"><![CDATA[<h1 id="section"></h1>
+    <content type="html"><![CDATA[<p>#  #</p>
 
 <p>In this tutorial, I will show you how to create a Spree application on your local
 box, configure and push it to Heroku.</p>
@@ -1196,7 +1196,7 @@ there are possibly issues that I am not aware of, so please file a ticket on <a 
     <link href="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/"/>
     <updated>2012-03-12T16:57:00+11:00</updated>
     <id>http://ruby-journal.com/heroku/install-ghostscript-on-heroku</id>
-    <content type="html"><![CDATA[<h1 id="section"></h1>
+    <content type="html"><![CDATA[<p>#  #</p>
 
 <p>In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
 As you might have known that Heroku virtual machine does come with a system-wide
@@ -1260,7 +1260,7 @@ if the binary works by:</p>
     <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
     <updated>2012-03-12T12:52:00+11:00</updated>
     <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
-    <content type="html"><![CDATA[<h1 id="section"></h1>
+    <content type="html"><![CDATA[<p>#  #</p>
 
 <p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
 used with rails. It is quite common that you have to expose ActiveRecord attributes
@@ -1317,7 +1317,7 @@ you want to be exposed to Liquid:</p>
     <link href="http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/"/>
     <updated>2012-03-09T15:16:00+11:00</updated>
     <id>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association</id>
-    <content type="html"><![CDATA[<h1 id="section"></h1>
+    <content type="html"><![CDATA[<p>#  #</p>
 
 <p>It is more than often that you have to write a fixtures for models with polymorphic
 association. In this short tutorial, I will show you how to use few shortcut trick
@@ -1393,9 +1393,9 @@ Without that, the fixtures will set <code>borrowable_type</code> to <code>nil</c
     <id>http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat</id>
     <content type="html"><![CDATA[<p><img class="left" src="http://ruby-journal.com/images/octocat/dr-octocat.png" width="448" height="448" title="'Dr. Indy Cat'" /></p>
 
-<h1 id="section"></h1>
+<p>#  #</p>
 
-<p>I&rsquo;ve been a fan of Indiana Jones and GitHub. So I made a request for
+<p>I’ve been a fan of Indiana Jones and GitHub. So I made a request for
 my brother <a href="https://github.com/modology">Huey</a> and guess what he gave me. I just hope this artwork could be
 featured in the Octodex.</p>
 
@@ -1416,7 +1416,7 @@ featured in the Octodex.</p>
     <id>http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku</id>
     <content type="html"><![CDATA[<p><img class="left" src="http://ruby-journal.com/images/spree-1.0.0-release-ribbon.png" /></p>
 
-<h1 id="section"></h1>
+<p>#  #</p>
 
 <p>Spree is without a doubt a de-facto eCommerce stack of Ruby world. Yet to many Spree
 is still a pandora box. In this tutorial, I will try to go through step by step
