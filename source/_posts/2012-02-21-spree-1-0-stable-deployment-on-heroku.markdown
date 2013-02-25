@@ -31,27 +31,24 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
 Install Heroku toolbelt via Rubygems:
 
 ```
-$ gem install heroku
+gem install heroku
 ```
 
-If you have installed Heroku, please ensure you update to version 2.1.0 or higher
-for Cedar support:
+If you have installed Heroku, please ensure you update to version 2.1.0 or higher for Cedar support:
 
 ```
-$ heroku update
-$ heroku --version
-heroku-gem/2.28.7 (x86_64-darwin12.0.0) ruby/1.9.3
+heroku update
+heroku --version
+heroku-toolbelt/2.35.0 (x86_64-darwin10.8.0) ruby/1.9.3
 ```
 
 #### Ruby ####
 
-By default, Heroku Cedar stack uses Ruby 1.9.2. However, I will use Ruby 1.9.3
-for this tutorial.
+By default, Heroku Cedar stack uses Ruby 1.9.3. And normally it is always the latest minor version, so it is recommended you to install the latest version on your local box:
 
-If you haven't installed Ruby 1.9.3-p194 on your box, please do so:
 
 ```
-$ rvm install 1.9.3-p194
+rvm get stable; rvm install 1.9.3; rvm reload
 ```
 
 I use RVM to manage rubies versions on my box, you can adapt this technique
@@ -59,31 +56,30 @@ if you use rbenv or precompiled binary package
 
 #### Ruby On Rails ####
 
-Spree 1.0.x leaves the choice of rails version to you. You can choose version
-`3.1.1` to `3.1.6`. It is highly recommended that you go for `3.1.6`.
+Spree 1.0.7 supports rails 3.1.10
 
 ```
-$ gem install rails -v=3.1.6
+gem install rails -v=3.1.10
 ```
 
 #### Spree ####
 
 ```
-$ gem install spree -v=1.0.4
+gem install spree -v=1.0.7
 ```
 
 Check installed spree gems:
 
 ```
-$ gem list | grep 'spree'
-spree (1.0.4)
-spree_api (1.0.4)
-spree_auth (1.0.4)
-spree_cmd (1.0.4)
-spree_core (1.0.4)
-spree_dash (1.0.4)
-spree_promo (1.0.4)
-spree_sample (1.0.4)
+gem list | grep 'spree'
+spree (1.0.7)
+spree_api (1.0.7)
+spree_auth (1.0.7)
+spree_cmd (1.0.7)
+spree_core (1.0.7)
+spree_dash (1.0.7)
+spree_promo (1.0.7)
+spree_sample (1.0.7)
 ```
 
 `spree` gem consists of many components, however please note that you only need `spree_core`
@@ -106,7 +102,7 @@ You can install the Postgres.app from Heroku guys at [http://postgresapp.com/][p
 If you aren't in a rush, PostgeSQL can be installed with Homebrew:
 
 ```
-$ brew install postgresql
+brew install postgresql
 ```
 
 Though I do not recommend this method because you might bump into issues with compilation.
@@ -117,7 +113,7 @@ Please make sure you read the Build Notes after the installation.
 Now we need to install `pg` gem too:
 
 ```
-$ gem install pg
+gem install pg
 ```
 
 #### ImageMagick ####
@@ -126,7 +122,7 @@ Spree uses `paperclip` gem which in turn require imagemagick. You search on Goog
 for binary DMG package or for my case, I install it with Homebrew:
 
 ```
-$ brew install imagemagick
+brew install imagemagick
 ```
 
 ## Prepare local application ##
@@ -134,7 +130,7 @@ $ brew install imagemagick
 Create a new rails app default to postgreSQL
 
 ```
-rails _3.1.6_ new fool-man-chew -d postgresql
+rails _3.1.10_ new fool-man-chew -d postgresql
 ```
 Configure database setting by editing `config/database.yml`.
 
@@ -161,7 +157,7 @@ production:
 then create the DB tables:
 
 ```
-$ bundle exec rake db:create:all
+bundle exec rake db:create:all
 ```
 
 ## Bootstraping on local box ##
@@ -221,20 +217,20 @@ precompiling  assets
 You could manually append `spree` gem into the end of your `Gemfile`:
 
 ```
-gem 'spree', '~> 1.0.4'
+gem 'spree', '~> 1.0.7'
 ```
 
 If you have not yet run `bundle install`, please run it now:
 
 ```
-$ bundle install
+bundle install
 ```
 
 Next we invoke Spree install generator to copy migrations, initializers and
 generate sample data:
 
 ```
-$ rails g spree:install
+rails g spree:install
 ```
 
 OR
@@ -242,16 +238,16 @@ OR
 Bootstraping manually with command:
 
 ```
-$ bundle exec rake spree:install:migrations
-$ bundle exec rake db:migrate
-$ bundle exec rake db:seed
-$ bundle exec rake spree_sample:load
+bundle exec rake spree:install:migrations
+bundle exec rake db:migrate
+bundle exec rake db:seed
+bundle exec rake spree_sample:load
 ```
 
 Once the bootstrap is finished, we need to precompile our assets too:
 
 ```
-$ bundle exec rake assets:precompile:nondigest
+bundle exec rake assets:precompile:nondigest
 ```
 
 ## Deploy to Heroku ##
@@ -273,7 +269,7 @@ end
 and install the gem with:
 
 ```
-$ bundle install
+bundle install
 ```
 
 The great thing about Cedar stack is that Heroku introduces a new way to scale your app,
@@ -304,7 +300,7 @@ gem 'spree_heroku', :git => 'git://github.com/joneslee85/spree-heroku.git', :bra
 then
 
 ```
-$ bundle install
+bundle install
 ```
 
 Next, we create a new bucket 'fool-man-chew_production' under US Standard region via AWS Management Console.
@@ -315,9 +311,9 @@ settings.
 First one is to create Heroku config vars (recommended way):
 
 ```
-$ heroku config:add S3_KEY='your_access_key'
-$ heroku config:add S3_SECRET='secret_access_key'
-$ heroku config:add S3_BUCKET='fool-man-chew_production'
+heroku config:add S3_KEY='your_access_key'
+heroku config:add S3_SECRET='secret_access_key'
+heroku config:add S3_BUCKET='fool-man-chew_production'
 ```
 
 The second is to create a new file under `config/s3.yml` and modify the key in accordance to your S3 account:
@@ -334,7 +330,7 @@ production:
 We are going to create an Cedar stack app:
 
 ```
-$ heroku apps:create smooth-autumn-7451
+heroku apps:create smooth-autumn-7451
 ```
 
 If success, you would see below output:
@@ -348,57 +344,9 @@ Git remote heroku added
 and double check git remote you would see heroku remote listed:
 
 ```
-$ git remote show
+git remote show
 heroku
 ```
-
-#### Use ruby-1.9.3 on Heroku ####
-
-Cedar stack default to ruby-1.9.2, however Spree has been tested with
-`ruby-1.9.3` so I highly recommended you to use same version for production.
-
-*UPDATE*: After March 19, 2012, Heroku has deprecated installing Ruby 1.9.3 using
-heroku-labs plugin. So it is uncesssary to setup RUBY_VERSION variable or to set up
-PATH config variable to include 'bin'.
-
-The new way is to specify the Ruby version in the `Gemfile`.
-Unfortunately, as of 3 July 2012, the unreleased version 1.2.0.pre.1 is the only
-version that support the feature. So we will go with this unrelease version.
-
-You could read more about [Selecting a version of Ruby] [55].
-
-First, we install latest version of Rubygems-bundler:
-
-```
-$ gem update rubygems-bundler
-```
-
-Then install Bundler 1.2.0 or newer, we have to uninstall the
-current version before installing:
-
-```
-$ gem uninstall -ax bundler
-$ gem install bundler
-```
-
-Now we specify Ruby version in the `Gemfile`:
-
-```
-source 'http://rubygems.org'
-
-ruby '1.9.3'
-```
-
-then
-
-```
-bundle install
-```
-
-*NOTE*: It is no longer possible to explicitly specify a patch level for a Ruby
-version (such as ruby-1.9.3-p194), Heroku provides the most secure patch level of
-whatever minor version you expect.
-
 
 #### Add SSL certificate ####
 
@@ -466,16 +414,7 @@ If all goes well, you would see following output:
 ```
 -----> Heroku receiving push
 -----> Ruby/Rails app detected
------> Using RUBY_VERSION: ruby-1.9.3-p194
------> Installing dependencies using Bundler version 1.1.rc.7
-       Running: bundle install --without development:test --path vendor/bundle --binstubs bin/ --deployment
-       Fetching gem metadata from http://rubygems.org/.......
-       Fetching gem metadata from http://rubygems.org/..
-       Fetching git://github.com/joneslee85/spree-heroku.git
-       Using rake (0.9.2.2)
-       ....
-       Writing config/database.yml to read from DATABASE_URL
------> Preparing app for Rails asset pipeline
+...
        Detected manifest.yml, assuming assets were compiled locally
 -----> Rails plugin injection
        Injecting rails_log_stdout

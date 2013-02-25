@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-02-26T00:21:17+11:00</updated>
+  <updated>2013-02-26T00:40:44+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -1437,43 +1437,38 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
 <p>Install Heroku toolbelt via Rubygems:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gem install heroku</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem install heroku</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>If you have installed Heroku, please ensure you update to version 2.1.0 or higher
-for Cedar support:</p>
+<p>If you have installed Heroku, please ensure you update to version 2.1.0 or higher for Cedar support:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku update
-</span><span class="line">$ heroku --version
-</span><span class="line">heroku-gem/2.28.7 (x86_64-darwin12.0.0) ruby/1.9.3</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">heroku update
+</span><span class="line">heroku --version
+</span><span class="line">heroku-toolbelt/2.35.0 (x86_64-darwin10.8.0) ruby/1.9.3</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h4 id="ruby">Ruby</h4>
 
-<p>By default, Heroku Cedar stack uses Ruby 1.9.2. However, I will use Ruby 1.9.3
-for this tutorial.</p>
-
-<p>If you haven’t installed Ruby 1.9.3-p194 on your box, please do so:</p>
+<p>By default, Heroku Cedar stack uses Ruby 1.9.3. And normally it is always the latest minor version, so it is recommended you to install the latest version on your local box:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ rvm install 1.9.3-p194</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm get stable; rvm install 1.9.3; rvm reload</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>I use RVM to manage rubies versions on my box, you can adapt this technique
 if you use rbenv or precompiled binary package</p>
 
 <h4 id="ruby-on-rails">Ruby On Rails</h4>
 
-<p>Spree 1.0.x leaves the choice of rails version to you. You can choose version
-<code>3.1.1</code> to <code>3.1.6</code>. It is highly recommended that you go for <code>3.1.6</code>.</p>
+<p>Spree 1.0.7 supports rails 3.1.10</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gem install rails -v=3.1.6</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem install rails -v=3.1.10</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h4 id="spree">Spree</h4>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gem install spree -v=1.0.4</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem install spree -v=1.0.7</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Check installed spree gems:</p>
 
@@ -1486,15 +1481,15 @@ if you use rbenv or precompiled binary package</p>
 <span class="line-number">7</span>
 <span class="line-number">8</span>
 <span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gem list | grep 'spree'
-</span><span class="line">spree (1.0.4)
-</span><span class="line">spree_api (1.0.4)
-</span><span class="line">spree_auth (1.0.4)
-</span><span class="line">spree_cmd (1.0.4)
-</span><span class="line">spree_core (1.0.4)
-</span><span class="line">spree_dash (1.0.4)
-</span><span class="line">spree_promo (1.0.4)
-</span><span class="line">spree_sample (1.0.4)</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem list | grep 'spree'
+</span><span class="line">spree (1.0.7)
+</span><span class="line">spree_api (1.0.7)
+</span><span class="line">spree_auth (1.0.7)
+</span><span class="line">spree_cmd (1.0.7)
+</span><span class="line">spree_core (1.0.7)
+</span><span class="line">spree_dash (1.0.7)
+</span><span class="line">spree_promo (1.0.7)
+</span><span class="line">spree_sample (1.0.7)</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p><code>spree</code> gem consists of many components, however please note that you only need <code>spree_core</code>
 to build an online store.</p>
@@ -1515,7 +1510,7 @@ environment use the same DB.</p>
 <p>If you aren’t in a rush, PostgeSQL can be installed with Homebrew:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ brew install postgresql</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">brew install postgresql</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Though I do not recommend this method because you might bump into issues with compilation.
 Please make sure you read the Build Notes after the installation.</p>
@@ -1525,7 +1520,7 @@ Please make sure you read the Build Notes after the installation.</p>
 <p>Now we need to install <code>pg</code> gem too:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gem install pg</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem install pg</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h4 id="imagemagick">ImageMagick</h4>
 
@@ -1533,14 +1528,14 @@ Please make sure you read the Build Notes after the installation.</p>
 for binary DMG package or for my case, I install it with Homebrew:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ brew install imagemagick</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">brew install imagemagick</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h2 id="prepare-local-application">Prepare local application</h2>
 
 <p>Create a new rails app default to postgreSQL</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rails _3.1.6_ new fool-man-chew -d postgresql</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">rails _3.1.10_ new fool-man-chew -d postgresql</span></code></pre></td></tr></table></div></figure></notextile></div>
 <p>Configure database setting by editing <code>config/database.yml</code>.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
@@ -1581,7 +1576,7 @@ for binary DMG package or for my case, I install it with Homebrew:</p>
 <p>then create the DB tables:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec rake db:create:all</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec rake db:create:all</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h2 id="bootstraping-on-local-box">Bootstraping on local box</h2>
 
@@ -1651,18 +1646,18 @@ because I am not going to use skrill gateway for this tutorial.</p>
 <p>You could manually append <code>spree</code> gem into the end of your <code>Gemfile</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem 'spree', '~&gt; 1.0.4'</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'spree', '~&gt; 1.0.7'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>If you have not yet run <code>bundle install</code>, please run it now:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Next we invoke Spree install generator to copy migrations, initializers and
 generate sample data:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ rails g spree:install</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">rails g spree:install</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>OR</p>
 
@@ -1672,15 +1667,15 @@ generate sample data:</p>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec rake spree:install:migrations
-</span><span class="line">$ bundle exec rake db:migrate
-</span><span class="line">$ bundle exec rake db:seed
-</span><span class="line">$ bundle exec rake spree_sample:load</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec rake spree:install:migrations
+</span><span class="line">bundle exec rake db:migrate
+</span><span class="line">bundle exec rake db:seed
+</span><span class="line">bundle exec rake spree_sample:load</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Once the bootstrap is finished, we need to precompile our assets too:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec rake assets:precompile:nondigest</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec rake assets:precompile:nondigest</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h2 id="deploy-to-heroku">Deploy to Heroku</h2>
 
@@ -1702,7 +1697,7 @@ Cedar support.</p>
 <p>and install the gem with:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>The great thing about Cedar stack is that Heroku introduces a new way to scale your app,
 that is <a href="http://adam.heroku.com/past/2011/5/9/applying_the_unix_process_model_to_web_apps/" title="Heroku Process Model">Process Model</a>, now you could define a custom list of process type
@@ -1730,7 +1725,7 @@ we append to <code>Gemfile</code>:</p>
 <p>then</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Next, we create a new bucket ‘fool-man-chew_production’ under US Standard region via AWS Management Console.</p>
 
@@ -1742,9 +1737,9 @@ settings.</p>
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku config:add S3_KEY='your_access_key'
-</span><span class="line">$ heroku config:add S3_SECRET='secret_access_key'
-</span><span class="line">$ heroku config:add S3_BUCKET='fool-man-chew_production'</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">heroku config:add S3_KEY='your_access_key'
+</span><span class="line">heroku config:add S3_SECRET='secret_access_key'
+</span><span class="line">heroku config:add S3_BUCKET='fool-man-chew_production'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>The second is to create a new file under <code>config/s3.yml</code> and modify the key in accordance to your S3 account:</p>
 
@@ -1762,7 +1757,7 @@ settings.</p>
 <p>We are going to create an Cedar stack app:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku apps:create smooth-autumn-7451</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">heroku apps:create smooth-autumn-7451</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>If success, you would see below output:</p>
 
@@ -1777,54 +1772,8 @@ settings.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ git remote show
+</pre></td><td class="code"><pre><code class=""><span class="line">git remote show
 </span><span class="line">heroku</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<h4 id="use-ruby-193-on-heroku">Use ruby-1.9.3 on Heroku</h4>
-
-<p>Cedar stack default to ruby-1.9.2, however Spree has been tested with
-<code>ruby-1.9.3</code> so I highly recommended you to use same version for production.</p>
-
-<p><em>UPDATE</em>: After March 19, 2012, Heroku has deprecated installing Ruby 1.9.3 using
-heroku-labs plugin. So it is uncesssary to setup RUBY_VERSION variable or to set up
-PATH config variable to include ‘bin’.</p>
-
-<p>The new way is to specify the Ruby version in the <code>Gemfile</code>.
-Unfortunately, as of 3 July 2012, the unreleased version 1.2.0.pre.1 is the only
-version that support the feature. So we will go with this unrelease version.</p>
-
-<p>You could read more about <a href="https://devcenter.heroku.com/articles/ruby-versions#selecting_a_version_of_ruby" title="Selecting a version of Ruby">Selecting a version of Ruby</a>.</p>
-
-<p>First, we install latest version of Rubygems-bundler:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gem update rubygems-bundler</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Then install Bundler 1.2.0 or newer, we have to uninstall the
-current version before installing:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gem uninstall -ax bundler
-</span><span class="line">$ gem install bundler</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Now we specify Ruby version in the <code>Gemfile</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">source 'http://rubygems.org'
-</span><span class="line">
-</span><span class="line">ruby '1.9.3'</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>then</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p><em>NOTE</em>: It is no longer possible to explicitly specify a patch level for a Ruby
-version (such as ruby-1.9.3-p194), Heroku provides the most secure patch level of
-whatever minor version you expect.</p>
 
 <h4 id="add-ssl-certificate">Add SSL certificate</h4>
 
@@ -1915,27 +1864,9 @@ going to set up a <a href="http://devcenter.heroku.com/articles/ssl-certificate-
 <span class="line-number">11</span>
 <span class="line-number">12</span>
 <span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">-----&gt; Heroku receiving push
 </span><span class="line">-----&gt; Ruby/Rails app detected
-</span><span class="line">-----&gt; Using RUBY_VERSION: ruby-1.9.3-p194
-</span><span class="line">-----&gt; Installing dependencies using Bundler version 1.1.rc.7
-</span><span class="line">       Running: bundle install --without development:test --path vendor/bundle --binstubs bin/ --deployment
-</span><span class="line">       Fetching gem metadata from http://rubygems.org/.......
-</span><span class="line">       Fetching gem metadata from http://rubygems.org/..
-</span><span class="line">       Fetching git://github.com/joneslee85/spree-heroku.git
-</span><span class="line">       Using rake (0.9.2.2)
-</span><span class="line">       ....
-</span><span class="line">       Writing config/database.yml to read from DATABASE_URL
-</span><span class="line">-----&gt; Preparing app for Rails asset pipeline
+</span><span class="line">...
 </span><span class="line">       Detected manifest.yml, assuming assets were compiled locally
 </span><span class="line">-----&gt; Rails plugin injection
 </span><span class="line">       Injecting rails_log_stdout
