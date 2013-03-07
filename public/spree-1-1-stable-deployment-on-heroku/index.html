@@ -121,11 +121,6 @@ also works to UNIX and Linux systems with minor adaptations.</p>
 
 <h4 id="heroku">Heroku</h4>
 
-<p>If you have not yet installed Heroku, you can install it via Rubygem:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gem install heroku</span></code></pre></td></tr></table></div></figure></notextile></div>
-
 <p>If you have installed Heroku, please make sure you update to version 2.1.0 or higher
 for Cedar support:</p>
 
@@ -134,15 +129,14 @@ for Cedar support:</p>
 <span class="line-number">3</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">$ heroku update
 </span><span class="line">$ heroku --version
-</span><span class="line">heroku-gem/2.28.7 (x86_64-darwin12.0.0) ruby/1.9.3</span></code></pre></td></tr></table></div></figure></notextile></div>
+</span><span class="line">heroku-toolbelt/2.35.0 (x86_64-darwin10.8.0) ruby/1.9.3</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h4 id="ruby">Ruby</h4>
 
-<p>Because we are going to deploy on Heroku Cedar stack with <code>ruby-1.9.3-p194</code>,
-we should use the same Ruby version on our local box for consistency.</p>
+<p>Because we are going to deploy on Heroku Cedar stack with Ruby 1.9.3 chosen as default version. We should use the same Ruby version on our local box for consistency.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ rvm install 1.9.3-p194</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ rvm install 1.9.3</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h4 id="ruby-on-rails">Ruby On Rails</h4>
 

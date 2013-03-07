@@ -25,28 +25,21 @@ also works to UNIX and Linux systems with minor adaptations.
 
 #### Heroku ####
 
-If you have not yet installed Heroku, you can install it via Rubygem:
-
-```
-$ gem install heroku
-```
-
 If you have installed Heroku, please make sure you update to version 2.1.0 or higher
 for Cedar support:
 
 ```
 $ heroku update
 $ heroku --version
-heroku-gem/2.28.7 (x86_64-darwin12.0.0) ruby/1.9.3
+heroku-toolbelt/2.35.0 (x86_64-darwin10.8.0) ruby/1.9.3
 ```
 
 #### Ruby ####
 
-Because we are going to deploy on Heroku Cedar stack with `ruby-1.9.3-p194`,
-we should use the same Ruby version on our local box for consistency.
+Because we are going to deploy on Heroku Cedar stack with Ruby 1.9.3 chosen as default version. We should use the same Ruby version on our local box for consistency.
 
 ```
-$ rvm install 1.9.3-p194
+$ rvm install 1.9.3
 ```
 
 #### Ruby On Rails ####

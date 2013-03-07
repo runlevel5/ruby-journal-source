@@ -532,7 +532,7 @@ $ bundle install
 Then we have to enable `user_env_compile` plugin first:
 
 ```
-heroku labs:enable user_env_compile
+heroku labs:enable user-env-compile
 ```
 
 Next, we configure asset_sync to sync with Amazon S3 by adding following variables into Heroku env:
