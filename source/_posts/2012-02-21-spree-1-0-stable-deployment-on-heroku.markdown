@@ -54,14 +54,6 @@ rvm get stable; rvm install 1.9.3; rvm reload
 I use RVM to manage rubies versions on my box, you can adapt this technique
 if you use rbenv or precompiled binary package
 
-#### Ruby On Rails ####
-
-Spree 1.0.7 supports rails 3.1.10
-
-```
-gem install rails -v=3.1.10
-```
-
 #### Spree ####
 
 ```
@@ -689,7 +681,7 @@ $ rake production deploy
 
 ### Conclusion ###
 
-Spree 1.0 is a big major leap to previous versions. It is faster, more robust and
+Spree 1.0 is a big major leap. It is faster, more robust and
 much easier to install. Outstanding issue such as 'Superclass mistmach bug with Calculator::PriceBucket', 'Bootstraping migration run failed' are resolved. Yet
 there are possibly issues that I am not aware of, so please file a ticket on [GitHub Issues] [3] and I'll make sure it has my utmost attention.
 

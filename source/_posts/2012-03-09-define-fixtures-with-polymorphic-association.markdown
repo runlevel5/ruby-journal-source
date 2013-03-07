@@ -57,4 +57,4 @@ Please be noted that the syntax of line `borrowable` now has an additonal `(Comp
 keyword. This is to tell rails that the `borrowable_type` is of `Company` class.
 Without that, the fixtures will set `borrowable_type` to `nil`, thus invalid.
 
-Hope you find this tutorial useful. See you in the next tutorial.
+Hope you find this tutorial useful. And please avoid using fixures as much as you can. Use factory_girl or machinist. See you in the next tutorial.

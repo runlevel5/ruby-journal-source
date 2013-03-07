@@ -42,34 +42,24 @@ Because we are going to deploy on Heroku Cedar stack with Ruby 1.9.3 chosen as d
 $ rvm install 1.9.3
 ```
 
-#### Ruby On Rails ####
-
-Spree 1.0.x leaves the choice of rails version to you. You can choose version any
-minor version of `3.2.x`. It is highly recommended that you go for `3.2.6`
-unless you have reasons not to.
-
-```
-$ gem install rails -v=3.2.6
-```
-
 #### Spree ####
 
 ```
-$ gem install spree -v=1.1.2
+$ gem install spree -v=1.1.7
 ```
 
 Check installed spree gems:
 
 ```
 $ gem list | grep 'spree'
-spree (1.1.2)
-spree_api (1.1.2)
-spree_auth (1.1.2)
-spree_cmd (1.1.2)
-spree_core (1.1.2)
-spree_dash (1.1.2)
-spree_promo (1.1.2)
-spree_sample (1.1.2)
+spree (1.1.7)
+spree_api (1.1.7)
+spree_auth (1.1.7)
+spree_cmd (1.1.7)
+spree_core (1.1.7)
+spree_dash (1.1.7)
+spree_promo (1.1.7)
+spree_sample (1.1.7)
 ```
 
 `spree` gem consists of many components, however you only need `spree_core`
@@ -103,7 +93,7 @@ $ brew install imagemagick
 Create a new rails app default to postgreSQL
 
 ```
-rails _3.2.6_ new fool-man-chew -d postgresql
+rails _3.2.12_ new fool-man-chew -d postgresql
 ```
 Configure database setting by editing `config/database.yml`.
 
@@ -199,7 +189,7 @@ precompiling  assets
 You could manually append `spree` gem into the end of your `Gemfile`:
 
 ```
-gem 'spree', '~> 1.1.2'
+gem 'spree', '~> 1.1.7'
 ```
 
 If you have not yet run `bundle install`, please run it now:
@@ -299,55 +289,15 @@ heroku
 
 #### Install ruby-1.9.3 for Heroku ####
 
-Cedar stack default to ruby-1.9.2, however Spree has been tested with
-`ruby-1.9.3` so I highly recommended you to use same version for production.
+Cedar stack default to ruby-1.9.3.
 
-*UPDATE*: After March 19, 2012, Heroku has deprecated installing Ruby 1.9.3 using
-heroku-labs plugin. So it is uncesssary to setup RUBY_VERSION variable or to set up
-PATH config variable to include 'bin' when you specify the default Ruby 1.9.3 with:
-
-```
-$ heroku config:add RUBY_VERSION=ruby-1.9.3-p194
-$ heroku config:add PATH=bin:vendor/bundle/ruby/1.9.1/bin:/usr/local/bin:/usr/bin:/bin
-```
-
-To configure Heroku to use Ruby 1.9.3, we specify the Ruby version in the Gemfile.
-Unfortunately, as of 3 July 2012, the unreleased version 1.2.0.pre.1 is the only
-version that support the feature. So we will go with this unrelease version.
-
-You could read more about [Selecting a version of Ruby] [55].
-
-First, we install latest version of Rubygems-bunder:
-
-```
-$ gem update rubygems-bundler
-```
-
-Then install Bundler 1.2.0 or newer, we have to uninstall the
-current version before installing:
-
-```
-$ gem uninstall -ax bundler
-$ gem install bundler
-```
-
-Now we specify Ruby version in the Gemfile:
+We specify Ruby version in the Gemfile:
 
 ```
 source 'http://rubygems.org'
 
 ruby '1.9.3'
 ```
-
-then
-
-```
-bundle install
-```
-
-*NOTE*: It is no longer possible to explicitly specify a patch level for a Ruby
-version (such as ruby-1.9.3-p194), Heroku provides the most secure patch level of
-whatever minor version you expect.
 
 #### Set up Amazon S3 ####
 
@@ -421,13 +371,12 @@ If all goes well, you would see following output:
 ```
 -----> Heroku receiving push
 -----> Ruby/Rails app detected
------> Using RUBY_VERSION: ruby-1.9.3-p194
------> Installing dependencies using Bundler version 1.1.rc.7
+-----> Using RUBY_VERSION: ruby-1.9.3-p392
+-----> Installing dependencies using Bundler version 1.3.0.pre5
        Running: bundle install --without development:test --path vendor/bundle --binstubs bin/ --deployment
        Fetching gem metadata from http://rubygems.org/.......
        Fetching gem metadata from http://rubygems.org/..
        Fetching git://github.com/joneslee85/spree-heroku.git
-       Using rake (0.9.2.2)
        ....
        Writing config/database.yml to read from DATABASE_URL
 -----> Preparing app for Rails asset pipeline
@@ -454,9 +403,6 @@ Now we could open app:
 ```
 $ heroku apps:open
 ```
-
-
-
 
 #### Custom Domain ####
 
@@ -575,16 +521,13 @@ You could read more on [Rails 3.1 on Heroku] [a]
 
 ### Conclusion ###
 
-Spree 1.0 is a big major leap to previous versions. It is faster, more robust and
-much easier to install. Outstanding issue such as 'Superclass mistmach bug with Calculator::PriceBucket', 'Bootstraping migration run failed' are resolved. Yet
-there are possibly issues that I am not aware of, so please file a ticket on [GitHub Issues] [3] and I'll make sure it has my utmost attention.
+Spree 1.1.x is not a revolutionary change from 1.0.x but it is an incremental changes with bug fixes and updates such as dependency on Rails 3.1.x. I highly recommend you upgrade if you are still on 1.0.x.
 
-I'd like to extend my gratitude to the Spree community for the hardwork.
+Again, I'd extend to the core team to deliver another robust release.
 
 [0]: http://michaelvanrooijen.com/articles/2011/06/01-more-concurrency-on-a-single-heroku-dyno-with-the-new-celadon-cedar-stack/ "More concurrency on a single Heroku dyno with the new Celadon Cedar stack"
 [1]: http://adam.heroku.com/past/2011/5/9/applying_the_unix_process_model_to_web_apps/ "Heroku Process Model"
 [2]: http://devcenter.heroku.com/articles/custom-domains "Heroku Custom Domains"
-[3]: https://github.com/spree/spree/issues "Spree Issues"
 [a]: http://devcenter.heroku.com/articles/rails31_heroku_cedar/ "Rails 3.1 Heroku Cedar"
 [55]: https://devcenter.heroku.com/articles/ruby-versions#selecting_a_version_of_ruby "Selecting a version of Ruby"
 [assets-precompiling]: #assets-precompiling
