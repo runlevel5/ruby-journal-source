@@ -7,7 +7,7 @@ tags: linux, osx, dhcp, deployment, ubuntu, tftp
 author: "Trung Lê"
 ---
 
-# {{ post.title }} #
+{{ post.title }}
 
 In this tutorial, I'll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts.
 

@@ -10,7 +10,7 @@ author: "Trung Lê"
 
 {% img left /images/netsuke.png %}
 
-# {{ post.title }} #
+{{ post.title }}
 
 Traditionally, pogstgresql is installed manually with MacPort or Homebrew on Mac OSX 10.7+. I used
 to have lots of problem with the setup for the installation as it requires Xcode, this libs and that libs, etc.

@@ -8,7 +8,7 @@ tags: liquid, template, activerecord, rails, module, ruby
 author: "Trung Lê"
 ---
 
-# {{ post.title }} #
+{{ post.title }}
 
 [Liquid](http://liquidmarkup.org/) is a powerful templating tool especially when
 used with rails. It is quite common that you have to expose ActiveRecord attributes

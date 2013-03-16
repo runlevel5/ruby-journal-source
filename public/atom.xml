@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-03-08T07:42:33+11:00</updated>
+  <updated>2013-03-16T18:00:10+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -14,13 +14,502 @@
 
   
   <entry>
+    <title type="html"><![CDATA[How to install Ruby 2.0 on OSX 10.7 or newer]]></title>
+    <link href="http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/"/>
+    <updated>2013-03-16T17:58:00+11:00</updated>
+    <id>http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer</id>
+    <content type="html"><![CDATA[
+<p>This short tutorial, I will show you how to install Ruby 2.0.0 on OSX 10.7+ or newer</p>
+
+<!--more-->
+
+<h2 id="rvm">RVM:</h2>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm get stable &amp;&amp; rvm reload</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Firstly, the OpenSSL comes with your OSX 10.7+ is outdated, you need to get latest version</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm pkg install openssl</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Secondly, the readline library on OSX 10.7+ suffers UTF-8 issue in which method in UTF-8 is converted to characters under <code>irb</code>, the 
+fix is to use latest version</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm pkg install readline</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And you can install Ruby 2.0.0-p0 with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm reinstall 2.0.0 --with-readline-dir=$rvm_path/usr --with-openssl-dir=$rvm_path/usr</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please note that <code>clang-425.0.24</code> that comes with Xcode successfully compile the source, should you bump into any compilation issue, you could try compiling it with <code>gcc-422</code></p>
+
+<h2 id="rbenv">rbenv</h2>
+
+<p>Make sure your <code>ruby-build</code> is up-to-date:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">cd ~/.rbenv/plugins/ruby-build &amp;&amp; git pull</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>rbenv does not fetch fixed readline lib, thus you are required to install them manually with <code>brew</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">brew update
+</span><span class="line">brew install readline openssl
+</span><span class="line">env CONFIGURE_OPTS=--with-readline-dir=`brew --prefix readline` rbenv install 2.0.0-p0</span></code></pre></td></tr></table></div></figure></notextile></div>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to block old IE version with Rails]]></title>
+    <link href="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/"/>
+    <updated>2013-03-16T17:56:00+11:00</updated>
+    <id>http://ruby-journal.com/how-to-block-old-ie-version-with-rails</id>
+    <content type="html"><![CDATA[
+<p>There are many ways to detect browser agent, it could be front-end side with Javascript or backend.
+In this short tutorial, I&#8217;ll walk you through on how to detect browser version with Ruby On Rails</p>
+
+<p>This applies for Rails &gt; 2.x</p>
+
+<!--more-->
+
+<h2 id="how-does-thing-work">How does thing work?</h2>
+
+<p>When you surf the site, your browser name and versions are stored in <code>HTTP_USER_AGENT</code> in the request. We need to process this string to work out the browser version and name to decide to greet viewers with warning text or not.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>We will use <code>ActionDispatch</code>&#8217;s <code>request.user_agent</code> to grab the <code>HTTP_USER_AGENT</code> string. An example of user agent string:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>With a bit of text processing, we could work out the browser version, OS platform. Sound simple, isn&#8217;t it? A bit of regex magic and you could write your own detect method. However, we will not do reinvent the wheel in this tutorial, instead we will use the <code>useragent</code> gem for the sake of convenience.</p>
+
+<p>Install <code>useragent</code> gem by appending to <code>Gemfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'useragent'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then <code>bundle install</code></p>
+
+<p>Now we will inject a filter in <code>ApplicationController</code> to detect user agent. Below is the source code:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="ss">ActionController</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">before_filter</span> <span class="ss">:check_browser</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">    <span class="no">Browser</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:browser</span><span class="p">,</span> <span class="ss">:version</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="no">SupportedBrowsers</span> <span class="o">=</span> <span class="o">[</span>
+</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Safari&#39;</span><span class="p">,</span> <span class="s1">&#39;6.0.2&#39;</span><span class="p">),</span>
+</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Firefox&#39;</span><span class="p">,</span> <span class="s1">&#39;19.0.2&#39;</span><span class="p">),</span>
+</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Internet Explorer&#39;</span><span class="p">,</span> <span class="s1">&#39;9.0&#39;</span><span class="p">),</span>
+</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Chrome&#39;</span><span class="p">,</span> <span class="s1">&#39;25.0.1364.160&#39;</span><span class="p">)</span>
+</span><span class="line">    <span class="o">]</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">check_browser</span>
+</span><span class="line">      <span class="n">user_agent</span> <span class="o">=</span> <span class="no">UserAgent</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user_agent</span><span class="p">)</span>
+</span><span class="line">      <span class="k">unless</span> <span class="no">SupportedBrowsers</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">browser</span><span class="o">|</span> <span class="n">user_agent</span> <span class="o">&gt;=</span> <span class="n">browser</span> <span class="p">}</span>
+</span><span class="line">        <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Your browser is not supported!&#39;</span>
+</span><span class="line">      <span class="k">end</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Let&#8217;s digest what&#8217;s happening the code above.</p>
+
+<p><code>Browsers</code> is a <code>Struct</code> object with two attributes <code>:browser</code> and <code>:version</code>. This models after the way <code>UserAgent</code> create browser object. Pay attention to <code>SupportedBrowsers</code> closely, this array defines a stack of supported browsers.</p>
+
+<p><code>check_browser</code> will get called before any action, this method compare your current user agent with <code>SupportedBrowsers</code>. If the condition is not met, we render a simple text to warn the user. You could extend it to use HTML template if you like.</p>
+
+<p>Please be noted that I assume all your controllers are subclass of <code>ApplicationController</code>. Please adapt the source code accordingly should your controllers extends different parent controller class.</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to setup Rails app with puma and nginx]]></title>
+    <link href="http://ruby-journal.com/how-to-setup-rails-app-with-puma-and-nginx/"/>
+    <updated>2013-03-16T17:51:00+11:00</updated>
+    <id>http://ruby-journal.com/how-to-setup-rails-app-with-puma-and-nginx</id>
+    <content type="html"><![CDATA[
+<p>In this tutorial, I&#8217;ll walk you through the concept behind using puma + nginx, plus thorough instructions on setting them up on CentOS and Ubuntu.</p>
+
+<!--more-->
+
+<h2 id="concept">Concept</h2>
+
+<p>Many people who come from the old Apache HTTPd day often ask me how reverse proxy + web server work?</p>
+
+<blockquote>
+  <p><em>&#8220;It&#8217;s different paradigm&#8221;</em></p>
+</blockquote>
+
+<p>Reverse proxy software (such as Varnish or nginx) would acts as a load balancer that routes all external requests to a pool of web apps. The below diagram depicts simply how it works:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">                                           +---&gt; web app 1
+</span><span class="line">                                           |              
+</span><span class="line">[requests] &lt;------&gt;  [reverse proxy server]  --+---&gt; web app 2
+</span><span class="line">                                           |
+</span><span class="line">                                           +---&gt; web app 3</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>In constrast to Apache way, which is depicted below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">                +--- web process fork
+</span><span class="line">                |
+</span><span class="line">[requests] ------&gt;  +--- web process fork
+</span><span class="line">                |
+</span><span class="line">                +--- web process fork</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>in which Apache HTTPd will act as both load balancer that route request to only 1 dedicated web app and automatically tell itself to fork more processes to meet demand.</p>
+
+<p>I am NOT going to dwelve into which way is better than which. My 5cent on this is, reverse proxy + web server is new way to do things, it offers distinct advantages on scalability on multi-tenancy scenario. In which you could up-scale and down-scale more web processes on demand without affecting other apps.</p>
+
+<h2 id="installation">Installation</h2>
+
+<h3 id="puma">puma</h3>
+
+<p>puma is a multi-threaded high performance webserver written in Ruby. It is new in the market yet it has gained lots of traction. It can be used to server any ruby web app that support rack such as Sinatra or Ruby On Rails.</p>
+
+<p>To install <code>puma</code> with Rails 3+ app, simply append to <code>Gemfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', :github =&gt; 'puma/puma'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>NOTE: as the time of this writing, puma 2.0 (in which <code>puma</code> CLI has <code>-d</code> option) is not yet released and we need to get the latest code from the repostiory instead.</p>
+
+<p>then <code>bundle install</code></p>
+
+<p>You can now start your app with puma with <code>rails s</code>.  You should see output if it is started correctly:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.0.0 starting...
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">...</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="nginx">nginx</h3>
+
+<p>nginx is utilised as reverse proxy server for its <code>HttpProxyModule</code> could perform proxy passing request to many virtual hosts.</p>
+
+<p>Firstly, we need to get the software installed on our server:</p>
+
+<p><strong>CentOS 5+</strong></p>
+
+<p>Create file name <code>/etc/yum.repos.d/nginx.repo</code> and paste following:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">[nginx]
+</span><span class="line">name=nginx repo
+</span><span class="line">baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+</span><span class="line">gpgcheck=0
+</span><span class="line">enabled=1</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Then we can install nginx with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo yum install nginx</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and the server could be started with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo /etc/init.d/nginx start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>Ubuntu 12.04+</strong></p>
+
+<p>It&#8217;s even simpler on Ubuntu with one command:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo apt-get install nginx</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and can be started with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo service nginx start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Once successfully installed, you could verify with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">nginx -v
+</span><span class="line"># nginx version: nginx/1.2.7</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>Due to the differences in file locations between CentOS and Ubuntu, I divide this section into two, please read the section that match your OS.</p>
+
+<p>Before continuing, there are few assumptions I would like you to be aware of:</p>
+
+<ul>
+  <li>You are running your app under <code>RAILS_ENV=production</code></li>
+  <li>Your rails app should be placed in <code>/var/www</code> folder.</li>
+  <li>You have setup correctly all permissions and firewall settings for your environment</li>
+</ul>
+
+<h3 id="nginx-configuration">nginx configuration</h3>
+
+<p>We are going to configure nginx to have an <code>upstream</code> directive, this directive tell nginx where to proxy parse the request to.
+Next we will add a virtual host and use <code>proxy_pass</code> directive to tell nginx to pass the request to the pool of processes defined in <code>upstream</code> section.</p>
+
+<p><strong>CentOS</strong></p>
+
+<p>The very first thing I normally do is to delete all default virtual hosts files:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo rm /etc/nginx/conf.d/default.conf</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next, let&#8217;s create a new host config file at <code>/etc/nginx/conf.d/my_app.conf</code> for our rails app, paste following:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">upstream my_app {
+</span><span class="line">  server unix:///var/run/my_app.sock;
+</span><span class="line">}
+</span><span class="line">
+</span><span class="line">server {
+</span><span class="line">  listen 80;
+</span><span class="line">  server_name my_app_url.com; # change to match your URL
+</span><span class="line">  root /var/www/my_app/public; # I assume your app is located at this location
+</span><span class="line">
+</span><span class="line">  location / {
+</span><span class="line">    proxy_pass http://my_app; # match the name of upstream directive which is defined above
+</span><span class="line">    proxy_set_header Host $host;
+</span><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class="line">  }
+</span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then you can restart your nginx server:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo /etc/init.id/nginx restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>Ubuntu</strong></p>
+
+<p>The very first thing I normally do is to disable default site by removing the symlink:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo rm /etc/nginx/conf.d/sites-enabled/default</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next, let&#8217;s create a new virtual host config file at <code>/etc/nginx/sites-available/my_app.conf</code> for our rails app, paste following:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">upstream my_app {
+</span><span class="line">  server unix:///var/run/my_app.sock;
+</span><span class="line">}
+</span><span class="line">
+</span><span class="line">server {
+</span><span class="line">  listen 80;
+</span><span class="line">  server_name my_app_url.com; # change to match your URL
+</span><span class="line">  root /var/www/my_app/public; # I assume your app is located at that location
+</span><span class="line">
+</span><span class="line">  location / {
+</span><span class="line">    proxy_pass http://my_app; # match the name of upstream directive which is defined above
+</span><span class="line">    proxy_set_header Host $host;
+</span><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class="line">  }
+</span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and we need to enable it by creating symlink in <code>/etc/nginx/sites-enabled</code></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo ln -sf /etc/nginx/sites-available/my_app.conf /etc/nginx/sites-enabled/my_app.conf</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then you can restart your nginx server:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo service nginx restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="start-your-app-server">start your app server</h3>
+
+<p>Now we need to tell puma to start our app and bind it to a Unix socket:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">cd /var/www/my_app
+</span><span class="line">RAILS_ENV=production bundle exec puma -e production -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>if nothing goes wrong, you should see this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.0.0 starting...
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">* Listening on unix:///var/run/my_app.sock
+</span><span class="line">Use Ctrl-C to stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and now try to surf your site with Firefox or Chrome, open <code>my_app_url.com</code>. Please substitute it with your site domain name instead here. And you should not see any error page like 403.</p>
+
+<p>Once you have verified that our puma has correctly serve the request, we now can run the puma server as daemon.</p>
+
+<p>Press <code>CTRL-C</code> to stop the foreground running puma processing and run command with <code>-d</code> parameter:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You could verify if the puma process are in bg by:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">ps aux | grep puma
+</span><span class="line"># 9594 92.8  1.4 496844 117280 ?       Rl   17:25   0:25 ruby /usr/lib/ruby/1.9.1/bin/puma -e production -d -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="restartstop-your-app-server">restart/stop your app server</h3>
+
+<p>So you guess we are at the end of the tutorial? I think not, we still have no clue how to restart/stop the puma server. Well, to stop it we could kill the PID. But there are a better way, introducing the awesome <code>pumactl</code> command line tool.</p>
+
+<p><code>pumactl</code> is a command line that takes in parameter of the path where we store the puma process state. We need to tell puma to generate the state file first. So let&#8217;s just kill our current puma running in the background with</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo killall puma</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then we start our server with <code>-S</code> parameter:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock -S /var/run/my_app.state --control 'unix:///var/run/my_app_pumactl.sock'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>puma would generate <code>/var/run/my_app.state</code> file with content:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">---
+</span><span class="line">pid: 9654
+</span><span class="line">config: !ruby/object:Puma::Configuration
+</span><span class="line">  options:
+</span><span class="line">    :min_threads: 0
+</span><span class="line">    :max_threads: 16
+</span><span class="line">    :quiet: true
+</span><span class="line">    :debug: false
+</span><span class="line">    :binds:
+</span><span class="line">    - unix:///var/run/my_app.sock
+</span><span class="line">    :workers: 0
+</span><span class="line">    :daemon: true
+</span><span class="line">    :worker_boot: []
+</span><span class="line">    :environment: production
+</span><span class="line">    :worker_directory: /home/jr_deploy/staging/current
+</span><span class="line">    :state: /var/run/my_app.state
+</span><span class="line">    :control_url: unix:///var/run/my_app_pumactl.sock
+</span><span class="line">    :control_auth_token: ebc1c8acff6766a29f93795ac8b74e</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>this is a serialized <code>Puma::Configuration</code> object, and <code>pumactl</code> would read in this object to figure out where you bind your puma process and other details.</p>
+
+<p>Now to restart our puma, we do:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and if you want to stop puma:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now you know how puma works, you could adapt what you learned for your deployment. If you use <code>capistrano</code>, you could use the <code>puma/capistrano</code> tasks by append to your <code>config/deploy.rb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">require 'puma/capistrano`</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Install Ubuntu with PXE via OSX]]></title>
     <link href="http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/"/>
     <updated>2012-10-06T14:21:00+10:00</updated>
     <id>http://ruby-journal.com/install-ubuntu-with-pxe-via-osx</id>
-    <content type="html"><![CDATA[<p>#  #</p>
-
-<p>In this tutorial, I’ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts.</p>
+    <content type="html"><![CDATA[
+<p>In this tutorial, I&#8217;ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts.</p>
 
 <!--more-->
 
@@ -28,7 +517,7 @@
 
 <p><a href="http://en.wikipedia.org/wiki/Preboot_Execution_Environment" title="Preboot Execution Environment on Wikipedia">The Preboot Execution Environment (PXE)</a> is widely used in enterprise environment for mass deployment, however it is not well-known in home and office environment because it is always easier to install Ubuntu Linux using traditional CD/DVD or USB storage devices method.</p>
 
-<p>If your box doesn’t have CD/DVD or USB storage devices, you can install Ubuntu using PXE. The concept is very simple, a computer that host TFTP server and the to-be-installed host support PXE.</p>
+<p>If your box doesn&#8217;t have CD/DVD or USB storage devices, you can install Ubuntu using PXE. The concept is very simple, a computer that host TFTP server and the to-be-installed host support PXE.</p>
 
 <p>I adapt the concept to OSX to show you that you could achieve the same result with Mac OSX. In this tutorial, I use OSX 10.8.2. However, it should also work with older versions.</p>
 
@@ -44,7 +533,7 @@
 
 <h2 id="download-ubuntu-netboot-installer">Download Ubuntu Netboot installer</h2>
 
-<p>We only need the netboot installer of Ubuntu, you don’t have to download a full ISO for the purpose. The file that we need to download is the <code>netboot.tar.gz</code> which can be found at <a href="http://cdimage.ubuntu.com/netboot/">http://cdimage.ubuntu.com/netboot/</a>.</p>
+<p>We only need the netboot installer of Ubuntu, you don&#8217;t have to download a full ISO for the purpose. The file that we need to download is the <code>netboot.tar.gz</code> which can be found at <a href="http://cdimage.ubuntu.com/netboot/">http://cdimage.ubuntu.com/netboot/</a>.</p>
 
 <ol>
   <li>Open your <em>Terminal.app</em></li>
@@ -83,7 +572,7 @@
   <li>Open the DMG file and drag the application into your Applications folder.</li>
   <li>Open the <em>TftpServer.app</em>.</li>
   <li>
-    <p>We will NOT use the default <code>/private/tftpboot</code> as root for TFTP server. From <em>TftpServer.app</em>’s screen, click on <em>Change Path</em> icon and select <code>Downloads/tftp</code> and you should see the path bar change to <code>/Users/yourusername/Downloads/tftp</code>.</p>
+    <p>We will NOT use the default <code>/private/tftpboot</code> as root for TFTP server. From <em>TftpServer.app</em>&#8217;s screen, click on <em>Change Path</em> icon and select <code>Downloads/tftp</code> and you should see the path bar change to <code>/Users/yourusername/Downloads/tftp</code>.</p>
   </li>
   <li>
     <p>Fixing folder permission by click on <em>Fix</em> buttons of both <code>Working path permission</code> and <code>Parentals folders permissions</code>. You should see <code>Attributes OK</code> if all goes well.</p>
@@ -171,7 +660,7 @@
 
 <h2 id="set-up-dhcp-server">Set up DHCP server</h2>
 
-<p>In concept, PXE-bootable device will look for DHCP service in order to receive available PXE boot server. If you don’t have a DHCP servive running locally in router or in your LAN, you have to set up a DHCP server.</p>
+<p>In concept, PXE-bootable device will look for DHCP service in order to receive available PXE boot server. If you don&#8217;t have a DHCP servive running locally in router or in your LAN, you have to set up a DHCP server.</p>
 
 <h3 id="with-isc-dchpd">With isc-dchpd</h3>
 
@@ -241,7 +730,7 @@
 
 <h3 id="with-built-in-bootpd">With built-in bootpd</h3>
 
-<p>OSX does come with a built-in BOOTP server called <code>bootpd</code>, which offer also offer DHCP service. This technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. I adapt instructions at <a href="http://www.jacquesf.com/2011/04/mac-os-x-dhcp-server/" title="Mac OSX DHCP Server">Jacques Fortier’s blog</a> for this tutorial.</p>
+<p>OSX does come with a built-in BOOTP server called <code>bootpd</code>, which offer also offer DHCP service. This technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. I adapt instructions at <a href="http://www.jacquesf.com/2011/04/mac-os-x-dhcp-server/" title="Mac OSX DHCP Server">Jacques Fortier&#8217;s blog</a> for this tutorial.</p>
 
 <ol>
   <li>Create <code>/etc/bootpd.plist</code> with content:</li>
@@ -369,8 +858,7 @@
     <link href="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/"/>
     <updated>2012-08-24T13:04:00+10:00</updated>
     <id>http://ruby-journal.com/debug-your-failed-test-in-travis-ci</id>
-    <content type="html"><![CDATA[<p>#  #</p>
-
+    <content type="html"><![CDATA[
 <p>Ever wondering why some tests passed locally but failed on Travis?
 Ever questioning how could I go about to debug why that failed test on remote Travis?
 Read on as I show you how</p>
@@ -382,11 +870,11 @@ Read on as I show you how</p>
 
 <p>In one occassion, I had a failed Ruby test on Travis which infact passed on my local box. So I tried
 to put in <code>debugger</code> and see if Travis could let me drop into Irb or not. It turns out Travis hang
-for quite a while until timed out. So debug remotely doesn’t work.</p>
+for quite a while until timed out. So debug remotely doesn&#8217;t work.</p>
 
 <p>Right, plan B then. I spent some time dig into Travis documentation and learned that Travis server
 provisioned new VM image for every test. So if I could get my hand on the VMs, I could replicate the
-same environment that Travis run the test locally. Sound rational, doesn’t it? Unfortunately, I could
+same environment that Travis run the test locally. Sound rational, doesn&#8217;t it? Unfortunately, I could
 not find any traces nor URL where to download those VMs. Thanks to Josh at Travis, he sent me the URL
 to VMs.</p>
 
@@ -430,7 +918,7 @@ to VMs.</p>
 
 <h2 id="bootstrap">Bootstrap</h2>
 
-<p>Let’s get our box up so we could SSH and start playing around with it:</p>
+<p>Let&#8217;s get our box up so we could SSH and start playing around with it:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant init travis-ruby</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -466,8 +954,6 @@ We could bring the box up with:</p>
     <updated>2012-08-23T16:21:00+10:00</updated>
     <id>http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus</id>
     <content type="html"><![CDATA[<p><img class="left" src="http://ruby-journal.com/images/netsuke.png" /></p>
-
-<p>#  #</p>
 
 <p>Traditionally, pogstgresql is installed manually with MacPort or Homebrew on Mac OSX 10.7+. I used
 to have lots of problem with the setup for the installation as it requires Xcode, this libs and that libs, etc.
@@ -536,8 +1022,7 @@ Go ahead and add the <code>/bin</code> directory that ships with Postgres.app to
     <link href="http://ruby-journal.com/spree-1-1-stable-deployment-on-heroku/"/>
     <updated>2012-07-06T07:31:00+10:00</updated>
     <id>http://ruby-journal.com/spree-1-1-stable-deployment-on-heroku</id>
-    <content type="html"><![CDATA[<p>#  #</p>
-
+    <content type="html"><![CDATA[
 <p>In this tutorial, I will show you how to create a Spree application on your local
 box, configure and push it to Heroku.</p>
 
@@ -1139,8 +1624,7 @@ the error:</p>
     <link href="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/"/>
     <updated>2012-03-12T16:57:00+11:00</updated>
     <id>http://ruby-journal.com/heroku/install-ghostscript-on-heroku</id>
-    <content type="html"><![CDATA[<p>#  #</p>
-
+    <content type="html"><![CDATA[
 <p>In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
 As you might have known that Heroku virtual machine does come with a system-wide
 ghostscript version which is located at <code>/usr/bin/gs</code>. You can find out the
@@ -1175,7 +1659,7 @@ configure and compile the software:</p>
 </span><span class="line">$ cp bin/gs ~/bin</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>You might notice that I only specify configuration parameters <code>--with-drivers=FILES</code>.
-It is because I don’t need printer drivers for my app which only does think like
+It is because I don&#8217;t need printer drivers for my app which only does think like
 images and PDF manipulation.</p>
 
 <p>Once the compilation is completed, copy the binary <code>ghostscript-9.05/bin/gs</code> to <code>~/bin</code>.
@@ -1203,8 +1687,7 @@ if the binary works by:</p>
     <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
     <updated>2012-03-12T12:52:00+11:00</updated>
     <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
-    <content type="html"><![CDATA[<p>#  #</p>
-
+    <content type="html"><![CDATA[
 <p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
 used with rails. It is quite common that you have to expose ActiveRecord attributes
 to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
@@ -1260,8 +1743,7 @@ you want to be exposed to Liquid:</p>
     <link href="http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/"/>
     <updated>2012-03-09T15:16:00+11:00</updated>
     <id>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association</id>
-    <content type="html"><![CDATA[<p>#  #</p>
-
+    <content type="html"><![CDATA[
 <p>It is more than often that you have to write a fixtures for models with polymorphic
 association. In this short tutorial, I will show you how to use few shortcut trick
 to create fixtures.</p>
@@ -1336,8 +1818,6 @@ Without that, the fixtures will set <code>borrowable_type</code> to <code>nil</c
     <id>http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat</id>
     <content type="html"><![CDATA[<p><img class="left" src="http://ruby-journal.com/images/octocat/dr-octocat.png" width="448" height="448" title="'Dr. Indy Cat'" /></p>
 
-<p>#  #</p>
-
 <p>I’ve been a fan of Indiana Jones and GitHub. So I made a request for
 my brother <a href="https://github.com/modology">Huey</a> and guess what he gave me. I just hope this artwork could be
 featured in the Octodex.</p>
@@ -1358,8 +1838,6 @@ featured in the Octodex.</p>
     <updated>2012-02-21T06:40:00+11:00</updated>
     <id>http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku</id>
     <content type="html"><![CDATA[<p><img class="left" src="http://ruby-journal.com/images/spree-1.0.0-release-ribbon.png" /></p>
-
-<p>#  #</p>
 
 <p>Spree is without a doubt a de-facto eCommerce stack of Ruby world. Yet to many Spree
 is still a pandora box. In this tutorial, I will try to go through step by step

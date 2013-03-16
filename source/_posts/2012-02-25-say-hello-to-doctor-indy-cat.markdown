@@ -10,7 +10,7 @@ author: "Hiếu Lê"
 
 {% img left /images/octocat/dr-octocat.png 448 448 'Dr. Indy Cat' %}
 
-# {{ post.title }} #
+{{ post.title }}
 
 I've been a fan of Indiana Jones and GitHub. So I made a request for
 my brother [Huey] [gh] and guess what he gave me. I just hope this artwork could be

@@ -8,7 +8,7 @@ tags: fixtures, testing, rails, polymorphic
 author: "Trung Lê"
 ---
 
-# {{ post.title }} #
+{{ post.title }}
 
 It is more than often that you have to write a fixtures for models with polymorphic
 association. In this short tutorial, I will show you how to use few shortcut trick

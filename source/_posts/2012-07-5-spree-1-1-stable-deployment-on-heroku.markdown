@@ -8,7 +8,7 @@ tags: spree, heroku, ruby, deployment, cedar stack
 author: "Trung Lê"
 ---
 
-# {{ post.title }} #
+{{ post.title }}
 
 In this tutorial, I will show you how to create a Spree application on your local
 box, configure and push it to Heroku.

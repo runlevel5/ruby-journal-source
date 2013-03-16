@@ -8,7 +8,7 @@ tags: install, heroku, gs, ghostscript, cedar
 author: "Trung Lê"
 ---
 
-# {{ post.title }} #
+{{ post.title }}
 
 In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
 As you might have known that Heroku virtual machine does come with a system-wide

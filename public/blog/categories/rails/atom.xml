@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Ruby Journal]]></title>
   <link href="http://ruby-journal.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-03-08T07:42:33+11:00</updated>
+  <updated>2013-03-16T18:00:10+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -18,7 +18,7 @@
     <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
     <updated>2012-03-12T12:52:00+11:00</updated>
     <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
-    <content type="html"><![CDATA[<h1 id="posttitle-"></h1>
+    <content type="html"><![CDATA[<p></p>
 
 <p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
 used with rails. It is quite common that you have to expose ActiveRecord attributes
@@ -72,7 +72,7 @@ end
     <link href="http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/"/>
     <updated>2012-03-09T15:16:00+11:00</updated>
     <id>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association</id>
-    <content type="html"><![CDATA[<h1 id="posttitle-"></h1>
+    <content type="html"><![CDATA[<p></p>
 
 <p>It is more than often that you have to write a fixtures for models with polymorphic
 association. In this short tutorial, I will show you how to use few shortcut trick

@@ -7,7 +7,7 @@ tags: test, ruby, ci, travis
 author: "Trung Lê"
 ---
 
-# {{ post.title }} #
+{{ post.title }}
 
 Ever wondering why some tests passed locally but failed on Travis?
 Ever questioning how could I go about to debug why that failed test on remote Travis?

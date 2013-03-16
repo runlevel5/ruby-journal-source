@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Exposing ActiveRecord model attributes to Liquid dynamically - Ruby Journal</title>
+  <title>How to install Ruby 2.0 on OSX 10.7 or newer - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Liquid is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. &hellip;">
+  <meta name="description" content="This short tutorial, I will show you how to install Ruby 2.0.0 on OSX 10.7+ or newer RVM: 1
+rvm get stable &amp;&amp; rvm reload Firstly, the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +19,7 @@ to liquid. &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">
+  <link rel="canonical" href="http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -80,7 +79,7 @@ to liquid. &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Exposing ActiveRecord Model Attributes to Liquid Dynamically</h1>
+      <h1 class="entry-title">How to Install Ruby 2.0 on OSX 10.7 or Newer</h1>
     
     
       <p class="meta">
@@ -96,7 +95,7 @@ to liquid. &hellip;">
   
 
 
-<time datetime="2012-03-12T12:52:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2013-03-16T17:58:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -106,53 +105,48 @@ to liquid. &hellip;">
 
 
 <div class="entry-content">
-<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
-model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
-to tell which attributes / call-able methods of the instance that could be passed
-with the <code>liquid_methods</code> call. In most of cases, people tend to use the latter method
-because they could narrow the exposure scope to liquid.</p>
+<p>This short tutorial, I will show you how to install Ruby 2.0.0 on OSX 10.7+ or newer</p>
 
-<p>However, what if your model has so many attributes and typing all them out for
-the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
-creating a module:</p>
+<!--more-->
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb  </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<h2 id="rvm">RVM:</h2>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm get stable &amp;&amp; rvm reload</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Firstly, the OpenSSL comes with your OSX 10.7+ is outdated, you need to get latest version</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm pkg install openssl</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Secondly, the readline library on OSX 10.7+ suffers UTF-8 issue in which method in UTF-8 is converted to characters under <code>irb</code>, the 
+fix is to use latest version</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm pkg install readline</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And you can install Ruby 2.0.0-p0 with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm reinstall 2.0.0 --with-readline-dir=$rvm_path/usr --with-openssl-dir=$rvm_path/usr</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please note that <code>clang-425.0.24</code> that comes with Xcode successfully compile the source, should you bump into any compilation issue, you could try compiling it with <code>gcc-422</code></p>
+
+<h2 id="rbenv">rbenv</h2>
+
+<p>Make sure your <code>ruby-build</code> is up-to-date:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">cd ~/.rbenv/plugins/ruby-build &amp;&amp; git pull</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>rbenv does not fetch fixed readline lib, thus you are required to install them manually with <code>brew</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class="line">    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
-</span><span class="line">        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And you also need to include the above module in the ActiveRecord classes that
-you want to be exposed to Liquid:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-</span><span class="line">  <span class="nb">require</span> <span class="s1">&#39;attributes_to_liquid_methods_mapper&#39;</span>
-</span><span class="line">  <span class="kp">include</span> <span class="no">AttributesToLiquidMethodsMapper</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
+</pre></td><td class="code"><pre><code class=""><span class="line">brew update
+</span><span class="line">brew install readline openssl
+</span><span class="line">env CONFIGURE_OPTS=--with-readline-dir=`brew --prefix readline` rbenv install 2.0.0-p0</span></code></pre></td></tr></table></div></figure></notextile></div>
 </div>
 
 
@@ -175,21 +169,15 @@ you want to be exposed to Liquid:</p>
   
 
 
-<time datetime="2012-03-12T12:52:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2013-03-16T17:58:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/rails/'>rails</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/" data-via="joneslee85" data-counturl="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -202,10 +190,8 @@ you want to be exposed to Liquid:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/rails/define-fixtures-with-polymorphic-association/" title="Previous Post: Define Fixtures with Polymorphic Association">&laquo; Define Fixtures with Polymorphic Association</a>
+        <a class="basic-alignment left" href="/how-to-block-old-ie-version-with-rails/" title="Previous Post: How to block old IE version with Rails">&laquo; How to block old IE version with Rails</a>
       
-      
-        <a class="basic-alignment right" href="/heroku/install-ghostscript-on-heroku/" title="Next Post: Install Ghostscript on Heroku Cedar">Install Ghostscript on Heroku Cedar &raquo;</a>
       
     </p>
   </footer>
@@ -331,8 +317,8 @@ you want to be exposed to Liquid:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/';
-        var disqus_url = 'http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/';
+        var disqus_identifier = 'http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/';
+        var disqus_url = 'http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -9,7 +9,7 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="# # In this tutorial, I’ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts. Introduction The Preboot Execution &hellip;">
+  <meta name="description" content="In this tutorial, I&#8217;ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts. Introduction The Preboot &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -103,9 +103,8 @@
   </header>
 
 
-<div class="entry-content"><p>#  #</p>
-
-<p>In this tutorial, I’ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts.</p>
+<div class="entry-content">
+<p>In this tutorial, I&#8217;ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts.</p>
 
 <!--more-->
 
@@ -113,7 +112,7 @@
 
 <p><a href="http://en.wikipedia.org/wiki/Preboot_Execution_Environment" title="Preboot Execution Environment on Wikipedia">The Preboot Execution Environment (PXE)</a> is widely used in enterprise environment for mass deployment, however it is not well-known in home and office environment because it is always easier to install Ubuntu Linux using traditional CD/DVD or USB storage devices method.</p>
 
-<p>If your box doesn’t have CD/DVD or USB storage devices, you can install Ubuntu using PXE. The concept is very simple, a computer that host TFTP server and the to-be-installed host support PXE.</p>
+<p>If your box doesn&#8217;t have CD/DVD or USB storage devices, you can install Ubuntu using PXE. The concept is very simple, a computer that host TFTP server and the to-be-installed host support PXE.</p>
 
 <p>I adapt the concept to OSX to show you that you could achieve the same result with Mac OSX. In this tutorial, I use OSX 10.8.2. However, it should also work with older versions.</p>
 
@@ -129,7 +128,7 @@
 
 <h2 id="download-ubuntu-netboot-installer">Download Ubuntu Netboot installer</h2>
 
-<p>We only need the netboot installer of Ubuntu, you don’t have to download a full ISO for the purpose. The file that we need to download is the <code>netboot.tar.gz</code> which can be found at <a href="http://cdimage.ubuntu.com/netboot/">http://cdimage.ubuntu.com/netboot/</a>.</p>
+<p>We only need the netboot installer of Ubuntu, you don&#8217;t have to download a full ISO for the purpose. The file that we need to download is the <code>netboot.tar.gz</code> which can be found at <a href="http://cdimage.ubuntu.com/netboot/">http://cdimage.ubuntu.com/netboot/</a>.</p>
 
 <ol>
   <li>Open your <em>Terminal.app</em></li>
@@ -168,7 +167,7 @@
   <li>Open the DMG file and drag the application into your Applications folder.</li>
   <li>Open the <em>TftpServer.app</em>.</li>
   <li>
-    <p>We will NOT use the default <code>/private/tftpboot</code> as root for TFTP server. From <em>TftpServer.app</em>’s screen, click on <em>Change Path</em> icon and select <code>Downloads/tftp</code> and you should see the path bar change to <code>/Users/yourusername/Downloads/tftp</code>.</p>
+    <p>We will NOT use the default <code>/private/tftpboot</code> as root for TFTP server. From <em>TftpServer.app</em>&#8217;s screen, click on <em>Change Path</em> icon and select <code>Downloads/tftp</code> and you should see the path bar change to <code>/Users/yourusername/Downloads/tftp</code>.</p>
   </li>
   <li>
     <p>Fixing folder permission by click on <em>Fix</em> buttons of both <code>Working path permission</code> and <code>Parentals folders permissions</code>. You should see <code>Attributes OK</code> if all goes well.</p>
@@ -256,7 +255,7 @@
 
 <h2 id="set-up-dhcp-server">Set up DHCP server</h2>
 
-<p>In concept, PXE-bootable device will look for DHCP service in order to receive available PXE boot server. If you don’t have a DHCP servive running locally in router or in your LAN, you have to set up a DHCP server.</p>
+<p>In concept, PXE-bootable device will look for DHCP service in order to receive available PXE boot server. If you don&#8217;t have a DHCP servive running locally in router or in your LAN, you have to set up a DHCP server.</p>
 
 <h3 id="with-isc-dchpd">With isc-dchpd</h3>
 
@@ -326,7 +325,7 @@
 
 <h3 id="with-built-in-bootpd">With built-in bootpd</h3>
 
-<p>OSX does come with a built-in BOOTP server called <code>bootpd</code>, which offer also offer DHCP service. This technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. I adapt instructions at <a href="http://www.jacquesf.com/2011/04/mac-os-x-dhcp-server/" title="Mac OSX DHCP Server">Jacques Fortier’s blog</a> for this tutorial.</p>
+<p>OSX does come with a built-in BOOTP server called <code>bootpd</code>, which offer also offer DHCP service. This technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. I adapt instructions at <a href="http://www.jacquesf.com/2011/04/mac-os-x-dhcp-server/" title="Mac OSX DHCP Server">Jacques Fortier&#8217;s blog</a> for this tutorial.</p>
 
 <ol>
   <li>Create <code>/etc/bootpd.plist</code> with content:</li>
@@ -492,6 +491,8 @@
         <a class="basic-alignment left" href="/debug-your-failed-test-in-travis-ci/" title="Previous Post: Debug your failed test in Travis CI">&laquo; Debug your failed test in Travis CI</a>
       
       
+        <a class="basic-alignment right" href="/how-to-setup-rails-app-with-puma-and-nginx/" title="Next Post: How to setup Rails app with puma and nginx">How to setup Rails app with puma and nginx &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -516,23 +517,23 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/">How to install Ruby 2.0 on OSX 10.7 or newer</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-to-block-old-ie-version-with-rails/">How to block old IE version with Rails</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-to-setup-rails-app-with-puma-and-nginx/">How to setup Rails app with puma and nginx</a>
+      </li>
+    
+      <li class="post">
         <a href="/install-ubuntu-with-pxe-via-osx/">Install Ubuntu with PXE via OSX</a>
       </li>
     
       <li class="post">
         <a href="/debug-your-failed-test-in-travis-ci/">Debug your failed test in Travis CI</a>
-      </li>
-    
-      <li class="post">
-        <a href="/install-postgres-dot-app-on-osx-10-dot-7-plus/">Install Postgres.app on OSX 10.7+</a>
-      </li>
-    
-      <li class="post">
-        <a href="/spree-1-1-stable-deployment-on-heroku/">Spree 1.1 deployment on Heroku</a>
-      </li>
-    
-      <li class="post">
-        <a href="/heroku/install-ghostscript-on-heroku/">Install Ghostscript on Heroku Cedar</a>
       </li>
     
   </ul>

@@ -9,7 +9,7 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="# # Ever wondering why some tests passed locally but failed on Travis?
+  <meta name="description" content="Ever wondering why some tests passed locally but failed on Travis?
 Ever questioning how could I go about to debug why that failed test on remote &hellip;">
   
 
@@ -104,8 +104,7 @@ Ever questioning how could I go about to debug why that failed test on remote &h
   </header>
 
 
-<div class="entry-content"><p>#  #</p>
-
+<div class="entry-content">
 <p>Ever wondering why some tests passed locally but failed on Travis?
 Ever questioning how could I go about to debug why that failed test on remote Travis?
 Read on as I show you how</p>
@@ -117,11 +116,11 @@ Read on as I show you how</p>
 
 <p>In one occassion, I had a failed Ruby test on Travis which infact passed on my local box. So I tried
 to put in <code>debugger</code> and see if Travis could let me drop into Irb or not. It turns out Travis hang
-for quite a while until timed out. So debug remotely doesn’t work.</p>
+for quite a while until timed out. So debug remotely doesn&#8217;t work.</p>
 
 <p>Right, plan B then. I spent some time dig into Travis documentation and learned that Travis server
 provisioned new VM image for every test. So if I could get my hand on the VMs, I could replicate the
-same environment that Travis run the test locally. Sound rational, doesn’t it? Unfortunately, I could
+same environment that Travis run the test locally. Sound rational, doesn&#8217;t it? Unfortunately, I could
 not find any traces nor URL where to download those VMs. Thanks to Josh at Travis, he sent me the URL
 to VMs.</p>
 
@@ -165,7 +164,7 @@ to VMs.</p>
 
 <h2 id="bootstrap">Bootstrap</h2>
 
-<p>Let’s get our box up so we could SSH and start playing around with it:</p>
+<p>Let&#8217;s get our box up so we could SSH and start playing around with it:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant init travis-ruby</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -264,23 +263,23 @@ We could bring the box up with:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/">How to install Ruby 2.0 on OSX 10.7 or newer</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-to-block-old-ie-version-with-rails/">How to block old IE version with Rails</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-to-setup-rails-app-with-puma-and-nginx/">How to setup Rails app with puma and nginx</a>
+      </li>
+    
+      <li class="post">
         <a href="/install-ubuntu-with-pxe-via-osx/">Install Ubuntu with PXE via OSX</a>
       </li>
     
       <li class="post">
         <a href="/debug-your-failed-test-in-travis-ci/">Debug your failed test in Travis CI</a>
-      </li>
-    
-      <li class="post">
-        <a href="/install-postgres-dot-app-on-osx-10-dot-7-plus/">Install Postgres.app on OSX 10.7+</a>
-      </li>
-    
-      <li class="post">
-        <a href="/spree-1-1-stable-deployment-on-heroku/">Spree 1.1 deployment on Heroku</a>
-      </li>
-    
-      <li class="post">
-        <a href="/heroku/install-ghostscript-on-heroku/">Install Ghostscript on Heroku Cedar</a>
       </li>
     
   </ul>

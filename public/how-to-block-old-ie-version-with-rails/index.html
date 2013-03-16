@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Exposing ActiveRecord model attributes to Liquid dynamically - Ruby Journal</title>
+  <title>How to block old IE version with Rails - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Liquid is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. &hellip;">
+  <meta name="description" content="There are many ways to detect browser agent, it could be front-end side with Javascript or backend.
+In this short tutorial, I&#8217;ll walk you &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +19,7 @@ to liquid. &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">
+  <link rel="canonical" href="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -80,7 +79,7 @@ to liquid. &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Exposing ActiveRecord Model Attributes to Liquid Dynamically</h1>
+      <h1 class="entry-title">How to Block Old IE Version With Rails</h1>
     
     
       <p class="meta">
@@ -96,7 +95,7 @@ to liquid. &hellip;">
   
 
 
-<time datetime="2012-03-12T12:52:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2013-03-16T17:56:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -106,20 +105,36 @@ to liquid. &hellip;">
 
 
 <div class="entry-content">
-<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
-model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
-to tell which attributes / call-able methods of the instance that could be passed
-with the <code>liquid_methods</code> call. In most of cases, people tend to use the latter method
-because they could narrow the exposure scope to liquid.</p>
+<p>There are many ways to detect browser agent, it could be front-end side with Javascript or backend.
+In this short tutorial, I&#8217;ll walk you through on how to detect browser version with Ruby On Rails</p>
 
-<p>However, what if your model has so many attributes and typing all them out for
-the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
-creating a module:</p>
+<p>This applies for Rails &gt; 2.x</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb  </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<!--more-->
+
+<h2 id="how-does-thing-work">How does thing work?</h2>
+
+<p>When you surf the site, your browser name and versions are stored in <code>HTTP_USER_AGENT</code> in the request. We need to process this string to work out the browser version and name to decide to greet viewers with warning text or not.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>We will use <code>ActionDispatch</code>&#8217;s <code>request.user_agent</code> to grab the <code>HTTP_USER_AGENT</code> string. An example of user agent string:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>With a bit of text processing, we could work out the browser version, OS platform. Sound simple, isn&#8217;t it? A bit of regex magic and you could write your own detect method. However, we will not do reinvent the wheel in this tutorial, instead we will use the <code>useragent</code> gem for the sake of convenience.</p>
+
+<p>Install <code>useragent</code> gem by appending to <code>Gemfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'useragent'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then <code>bundle install</code></p>
+
+<p>Now we will inject a filter in <code>ApplicationController</code> to detect user agent. Below is the source code:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
@@ -128,31 +143,51 @@ creating a module:</p>
 <span class="line-number">7</span>
 <span class="line-number">8</span>
 <span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class="line">    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
-</span><span class="line">        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="ss">ActionController</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">before_filter</span> <span class="ss">:check_browser</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">    <span class="no">Browser</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:browser</span><span class="p">,</span> <span class="ss">:version</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="no">SupportedBrowsers</span> <span class="o">=</span> <span class="o">[</span>
+</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Safari&#39;</span><span class="p">,</span> <span class="s1">&#39;6.0.2&#39;</span><span class="p">),</span>
+</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Firefox&#39;</span><span class="p">,</span> <span class="s1">&#39;19.0.2&#39;</span><span class="p">),</span>
+</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Internet Explorer&#39;</span><span class="p">,</span> <span class="s1">&#39;9.0&#39;</span><span class="p">),</span>
+</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Chrome&#39;</span><span class="p">,</span> <span class="s1">&#39;25.0.1364.160&#39;</span><span class="p">)</span>
+</span><span class="line">    <span class="o">]</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">check_browser</span>
+</span><span class="line">      <span class="n">user_agent</span> <span class="o">=</span> <span class="no">UserAgent</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user_agent</span><span class="p">)</span>
+</span><span class="line">      <span class="k">unless</span> <span class="no">SupportedBrowsers</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">browser</span><span class="o">|</span> <span class="n">user_agent</span> <span class="o">&gt;=</span> <span class="n">browser</span> <span class="p">}</span>
+</span><span class="line">        <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Your browser is not supported!&#39;</span>
 </span><span class="line">      <span class="k">end</span>
 </span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>And you also need to include the above module in the ActiveRecord classes that
-you want to be exposed to Liquid:</p>
+<p>Let&#8217;s digest what&#8217;s happening the code above.</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-</span><span class="line">  <span class="nb">require</span> <span class="s1">&#39;attributes_to_liquid_methods_mapper&#39;</span>
-</span><span class="line">  <span class="kp">include</span> <span class="no">AttributesToLiquidMethodsMapper</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p><code>Browsers</code> is a <code>Struct</code> object with two attributes <code>:browser</code> and <code>:version</code>. This models after the way <code>UserAgent</code> create browser object. Pay attention to <code>SupportedBrowsers</code> closely, this array defines a stack of supported browsers.</p>
 
-<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
+<p><code>check_browser</code> will get called before any action, this method compare your current user agent with <code>SupportedBrowsers</code>. If the condition is not met, we render a simple text to warn the user. You could extend it to use HTML template if you like.</p>
+
+<p>Please be noted that I assume all your controllers are subclass of <code>ApplicationController</code>. Please adapt the source code accordingly should your controllers extends different parent controller class.</p>
+
 </div>
 
 
@@ -175,21 +210,15 @@ you want to be exposed to Liquid:</p>
   
 
 
-<time datetime="2012-03-12T12:52:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2013-03-16T17:56:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/rails/'>rails</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/" data-via="joneslee85" data-counturl="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -202,10 +231,10 @@ you want to be exposed to Liquid:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/rails/define-fixtures-with-polymorphic-association/" title="Previous Post: Define Fixtures with Polymorphic Association">&laquo; Define Fixtures with Polymorphic Association</a>
+        <a class="basic-alignment left" href="/how-to-setup-rails-app-with-puma-and-nginx/" title="Previous Post: How to setup Rails app with puma and nginx">&laquo; How to setup Rails app with puma and nginx</a>
       
       
-        <a class="basic-alignment right" href="/heroku/install-ghostscript-on-heroku/" title="Next Post: Install Ghostscript on Heroku Cedar">Install Ghostscript on Heroku Cedar &raquo;</a>
+        <a class="basic-alignment right" href="/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/" title="Next Post: How to install Ruby 2.0 on OSX 10.7 or newer">How to install Ruby 2.0 on OSX 10.7 or newer &raquo;</a>
       
     </p>
   </footer>
@@ -331,8 +360,8 @@ you want to be exposed to Liquid:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/';
-        var disqus_url = 'http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/';
+        var disqus_identifier = 'http://ruby-journal.com/how-to-block-old-ie-version-with-rails/';
+        var disqus_url = 'http://ruby-journal.com/how-to-block-old-ie-version-with-rails/';
         var disqus_script = 'embed.js';
       
     (function () {

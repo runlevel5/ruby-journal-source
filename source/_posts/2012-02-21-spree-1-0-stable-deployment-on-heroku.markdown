@@ -10,7 +10,7 @@ author: "Trung Lê"
 
 {% img left /images/spree-1.0.0-release-ribbon.png %}
 
-# {{ post.title }} #
+{{ post.title }}
 
 Spree is without a doubt a de-facto eCommerce stack of Ruby world. Yet to many Spree
 is still a pandora box. In this tutorial, I will try to go through step by step
