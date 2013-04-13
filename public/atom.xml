@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-03-16T18:00:10+11:00</updated>
+  <updated>2013-04-13T10:29:29+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -1501,7 +1501,7 @@ to set up Heroku to respond to requests at custom domains:</p>
 <p>We also need to let Spree know of our custom domain by append <code>site_url</code> in our
 <code>config/initializers/spree.rb</code></p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb  </span></figcaption>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -1527,7 +1527,7 @@ to set up Heroku to respond to requests at custom domains:</p>
 
 <p>Edit file <code>config/initializers/spree.rb</code>:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb  </span></figcaption>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -1700,7 +1700,7 @@ because they could narrow the exposure scope to liquid.</p>
 the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
 creating a module:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb  </span></figcaption>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -2346,7 +2346,7 @@ the error:</p>
 
 <p>So we have to disable precompile on initialization by set <code>config.assets.initialize_on_precompile</code> to <code>false</code> in <code>config/application.rb</code></p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/application.rb  </span></figcaption>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/application.rb </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">config</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">initialize_on_precompile</span> <span class="o">=</span> <span class="kp">false</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -2435,7 +2435,7 @@ to serve our precompiled assets.</p>
 
 <p>Configure <code>config/environments/production.rb</code> to use Amazon S3 as the asset host and ensure precompiling is enabled:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/environments/production.rb  </span></figcaption>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/environments/production.rb </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">config</span><span class="o">.</span><span class="n">action_controller</span><span class="o">.</span><span class="n">asset_host</span> <span class="o">=</span> <span class="s2">&quot;//</span><span class="si">#{</span><span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;FOG_DIRECTORY&#39;</span><span class="o">]</span><span class="si">}</span><span class="s2">.s3.amazonaws.com&quot;</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -2510,7 +2510,7 @@ to set up Heroku to respond to requests at custom domains:</p>
 <p>We also need to let Spree know of our custom domain by append <code>site_url</code> in our
 <code>config/initializers/spree.rb</code></p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb  </span></figcaption>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -2536,7 +2536,7 @@ to set up Heroku to respond to requests at custom domains:</p>
 
 <p>Edit file <code>config/initializers/spree.rb</code>:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb  </span></figcaption>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
