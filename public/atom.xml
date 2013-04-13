@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-04-13T10:29:29+10:00</updated>
+  <updated>2013-04-13T11:03:16+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,174 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[minitest let() is lazy]]></title>
+    <link href="http://ruby-journal.com/minitest-let-is-lazy/"/>
+    <updated>2013-04-13T10:31:00+10:00</updated>
+    <id>http://ruby-journal.com/minitest-let-is-lazy</id>
+    <content type="html"><![CDATA[
+<p>Don&#8217;t you know that minitest also have a similar <code>let()</code> helper that does exactly the same job as the one of RSpec. But some people do not fully understand the difference between defining object in <code>let()</code> and <code>before()</code> block.</p>
+
+<!--more-->
+
+<p>So you&#8217;ve been doing TDD, that is writing tests. Tests is like app documentation, it needs attention as much as the main code does. One good way to refactor your test is to use <code>let()</code>.</p>
+
+<p>We have a simple spec below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">before</span> <span class="k">do</span>
+</span><span class="line">    <span class="vi">@post</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;#publish&#39;</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should publish to the world wide web&#39;</span> <span class="k">do</span>
+</span><span class="line">      <span class="vi">@post</span><span class="o">.</span><span class="n">publish</span>
+</span><span class="line">      <span class="vi">@post</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>that could be refactored to:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">let</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;#publish&#39;</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should publish to the world wide web&#39;</span> <span class="k">do</span>
+</span><span class="line">      <span class="n">post</span><span class="o">.</span><span class="n">publish</span>
+</span><span class="line">      <span class="n">post</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Our test is now easier to read. Some developers naively believes the <code>let()</code> just provides a syntax sugar to the test, in fact it is totally different from the block way. It&#8217;s lazy loaded. See the code below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">let</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="no">Post</span><span class="o">.</span><span class="n">count</span>
+</span><span class="line"><span class="c1"># 0</span>
+</span><span class="line">
+</span><span class="line"><span class="n">post</span>
+</span><span class="line">
+</span><span class="line"><span class="no">Post</span><span class="o">.</span><span class="n">count</span>
+</span><span class="line"><span class="c1"># 1</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the <code>post</code> is not created until it is invoked. This definitely helps improve the speed of test in which object is initialized upon being referenced. Yet a caveat for tests on collection of objects that does not reference the object directly in the test. For example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">let</span><span class="p">(</span><span class="ss">:post1</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class="line">  <span class="n">let</span><span class="p">(</span><span class="ss">:post2</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;.bulk_publish&#39;</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should bulk publish to the world wide web&#39;</span> <span class="k">do</span>
+</span><span class="line">      <span class="no">Post</span><span class="o">.</span><span class="n">bulk_publish</span>
+</span><span class="line">      <span class="n">post1</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
+</span><span class="line">      <span class="n">post2</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>To some people surprise, the test will fail because we do not invoke <code>post1</code> and <code>post2</code> in the test, thus 2 posts are not created before <code>Post.bulk_publish</code> is invoked. You tap those 2 objects before the test with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="s1">&#39;.bulk_publish&#39;</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">before</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post1</span>
+</span><span class="line">    <span class="n">post2</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Which I find very ugly. In such cases, it&#8217;d be best interest to use the block way to define objects.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;.bulk_publish&#39;</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">before</span> <span class="k">do</span>
+</span><span class="line">      <span class="vi">@post1</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span>
+</span><span class="line">      <span class="vi">@post2</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should bulk publish to the world wide web&#39;</span> <span class="k">do</span>
+</span><span class="line">      <span class="no">Post</span><span class="o">.</span><span class="n">bulk_publish</span>
+</span><span class="line">      <span class="vi">@post1</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
+</span><span class="line">      <span class="vi">@post2</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>So now you know the behaviour of <code>let()</code>, I highly recommend you go through your test and apply what you have learned. See you guys in the next tutorial.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to install Ruby 2.0 on OSX 10.7 or newer]]></title>
