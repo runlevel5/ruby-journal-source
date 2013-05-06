@@ -144,7 +144,7 @@
 
 <p>in which Apache HTTPd will act as both load balancer that route request to only 1 dedicated web app and automatically tell itself to fork more processes to meet demand.</p>
 
-<p>I am NOT going to dwelve into which way is better than which. My 5cent on this is, reverse proxy + web server is new way to do things, it offers distinct advantages on scalability on multi-tenancy scenario. In which you could up-scale and down-scale more web processes on demand without affecting other apps.</p>
+<p>I am NOT going to dwelve into which way is better than which. My 5cent on this is, reverse proxy + web server is new way to do things, it offers distinct advantages on scalability on multi-tenancy scenario. In which you could up-scale and down-scale more web processes on demand without affecting other apps. The downside is you have to deal with process monitoring which requires understanding of UNIX processes.</p>
 
 <h2 id="installation">Installation</h2>
 
@@ -152,12 +152,12 @@
 
 <p>puma is a multi-threaded high performance webserver written in Ruby. It is new in the market yet it has gained lots of traction. It can be used to server any ruby web app that support rack such as Sinatra or Ruby On Rails.</p>
 
-<p>To install <code>puma</code> with Rails 3+ app, simply append to <code>Gemfile</code>:</p>
+<p>As a first class Ruby project, you could install <code>puma</code> via RubyGems. </p>
+
+<p>With Rails 3+ app, simply append to <code>Gemfile</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', :github =&gt; 'puma/puma'</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>NOTE: as the time of this writing, puma 2.0 (in which <code>puma</code> CLI has <code>-d</code> option) is not yet released and we need to get the latest code from the repostiory instead.</p>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', '~&gt; 2.0'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>then <code>bundle install</code></p>
 
@@ -167,7 +167,7 @@
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.0.0 starting...
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.0.1 starting...
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">...</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -220,7 +220,7 @@
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">nginx -v
-</span><span class="line"># nginx version: nginx/1.2.7</span></code></pre></td></tr></table></div></figure></notextile></div>
+</span><span class="line"># nginx version: nginx/1.4.0</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h2 id="configuration">Configuration</h2>
 
@@ -350,7 +350,7 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <span class="line-number">3</span>
 <span class="line-number">4</span>
 <span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.0.0 starting...
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.0.1 starting...
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">* Listening on unix:///var/run/my_app.sock
@@ -425,7 +425,7 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 </span><span class="line">    :control_url: unix:///var/run/my_app_pumactl.sock
 </span><span class="line">    :control_auth_token: ebc1c8acff6766a29f93795ac8b74e</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>this is a serialized <code>Puma::Configuration</code> object, and <code>pumactl</code> would read in this object to figure out where you bind your puma process and other details.</p>
+<p>this is a serialized <code>Puma::Configuration</code> object, and <code>pumactl</code> would read this object to figure out where you bind your puma process and other details.</p>
 
 <p>Now to restart our puma, we do:</p>
 

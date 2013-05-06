@@ -42,7 +42,7 @@ In constrast to Apache way, which is depicted below:
 
 in which Apache HTTPd will act as both load balancer that route request to only 1 dedicated web app and automatically tell itself to fork more processes to meet demand.
 
-I am NOT going to dwelve into which way is better than which. My 5cent on this is, reverse proxy + web server is new way to do things, it offers distinct advantages on scalability on multi-tenancy scenario. In which you could up-scale and down-scale more web processes on demand without affecting other apps.
+I am NOT going to dwelve into which way is better than which. My 5cent on this is, reverse proxy + web server is new way to do things, it offers distinct advantages on scalability on multi-tenancy scenario. In which you could up-scale and down-scale more web processes on demand without affecting other apps. The downside is you have to deal with process monitoring which requires understanding of UNIX processes.
 
 ## Installation
 
@@ -50,20 +50,20 @@ I am NOT going to dwelve into which way is better than which. My 5cent on this i
 
 puma is a multi-threaded high performance webserver written in Ruby. It is new in the market yet it has gained lots of traction. It can be used to server any ruby web app that support rack such as Sinatra or Ruby On Rails.
 
-To install `puma` with Rails 3+ app, simply append to `Gemfile`:
+As a first class Ruby project, you could install `puma` via RubyGems. 
+
+With Rails 3+ app, simply append to `Gemfile`:
 
 ```
-gem 'puma', :github => 'puma/puma'
+gem 'puma', '~> 2.0'
 ```
-
-NOTE: as the time of this writing, puma 2.0 (in which `puma` CLI has `-d` option) is not yet released and we need to get the latest code from the repostiory instead.
 
 then `bundle install`
 
 You can now start your app with puma with `rails s`.  You should see output if it is started correctly:
 
 ```
-Puma 2.0.0 starting...
+Puma 2.0.1 starting...
 * Min threads: 0, max threads: 16
 * Environment: development
 ...
@@ -118,7 +118,7 @@ Once successfully installed, you could verify with:
 
 ```
 nginx -v
-# nginx version: nginx/1.2.7
+# nginx version: nginx/1.4.0
 ```
 
 ## Configuration
@@ -223,7 +223,7 @@ RAILS_ENV=production bundle exec puma -e production -b unix:///var/run/my_app.so
 if nothing goes wrong, you should see this:
 
 ```
-Puma 2.0.0 starting...
+Puma 2.0.1 starting...
 * Min threads: 0, max threads: 16
 * Environment: development
 * Listening on unix:///var/run/my_app.sock
@@ -286,7 +286,7 @@ config: !ruby/object:Puma::Configuration
     :control_auth_token: ebc1c8acff6766a29f93795ac8b74e
 ```
 
-this is a serialized `Puma::Configuration` object, and `pumactl` would read in this object to figure out where you bind your puma process and other details.
+this is a serialized `Puma::Configuration` object, and `pumactl` would read this object to figure out where you bind your puma process and other details.
 
 Now to restart our puma, we do:
 
