@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "How to setup Rails app with puma and nginx"
+title: "How to setup Rails app with puma and NGINX"
 date: 2013-03-16 17:51
 comments: true
 categories:
@@ -10,7 +10,7 @@ author: "Trung Lê"
 
 {{ post.title }}
 
-In this tutorial, I'll walk you through the concept behind using puma + nginx, plus thorough instructions on setting them up on CentOS and Ubuntu.
+In this tutorial, I'll walk you through the concept behind using puma + NGINX, plus thorough instructions on setting them up on CentOS and Ubuntu.
 
 <!--more-->
 
@@ -20,14 +20,14 @@ Many people who come from the old Apache HTTPd day often ask me how reverse prox
 
 > _"It's different paradigm"_
 
-Reverse proxy software (such as Varnish or nginx) would acts as a load balancer that routes all external requests to a pool of web apps. The below diagram depicts simply how it works:
+Reverse proxy software (such as Varnish or NGINX) would acts as a load balancer that routes all external requests to a pool of web apps. The below diagram depicts simply how it works:
 
 ```
-                                               +---> web app 1
-                                               |              
-[requests] <------>  [reverse proxy server]  --+---> web app 2
+                                               +---> web app process 1 --> threads
                                                |
-                                               +---> web app 3
+[requests] <------>  [reverse proxy server]  --+---> web app process 2 --> threads
+                                               |
+                                               +---> web app process 3 --> threads
 ```
 
 In constrast to Apache way, which is depicted below:
@@ -50,12 +50,12 @@ I am NOT going to dwelve into which way is better than which. My 5cent on this i
 
 puma is a multi-threaded high performance webserver written in Ruby. It is new in the market yet it has gained lots of traction. It can be used to server any ruby web app that support rack such as Sinatra or Ruby On Rails.
 
-As a first class Ruby project, you could install `puma` via RubyGems. 
+As a first class Ruby project, you could install `puma` via RubyGems.
 
 With Rails 3+ app, simply append to `Gemfile`:
 
 ```
-gem 'puma', '~> 2.0'
+gem 'puma', '~> 2.1.0'
 ```
 
 then `bundle install`
@@ -63,16 +63,16 @@ then `bundle install`
 You can now start your app with puma with `rails s`.  You should see output if it is started correctly:
 
 ```
-Puma 2.0.1 starting...
+Puma 2.1.0 starting...
 * Min threads: 0, max threads: 16
 * Environment: development
 ...
 ```
 
 
-### nginx
+### NGINX
 
-nginx is utilised as reverse proxy server for its `HttpProxyModule` could perform proxy passing request to many virtual hosts.
+NGINX is utilised as reverse proxy server for its `HttpProxyModule` could perform proxy passing request to many virtual hosts.
 
 Firstly, we need to get the software installed on our server:
 
@@ -88,7 +88,7 @@ gpgcheck=0
 enabled=1
 ```
 
-Then we can install nginx with:
+Then we can install NGINX with:
 
 ```
 sudo yum install nginx
@@ -100,18 +100,32 @@ and the server could be started with:
 sudo /etc/init.d/nginx start
 ```
 
-__Ubuntu 12.04+__
+__Ubuntu 12.04__
 
-It's even simpler on Ubuntu with one command:
+The NGINX version in the Ubuntu repo is quite old (ie. 1.2.6), you could install
+newer version by adding the official nginx.org repo:
 
 ```
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62
+```
+
+then add following line into the end of file `/etc/apt/sources.list`:
+
+```
+deb http://nginx.org/packages/ubuntu/ precise nginx
+```
+
+NOTE: If you have installed NGINX before, make sure you remove it first:
+
+```
+sudo apt-get purge nginx*
+```
+
+then you can install the package with:
+
+```
+sudo apt-get update
 sudo apt-get install nginx
-```
-
-and can be started with:
-
-```
-sudo service nginx start
 ```
 
 Once successfully installed, you could verify with:
@@ -121,20 +135,28 @@ nginx -v
 # nginx version: nginx/1.4.0
 ```
 
+you can manually start the daemon using Upstart:
+
+```
+sudo service nginx start
+```
+
 ## Configuration
 
 Due to the differences in file locations between CentOS and Ubuntu, I divide this section into two, please read the section that match your OS.
 
 Before continuing, there are few assumptions I would like you to be aware of:
 
+* You are running on Ruby 1.9.3 or newer
+* Your Rails app is 3.x or newer
 * You are running your app under `RAILS_ENV=production`
 * Your rails app should be placed in `/var/www` folder.
 * You have setup correctly all permissions and firewall settings for your environment
 
-### nginx configuration
+### NGINX configuration
 
-We are going to configure nginx to have an `upstream` directive, this directive tell nginx where to proxy parse the request to.
-Next we will add a virtual host and use `proxy_pass` directive to tell nginx to pass the request to the pool of processes defined in `upstream` section.
+We are going to configure NGINX to have an `upstream` directive, this directive tell NGINX where to proxy parse the request to.
+Next we will add a virtual host and use `proxy_pass` directive to tell NGINX to pass the request to the pool of processes defined in `upstream` section.
 
 __CentOS__
 
@@ -164,7 +186,7 @@ server {
 }
 ```
 
-then you can restart your nginx server:
+then you can restart your NGINX server:
 
 ```
 sudo /etc/init.id/nginx restart
@@ -223,7 +245,7 @@ RAILS_ENV=production bundle exec puma -e production -b unix:///var/run/my_app.so
 if nothing goes wrong, you should see this:
 
 ```
-Puma 2.0.1 starting...
+Puma 2.1.0 starting...
 * Min threads: 0, max threads: 16
 * Environment: development
 * Listening on unix:///var/run/my_app.sock
@@ -249,9 +271,30 @@ ps aux | grep puma
 
 ### restart/stop your app server
 
-So you guess we are at the end of the tutorial? I think not, we still have no clue how to restart/stop the puma server. Well, to stop it we could kill the PID. But there are a better way, introducing the awesome `pumactl` command line tool.
+In order to restart our server, we use command `kill` to send in `SIGUSR2` signal
+to the puma PID, in our case the PID is 9594:
 
-`pumactl` is a command line that takes in parameter of the path where we store the puma process state. We need to tell puma to generate the state file first. So let's just kill our current puma running in the background with
+```
+kill -s SIGUSR2 9594
+```
+
+and to stop the server we send in `SIGTERM`:
+
+```
+kill -s QUIT 9594
+```
+
+### a better way to manage your puma processes
+
+Dealing with UNIX PID is not something you want to deal with everyday. There are
+many tools to manage processes such as `god` or `monit`. You need to spend time
+to configure them correctly. Thanksfully, puma comes with a built-in process
+manager that help ease your admin job, introducing the awesome `pumactl` command line tool.
+
+`pumactl` is the puma processes monitor and controller, it allows you to start/restart/stop
+through a chain of socket files that keep track the PID and states of puma processes.
+
+We need to tell puma to generate the state file first. So let's just kill our current puma running in the background with
 
 ```
 sudo killall puma
