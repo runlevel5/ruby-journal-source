@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>How to setup Rails app with puma and nginx - Ruby Journal</title>
+  <title>How to setup Rails app with puma and NGINX - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="In this tutorial, I&#8217;ll walk you through the concept behind using puma + nginx, plus thorough instructions on setting them up on CentOS and &hellip;">
+  <meta name="description" content="In this tutorial, I&#8217;ll walk you through the concept behind using puma + NGINX, plus thorough instructions on setting them up on CentOS and &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">How to Setup Rails App With Puma and Nginx</h1>
+      <h1 class="entry-title">How to Setup Rails App With Puma and NGINX</h1>
     
     
       <p class="meta">
@@ -104,7 +104,7 @@
 
 
 <div class="entry-content">
-<p>In this tutorial, I&#8217;ll walk you through the concept behind using puma + nginx, plus thorough instructions on setting them up on CentOS and Ubuntu.</p>
+<p>In this tutorial, I&#8217;ll walk you through the concept behind using puma + NGINX, plus thorough instructions on setting them up on CentOS and Ubuntu.</p>
 
 <!--more-->
 
@@ -116,18 +116,18 @@
   <p><em>&#8220;It&#8217;s different paradigm&#8221;</em></p>
 </blockquote>
 
-<p>Reverse proxy software (such as Varnish or nginx) would acts as a load balancer that routes all external requests to a pool of web apps. The below diagram depicts simply how it works:</p>
+<p>Reverse proxy software (such as Varnish or NGINX) would acts as a load balancer that routes all external requests to a pool of web apps. The below diagram depicts simply how it works:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
 <span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">                                           +---&gt; web app 1
-</span><span class="line">                                           |              
-</span><span class="line">[requests] &lt;------&gt;  [reverse proxy server]  --+---&gt; web app 2
+</pre></td><td class="code"><pre><code class=""><span class="line">                                           +---&gt; web app process 1 --&gt; threads
 </span><span class="line">                                           |
-</span><span class="line">                                           +---&gt; web app 3</span></code></pre></td></tr></table></div></figure></notextile></div>
+</span><span class="line">[requests] &lt;------&gt;  [reverse proxy server]  --+---&gt; web app process 2 --&gt; threads
+</span><span class="line">                                           |
+</span><span class="line">                                           +---&gt; web app process 3 --&gt; threads</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>In constrast to Apache way, which is depicted below:</p>
 
@@ -152,12 +152,12 @@
 
 <p>puma is a multi-threaded high performance webserver written in Ruby. It is new in the market yet it has gained lots of traction. It can be used to server any ruby web app that support rack such as Sinatra or Ruby On Rails.</p>
 
-<p>As a first class Ruby project, you could install <code>puma</code> via RubyGems. </p>
+<p>As a first class Ruby project, you could install <code>puma</code> via RubyGems.</p>
 
 <p>With Rails 3+ app, simply append to <code>Gemfile</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', '~&gt; 2.0'</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', '~&gt; 2.1.0'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>then <code>bundle install</code></p>
 
@@ -167,14 +167,14 @@
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.0.1 starting...
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.0 starting...
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">...</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<h3 id="nginx">nginx</h3>
+<h3 id="nginx">NGINX</h3>
 
-<p>nginx is utilised as reverse proxy server for its <code>HttpProxyModule</code> could perform proxy passing request to many virtual hosts.</p>
+<p>NGINX is utilised as reverse proxy server for its <code>HttpProxyModule</code> could perform proxy passing request to many virtual hosts.</p>
 
 <p>Firstly, we need to get the software installed on our server:</p>
 
@@ -193,7 +193,7 @@
 </span><span class="line">gpgcheck=0
 </span><span class="line">enabled=1</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Then we can install nginx with:</p>
+<p>Then we can install NGINX with:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">sudo yum install nginx</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -203,17 +203,30 @@
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">sudo /etc/init.d/nginx start</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p><strong>Ubuntu 12.04+</strong></p>
+<p><strong>Ubuntu 12.04</strong></p>
 
-<p>It&#8217;s even simpler on Ubuntu with one command:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">sudo apt-get install nginx</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>and can be started with:</p>
+<p>The NGINX version in the Ubuntu repo is quite old (ie. 1.2.6), you could install
+newer version by adding the official nginx.org repo:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">sudo service nginx start</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then add following line into the end of file <code>/etc/apt/sources.list</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">deb http://nginx.org/packages/ubuntu/ precise nginx</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>NOTE: If you have installed NGINX before, make sure you remove it first:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo apt-get purge nginx*</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then you can install the package with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo apt-get update
+</span><span class="line">sudo apt-get install nginx</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Once successfully installed, you could verify with:</p>
 
@@ -222,6 +235,11 @@
 </pre></td><td class="code"><pre><code class=""><span class="line">nginx -v
 </span><span class="line"># nginx version: nginx/1.4.0</span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<p>you can manually start the daemon using Upstart:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo service nginx start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
 <h2 id="configuration">Configuration</h2>
 
 <p>Due to the differences in file locations between CentOS and Ubuntu, I divide this section into two, please read the section that match your OS.</p>
@@ -229,15 +247,17 @@
 <p>Before continuing, there are few assumptions I would like you to be aware of:</p>
 
 <ul>
+  <li>You are running on Ruby 1.9.3 or newer</li>
+  <li>Your Rails app is 3.x or newer</li>
   <li>You are running your app under <code>RAILS_ENV=production</code></li>
   <li>Your rails app should be placed in <code>/var/www</code> folder.</li>
   <li>You have setup correctly all permissions and firewall settings for your environment</li>
 </ul>
 
-<h3 id="nginx-configuration">nginx configuration</h3>
+<h3 id="nginx-configuration">NGINX configuration</h3>
 
-<p>We are going to configure nginx to have an <code>upstream</code> directive, this directive tell nginx where to proxy parse the request to.
-Next we will add a virtual host and use <code>proxy_pass</code> directive to tell nginx to pass the request to the pool of processes defined in <code>upstream</code> section.</p>
+<p>We are going to configure NGINX to have an <code>upstream</code> directive, this directive tell NGINX where to proxy parse the request to.
+Next we will add a virtual host and use <code>proxy_pass</code> directive to tell NGINX to pass the request to the pool of processes defined in <code>upstream</code> section.</p>
 
 <p><strong>CentOS</strong></p>
 
@@ -279,7 +299,7 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 </span><span class="line">  }
 </span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>then you can restart your nginx server:</p>
+<p>then you can restart your NGINX server:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">sudo /etc/init.id/nginx restart</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -350,7 +370,7 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <span class="line-number">3</span>
 <span class="line-number">4</span>
 <span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.0.1 starting...
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.0 starting...
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">* Listening on unix:///var/run/my_app.sock
@@ -374,9 +394,28 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 
 <h3 id="restartstop-your-app-server">restart/stop your app server</h3>
 
-<p>So you guess we are at the end of the tutorial? I think not, we still have no clue how to restart/stop the puma server. Well, to stop it we could kill the PID. But there are a better way, introducing the awesome <code>pumactl</code> command line tool.</p>
+<p>In order to restart our server, we use command <code>kill</code> to send in <code>SIGUSR2</code> signal
+to the puma PID, in our case the PID is 9594:</p>
 
-<p><code>pumactl</code> is a command line that takes in parameter of the path where we store the puma process state. We need to tell puma to generate the state file first. So let&#8217;s just kill our current puma running in the background with</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">kill -s SIGUSR2 9594</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and to stop the server we send in <code>SIGTERM</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">kill -s QUIT 9594</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="a-better-way-to-manage-your-puma-processes">a better way to manage your puma processes</h3>
+
+<p>Dealing with UNIX PID is not something you want to deal with everyday. There are
+many tools to manage processes such as <code>god</code> or <code>monit</code>. You need to spend time
+to configure them correctly. Thanksfully, puma comes with a built-in process
+manager that help ease your admin job, introducing the awesome <code>pumactl</code> command line tool.</p>
+
+<p><code>pumactl</code> is the puma processes monitor and controller, it allows you to start/restart/stop
+through a chain of socket files that keep track the PID and states of puma processes.</p>
+
+<p>We need to tell puma to generate the state file first. So let&#8217;s just kill our current puma running in the background with</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">sudo killall puma</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -526,7 +565,7 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
       </li>
     
       <li class="post">
-        <a href="/how-to-setup-rails-app-with-puma-and-nginx/">How to setup Rails app with puma and nginx</a>
+        <a href="/how-to-setup-rails-app-with-puma-and-nginx/">How to setup Rails app with puma and NGINX</a>
       </li>
     
       <li class="post">
