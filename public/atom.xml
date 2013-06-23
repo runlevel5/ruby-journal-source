@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-06-23T22:16:48+10:00</updated>
+  <updated>2013-06-23T22:56:43+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -667,7 +667,13 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
   <li>Control Server</li>
 </ul>
 
-<h4 id="pid-recommended">PID (RECOMMENDED)</h4>
+<p><em>WARNING</em>: Sadly, <code>pumactl</code> is very broken and yield inconsitent bugs. So for now, please <em>AVOID</em> using <code>pumactl</code> and instead use my production-grade bash script:</p>
+
+<p>https://gist.github.com/joneslee85/5844933</p>
+
+<p>Please read on if you want to know how <code>pumactl</code> does thing. If not, just skip it.</p>
+
+<h4 id="pid">PID</h4>
 
 <p>This is exactly like the traditional way of sending signal to process with <code>kill</code>. Please be noted that we could not start our server with this way because <code>pumactl</code> has no idea what our configuration, so you have to start the server the normal way with <code>puma</code> command.</p>
 
@@ -700,7 +706,7 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -P /var/run/puma.pid stop</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Isn&#8217;t that more civilized? At the moment of this writing, I find dealing with PID is very reliable. The downside is that you have to manually manage the process. I highly recommend you to use <code>monit</code> or <code>god</code> to manage the process instead of <code>pumactl</code> because <code>pumactl</code> suffers few bugs. </p>
+<p>Isn&#8217;t that more civilized? At the moment of this writing, I find dealing with PID is very reliable. The downside is that you have to manually manage the process. I highly recommend you to use <code>monit</code> or <code>god</code> to manage the process instead of <code>pumactl</code> because <code>pumactl</code> suffers few bugs.</p>
 
 <h4 id="state-file-avoid">State file (AVOID)</h4>
 
