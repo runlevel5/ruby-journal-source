@@ -322,7 +322,13 @@ manager that help ease your admin job, introducing the awesome `pumactl` command
 * State file
 * Control Server
 
-#### PID (RECOMMENDED)
+*WARNING*: Sadly, `pumactl` is very broken and yield inconsitent bugs. So for now, please *AVOID* using `pumactl` and instead use my production-grade bash script:
+
+https://gist.github.com/joneslee85/5844933
+
+Please read on if you want to know how `pumactl` does thing. If not, just skip it.
+
+#### PID
 
 This is exactly like the traditional way of sending signal to process with `kill`. Please be noted that we could not start our server with this way because `pumactl` has no idea what our configuration, so you have to start the server the normal way with `puma` command.
 
@@ -358,7 +364,7 @@ and stop process with:
 bundle exec pumactl -P /var/run/puma.pid stop
 ```
 
-Isn't that more civilized? At the moment of this writing, I find dealing with PID is very reliable. The downside is that you have to manually manage the process. I highly recommend you to use `monit` or `god` to manage the process instead of `pumactl` because `pumactl` suffers few bugs. 
+Isn't that more civilized? At the moment of this writing, I find dealing with PID is very reliable. The downside is that you have to manually manage the process. I highly recommend you to use `monit` or `god` to manage the process instead of `pumactl` because `pumactl` suffers few bugs.
 
 #### State file (AVOID)
 
