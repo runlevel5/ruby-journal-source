@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-06-22T19:57:24+10:00</updated>
+  <updated>2013-06-23T22:16:48+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -393,7 +393,7 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.0 starting...
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">...</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -596,7 +596,7 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <span class="line-number">3</span>
 <span class="line-number">4</span>
 <span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.0 starting...
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">* Listening on unix:///var/run/my_app.sock
@@ -611,14 +611,14 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>You could verify if the puma process are in bg by:</p>
+<p>You could verify if the puma process is in background or not:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">ps aux | grep puma
 </span><span class="line"># 9594 92.8  1.4 496844 117280 ?       Rl   17:25   0:25 ruby /usr/lib/ruby/1.9.1/bin/puma -e production -d -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<h3 id="restartstop-your-app-server">restart/stop your app server</h3>
+<h3 id="restartstop-your-daemon-puma-server">restart/stop your daemon puma server</h3>
 
 <p>In order to restart our server, we use command <code>kill</code> to send in <code>SIGUSR2</code> signal
 to the puma PID, in our case the PID is 9594:</p>
@@ -626,10 +626,31 @@ to the puma PID, in our case the PID is 9594:</p>
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">kill -s SIGUSR2 9594</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>and to stop the server we send in <code>SIGTERM</code>:</p>
+<p>The process kills itself and fork a new process with new PID</p>
+
+<p>If you want to stop the server, simply send <code>SIGTERM</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">kill -s QUIT 9594</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">kill -s SIGTERM 9594</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>you can verify if the process has been killed or not with <code>ps</code>.</p>
+
+<p>If you want UNIX fetch you the PID, you can start puma server with <code>--pidfile</code> params:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The PID will be store in <code>/var/run/puma.pid</code> and now you could just <code>cat</code> the PID out easily:</p>
+
+<p>To restart:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">kill -s SIGUSR2 `cat /var/run/puma.pid`</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>To stop:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">kill -s SIGTERM `cat /var/run/puma.pid`</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h3 id="a-better-way-to-manage-your-puma-processes">a better way to manage your puma processes</h3>
 
@@ -638,10 +659,54 @@ many tools to manage processes such as <code>god</code> or <code>monit</code>. Y
 to configure them correctly. Thanksfully, puma comes with a built-in process
 manager that help ease your admin job, introducing the awesome <code>pumactl</code> command line tool.</p>
 
-<p><code>pumactl</code> is the puma processes monitor and controller, it allows you to start/restart/stop
-through a chain of socket files that keep track the PID and states of puma processes.</p>
+<p><code>pumactl</code> is the puma processes monitor and controller, it allows you to start/restart/stop the server with 3 ways:</p>
 
-<p>We need to tell puma to generate the state file first. So let&#8217;s just kill our current puma running in the background with</p>
+<ul>
+  <li>PID</li>
+  <li>State file</li>
+  <li>Control Server</li>
+</ul>
+
+<h4 id="pid-recommended">PID (RECOMMENDED)</h4>
+
+<p>This is exactly like the traditional way of sending signal to process with <code>kill</code>. Please be noted that we could not start our server with this way because <code>pumactl</code> has no idea what our configuration, so you have to start the server the normal way with <code>puma</code> command.</p>
+
+<p>However, for existing running puma process, you could stop it with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -p &lt;pid&gt; stop
+</span><span class="line"># Command stop sent success</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and to restart it:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -p &lt;pid&gt; resart
+</span><span class="line"># Command restart sent success</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And in the case where you tell puma to store its PID in pid file:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and then we could restart the process with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -P /var/run/puma.pid restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and stop process with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -P /var/run/puma.pid stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Isn&#8217;t that more civilized? At the moment of this writing, I find dealing with PID is very reliable. The downside is that you have to manually manage the process. I highly recommend you to use <code>monit</code> or <code>god</code> to manage the process instead of <code>pumactl</code> because <code>pumactl</code> suffers few bugs. </p>
+
+<h4 id="state-file-avoid">State file (AVOID)</h4>
+
+<p>Dealing with PID is painful, you need to type the whole <code>puma</code> start line over and over again. However, there is a better way, by storing all the configurations into one state file, <code>pumactl</code> would be able to manage processes easily.</p>
+
+<p>So firstly, we need to kill all puma processes running:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">sudo killall puma</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -649,7 +714,7 @@ through a chain of socket files that keep track the PID and states of puma proce
 <p>then we start our server with <code>-S</code> parameter:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock -S /var/run/my_app.state --control 'unix:///var/run/my_app_pumactl.sock'</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock -S /var/run/my_app.state</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>puma would generate <code>/var/run/my_app.state</code> file with content:</p>
 
@@ -669,8 +734,6 @@ through a chain of socket files that keep track the PID and states of puma proce
 <span class="line-number">14</span>
 <span class="line-number">15</span>
 <span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">---
 </span><span class="line">pid: 9654
 </span><span class="line">config: !ruby/object:Puma::Configuration
@@ -686,9 +749,7 @@ through a chain of socket files that keep track the PID and states of puma proce
 </span><span class="line">    :worker_boot: []
 </span><span class="line">    :environment: production
 </span><span class="line">    :worker_directory: /home/jr_deploy/staging/current
-</span><span class="line">    :state: /var/run/my_app.state
-</span><span class="line">    :control_url: unix:///var/run/my_app_pumactl.sock
-</span><span class="line">    :control_auth_token: ebc1c8acff6766a29f93795ac8b74e</span></code></pre></td></tr></table></div></figure></notextile></div>
+</span><span class="line">    :state: /var/run/my_app.state</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>this is a serialized <code>Puma::Configuration</code> object, and <code>pumactl</code> would read this object to figure out where you bind your puma process and other details.</p>
 
@@ -700,12 +761,109 @@ through a chain of socket files that keep track the PID and states of puma proce
 <p>and if you want to stop puma:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state stop
+</span><span class="line"># Command stop sent success</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The interesting thing is that <code>/var/run/my_app.state</code> will be peristent and you could start the server with all configurations retained:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the output I get is:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">* Listening on tcp://0.0.0.0:9292
+</span><span class="line">Use Ctrl-C to stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which is not the way I expected because the server is started in non-daemon mode and use TCP mode. I believe this is an issue with puma. So for now, please refrain from starting the server with pumactl. Instead, remove file <code>/var/run/my_app.state</code> and repeat the whole process again. I&#8217;ve lodged this issue with @evanphx at https://github.com/puma/puma/issues/287</p>
+
+<h4 id="control-server-avoid">Control Server (AVOID)</h4>
+
+<p>puma also comes with a built-in control server which will be started on localhost port 9293 when you run puma with <code>--control</code> params:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock --control unix:///var/run/my_app_pumactl.sock --control-token foo</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If nothing goes wrong, you should see:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">* Listening on unix:///var/run/my_app.sock
+</span><span class="line">* Starting status server on unix:///var/run/my_app_pumactl.sock
+</span><span class="line">Use Ctrl-C to stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please pay attention to <code>--control-token</code> param, this is auth token which is required by <code>pumactl</code> to talk to this control server.</p>
+
+<p>You can query status of the server with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">pumactl -C unix://var/run/my_app_pumactl.sock [status|restart|halt|stop]</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You should see:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma is started</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now let&#8217;s try to halt/stop/restart the server:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">pumactl -C unix://var/run/my_app_pumactl.sock -T foo [restart|halt|restart]</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted, if your <code>-T</code> token does not match the token the server used, in our case <code>foo</code>, you would get this error:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Unauthorized access to server (wrong auth token)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Okay, so far all goes well, let&#8217;s try to stop the server first then start it with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">pumactl -C unix://var/run/my_app_pumactl.sock -T foo start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and the output:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">* Listening on tcp://0.0.0.0:9292
+</span><span class="line">Use Ctrl-C to stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which is wrong, it seems to me puma suffers the same issue as of the State file. So please refrain from using State File and Control Server methods to monitor puma process. Instead, just go for the PID way and use <code>monit</code> or <code>god</code> instead. I&#8217;ll update this section once the issue is resolved.</p>
+
+<h3 id="capistrano-deployment">Capistrano deployment</h3>
 
 <p>Now you know how puma works, you could adapt what you learned for your deployment. If you use <code>capistrano</code>, you could use the <code>puma/capistrano</code> tasks by append to your <code>config/deploy.rb</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">require 'puma/capistrano`</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and then</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec cap puma:start
+</span><span class="line">bundle exec cap puma:restart 
+</span><span class="line">bundle exec cap puma:stop</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 ]]></content>
   </entry>
