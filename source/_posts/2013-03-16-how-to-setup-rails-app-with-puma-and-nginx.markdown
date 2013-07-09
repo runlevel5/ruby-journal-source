@@ -55,7 +55,7 @@ As a first class Ruby project, you could install `puma` via RubyGems.
 With Rails 3+ app, simply append to `Gemfile`:
 
 ```
-gem 'puma', '~> 2.1.0'
+gem 'puma', '~> 2.3.2'
 ```
 
 then `bundle install`
@@ -63,7 +63,8 @@ then `bundle install`
 You can now start your app with puma with `rails s`.  You should see output if it is started correctly:
 
 ```
-Puma 2.1.1 starting...
+Puma starting in single mode...
+* Version 2.3.2, codename: Delicious Thin Mints
 * Min threads: 0, max threads: 16
 * Environment: development
 ...
@@ -245,7 +246,8 @@ RAILS_ENV=production bundle exec puma -e production -b unix:///var/run/my_app.so
 if nothing goes wrong, you should see this:
 
 ```
-Puma 2.1.1 starting...
+Puma starting in single mode...
+* Version 2.3.2, codename: Delicious Thin Mints
 * Min threads: 0, max threads: 16
 * Environment: development
 * Listening on unix:///var/run/my_app.sock
@@ -409,6 +411,7 @@ Now to restart our puma, we do:
 
 ```
 bundle exec pumactl -S /var/run/my_app.state restart
+# Command restart sent success
 ```
 
 and if you want to stop puma:
@@ -473,7 +476,7 @@ Now let's try to halt/stop/restart the server:
 
 ```
 pumactl -C unix://var/run/my_app_pumactl.sock -T foo [restart|halt|restart]
-``` 
+```
 
 Please be noted, if your `-T` token does not match the token the server used, in our case `foo`, you would get this error:
 
@@ -511,7 +514,7 @@ and then
 
 ```
 bundle exec cap puma:start
-bundle exec cap puma:restart 
+bundle exec cap puma:restart
 bundle exec cap puma:stop
 ```
 
