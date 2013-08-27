@@ -2,64 +2,68 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/</loc>
-        <lastmod>2013-03-16T17:55:22+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/</loc>
-        <lastmod>2013-03-16T17:55:21+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/</loc>
-        <lastmod>2013-03-16T17:55:20+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/
         </loc>
-        <lastmod>2013-03-16T17:54:57+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/heroku/install-ghostscript-on-heroku/</loc>
-        <lastmod>2013-03-16T17:54:57+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/spree-1-1-stable-deployment-on-heroku/</loc>
-        <lastmod>2013-03-16T17:54:57+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/</loc>
-        <lastmod>2013-03-16T17:55:13+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/debug-your-failed-test-in-travis-ci/</loc>
-        <lastmod>2013-03-16T17:55:11+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/</loc>
-        <lastmod>2013-03-16T17:55:08+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-setup-rails-app-with-puma-and-nginx/</loc>
-        <lastmod>2013-06-23T22:56:06+10:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-block-old-ie-version-with-rails/</loc>
-        <lastmod>2013-03-16T17:57:34+11:00</lastmod>
+        <lastmod>2013-08-27T22:51:50+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/</loc>
-        <lastmod>2013-03-16T18:00:00+11:00</lastmod>
+        <lastmod>2013-08-27T23:04:41+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/minitest-let-is-lazy/</loc>
-        <lastmod>2013-04-13T11:00:00+10:00</lastmod>
+        <lastmod>2013-08-27T23:04:34+10:00</lastmod>
+    </url>
+    <url>
+        <loc>http://ruby-journal.com/learn-to-know-myself-better/</loc>
+        <lastmod>2013-08-27T23:04:37+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2013-06-23T22:56:06+10:00</lastmod>
+        <lastmod>2013-08-27T23:04:41+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2013-06-23T22:56:06+10:00</lastmod>
+        <lastmod>2013-08-27T23:04:41+10:00</lastmod>
     </url>
 </urlset>

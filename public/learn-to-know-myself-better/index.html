@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Install Ghostscript on Heroku Cedar - Ruby Journal</title>
+  <title>Learn to know myself better - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
-As you might have known that Heroku virtual machine does come with a &hellip;">
+  <meta name="description" content="Unlike some of my friends, I occassionally write or blog. Because I don&#8217;t know how to express myself in verbal or writting form. In fact I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ As you might have known that Heroku virtual machine does come with a &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/">
+  <link rel="canonical" href="http://ruby-journal.com/learn-to-know-myself-better/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +78,7 @@ As you might have known that Heroku virtual machine does come with a &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Install Ghostscript on Heroku Cedar</h1>
+      <h1 class="entry-title">Learn to Know Myself Better</h1>
     
     
       <p class="meta">
@@ -95,7 +94,7 @@ As you might have known that Heroku virtual machine does come with a &hellip;">
   
 
 
-<time datetime="2012-03-12T16:57:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2013-08-27T22:59:00+10:00" pubdate data-updated="true">Aug 27<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,60 +104,19 @@ As you might have known that Heroku virtual machine does come with a &hellip;">
 
 
 <div class="entry-content">
-<p>In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
-As you might have known that Heroku virtual machine does come with a system-wide
-ghostscript version which is located at <code>/usr/bin/gs</code>. You can find out the
-location of this version:</p>
+<p>Unlike some of my friends, I <em>occassionally</em> write or blog. Because I don&#8217;t know how to express myself in verbal or writting form. In fact I suck at both. It is not because I hate them, on the contrary I <em>love</em> communication and always get fascinated by charismatic speeches. I have been always avoiding confronting this very own problem of mine. Gradually I refrain to question the problem at all.</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
-</span><span class="line">$ /usr/bin/gs --version
-</span><span class="line">8.71</span></code></pre></td></tr></table></div></figure></notextile></div>
+<!--more-->
 
-<p>However, explicit dependencies is not recommended, you could read 12 Factor Approach
-on dependencies at <a href="http://www.12factor.net/dependencies">http://www.12factor.net/dependencies</a>. Credit to <a href="https://github.com/rwdaigle">Ryan Daigle</a> who pointed it out for me and I agree with him.</p>
+<p>However today is special. When everyone&#8217;s busy with hectic life, I am lying here, on the hospital bed waiting for the surgery. I have been admitted to hospital for 3 days, at the beginning the fear of surgery makes I anxious and scared. I felt like I was falling into a pool of mixed feelings in which I could not figure out how to get out of it. I really want to write down this very feeling but I feel powerless at my inability to express. On the day three, all the anxeties and anger seems gone, I felt very peaceful and calm, as if I truly reach my own point of solitude. I learn to be patient and accept things that I could not control and most importantly I learn to accept myself.</p>
 
-<p>To install ghostscript, we fetch the source under heroku console, fetch the source,
-configure and compile the software:</p>
+<p>I was born <strong>different</strong>.</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
-</span><span class="line">$ curl -O http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz
-</span><span class="line">$ tar xzvf ghostscript-9.05.tar.gz
-</span><span class="line">$ cd ghostscript-9.05
-</span><span class="line">$ ./configure --disable-cups --disable-gtk --with-drivers=FILES
-</span><span class="line">$ make
-</span><span class="line">$ cp bin/gs ~/bin</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>I have never been good at talking and writting but I am gifted with different ability. Ability to conceive and interpret things visually, I could remember shapes and pictures and be able to draw them from memory and I could draw many shapes before I know how to write alphabets. My brain is programmed in a very graphical but <strong>organic</strong> way. It&#8217;s like Van Goh or Picasso artworks rather than Gantt or Pie charts. There are no rules to predicate how the artwork should be interpreted, just like a Picasso painting, it could mean a universe to some and a doodle work to some. The strength is that you are able to perceive things in multi-paradigms. However the caveat is that you are drown in the multiple streams of thoughts that you hardly be able to express ideas in a coherent way. And just like arts, it takes skills and time to build up the depth to appreciate.</p>
 
-<p>You might notice that I only specify configuration parameters <code>--with-drivers=FILES</code>.
-It is because I don&#8217;t need printer drivers for my app which only does think like
-images and PDF manipulation.</p>
+<p>So stop blaming other external factors before you have asserted yourself. Please ignoring all prejudices and expectations. Give yourself space and time to learn more about yourself. It&#8217;ll be a long journey but a rewarding one.</p>
 
-<p>Once the compilation is completed, copy the binary <code>ghostscript-9.05/bin/gs</code> to <code>~/bin</code>.
-All binaries in <code>~/bin</code> will be available for your Heroku app now. You can verify
-if the binary works by:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gs --version
-</span><span class="line">9.05</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And please do not forget to clean up:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ cd ~
-</span><span class="line">$ rm -rf ghostscript-9.05*</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>If you feel lazy, you could download my Ruby-wrapper of gs at <a href="https://github.com/joneslee85/ruby-ghostscript">https://github.com/joneslee85/ruby-ghostscript</a>.</p>
+<p>Good luck</p>
 </div>
 
 
@@ -181,21 +139,15 @@ if the binary works by:</p>
   
 
 
-<time datetime="2012-03-12T16:57:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2013-08-27T22:59:00+10:00" pubdate data-updated="true">Aug 27<span>th</span>, 2013</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/heroku/'>heroku</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/" data-via="joneslee85" data-counturl="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/learn-to-know-myself-better/" data-via="joneslee85" data-counturl="http://ruby-journal.com/learn-to-know-myself-better/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -208,10 +160,8 @@ if the binary works by:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/" title="Previous Post: Exposing ActiveRecord model attributes to Liquid dynamically">&laquo; Exposing ActiveRecord model attributes to Liquid dynamically</a>
+        <a class="basic-alignment left" href="/minitest-let-is-lazy/" title="Previous Post: minitest let() is lazy">&laquo; minitest let() is lazy</a>
       
-      
-        <a class="basic-alignment right" href="/spree-1-1-stable-deployment-on-heroku/" title="Next Post: Spree 1.1 deployment on Heroku">Spree 1.1 deployment on Heroku &raquo;</a>
       
     </p>
   </footer>
@@ -337,8 +287,8 @@ if the binary works by:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/heroku/install-ghostscript-on-heroku/';
-        var disqus_url = 'http://ruby-journal.com/heroku/install-ghostscript-on-heroku/';
+        var disqus_identifier = 'http://ruby-journal.com/learn-to-know-myself-better/';
+        var disqus_url = 'http://ruby-journal.com/learn-to-know-myself-better/';
         var disqus_script = 'embed.js';
       
     (function () {

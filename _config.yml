@@ -33,16 +33,7 @@ destination: public
 plugins: plugins
 code_dir: downloads/code
 category_dir: blog/categories
-<<<<<<< HEAD
 markdown: kramdown
-=======
-markdown: rdiscount
-rdiscount:
-  extensions:
-    - autolink
-    - footnotes
-    - smart
->>>>>>> a604dce25826ab31846064f9799f0c0e8197dac4
 pygments: false # default python pygments have been replaced by pygments.rb
 
 paginate: 10          # Posts per page on the blog index

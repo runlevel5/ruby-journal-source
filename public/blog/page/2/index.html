@@ -9,8 +9,9 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="It is more than often that you have to write a fixtures for models with polymorphic
-association. In this short tutorial, I will show you how to use &hellip;">
+  <meta name="description" content="Liquid is a powerful templating tool especially when
+used with rails. It is quite common that you have to expose ActiveRecord attributes
+to liquid. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,6 +83,91 @@ association. In this short tutorial, I will show you how to use &hellip;">
       
   <header>
     
+      <h1 class="entry-title"><a href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">Exposing ActiveRecord Model Attributes to Liquid Dynamically</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-12T12:52:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+        
+         | <a href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
+used with rails. It is quite common that you have to expose ActiveRecord attributes
+to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
+model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
+to tell which attributes / call-able methods of the instance that could be passed
+with the <code>liquid_methods</code> call. In most of cases, people tend to use the latter method
+because they could narrow the exposure scope to liquid.</p>
+
+<p>However, what if your model has so many attributes and typing all them out for
+the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
+creating a module:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+</span><span class="line">    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class="line">      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
+</span><span class="line">        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
+</span><span class="line">      <span class="k">end</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And you also need to include the above module in the ActiveRecord classes that
+you want to be exposed to Liquid:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="nb">require</span> <span class="s1">&#39;attributes_to_liquid_methods_mapper&#39;</span>
+</span><span class="line">  <span class="kp">include</span> <span class="no">AttributesToLiquidMethodsMapper</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/rails/define-fixtures-with-polymorphic-association/">Define Fixtures With Polymorphic Association</a></h1>
     
     
@@ -121,11 +207,11 @@ to create fixtures.</p>
 <span class="line-number">5</span>
 <span class="line-number">6</span>
 <span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Car</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Car</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class="line">  <span class="n">belongs_to</span> <span class="ss">:borrowable</span><span class="p">,</span> <span class="ss">:polymorphic</span> <span class="o">=&gt;</span> <span class="kp">true</span>
 </span><span class="line"><span class="k">end</span>
 </span><span class="line">
-</span><span class="line"><span class="k">class</span> <span class="nc">Company</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Company</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class="line">  <span class="n">has_many</span> <span class="ss">:cars</span><span class="p">,</span> <span class="ss">:as</span> <span class="o">=&gt;</span> <span class="ss">:borrowable</span>
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -145,12 +231,12 @@ of testing.</p>
 <span class="line-number">9</span>
 <span class="line-number">10</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># Company fixtures</span>
-</span><span class="line"><span class="n">google</span><span class="p">:</span>
+</span><span class="line"><span class="ss">google</span><span class="p">:</span>
 </span><span class="line">  <span class="nb">id</span><span class="p">:</span> <span class="mi">1</span>
 </span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">Google</span>
 </span><span class="line">
 </span><span class="line"><span class="c1"># car fixtures</span>
-</span><span class="line"><span class="n">ferrari</span><span class="p">:</span>
+</span><span class="line"><span class="ss">ferrari</span><span class="p">:</span>
 </span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">F430</span>
 </span><span class="line">  <span class="n">borrowable_id</span><span class="p">:</span> <span class="mi">1</span>
 </span><span class="line">  <span class="n">borrowable_type</span><span class="p">:</span> <span class="no">Company</span>
@@ -162,9 +248,9 @@ the above car fixture would be:</p>
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">ferrari</span><span class="p">:</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">ferrari</span><span class="p">:</span>
 </span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">F430</span>
-</span><span class="line">  <span class="n">borrowable</span><span class="p">:</span> <span class="n">google</span> <span class="p">(</span><span class="no">Company</span><span class="p">)</span>
+</span><span class="line">  <span class="ss">borrowable</span><span class="p">:</span> <span class="n">google</span> <span class="p">(</span><span class="no">Company</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Please be noted that the syntax of line <code>borrowable</code> now has an additonal <code>(Company)</code>
@@ -305,6 +391,10 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/learn-to-know-myself-better/">Learn to know myself better</a>
+      </li>
+    
+      <li class="post">
         <a href="/minitest-let-is-lazy/">minitest let() is lazy</a>
       </li>
     
@@ -318,10 +408,6 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
     
       <li class="post">
         <a href="/how-to-setup-rails-app-with-puma-and-nginx/">How to setup Rails app with puma and NGINX</a>
-      </li>
-    
-      <li class="post">
-        <a href="/install-ubuntu-with-pxe-via-osx/">Install Ubuntu with PXE via OSX</a>
       </li>
     
   </ul>

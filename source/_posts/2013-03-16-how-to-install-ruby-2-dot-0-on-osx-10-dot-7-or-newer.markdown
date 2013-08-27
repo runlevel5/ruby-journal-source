@@ -4,6 +4,7 @@ title: "How to install Ruby 2.0 on OSX 10.7 or newer"
 date: 2013-03-16 17:58
 comments: true
 tags: ruby
+author: "Trung Lê"
 ---
 
 {{ post.title }}
@@ -25,7 +26,7 @@ Firstly, the OpenSSL comes with your OSX 10.7+ is outdated, you need to get late
 rvm pkg install openssl
 ```
 
-Secondly, the readline library on OSX 10.7+ suffers UTF-8 issue in which method in UTF-8 is converted to characters under `irb`, the 
+Secondly, the readline library on OSX 10.7+ suffers UTF-8 issue in which method in UTF-8 is converted to characters under `irb`, the
 fix is to use latest version
 
 ```

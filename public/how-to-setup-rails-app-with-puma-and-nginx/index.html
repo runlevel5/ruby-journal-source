@@ -157,7 +157,7 @@
 <p>With Rails 3+ app, simply append to <code>Gemfile</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', '~&gt; 2.1.0'</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', '~&gt; 2.3.2'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>then <code>bundle install</code></p>
 
@@ -167,7 +167,9 @@
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma starting in single mode...
+</span><span class="line">* Version 2.3.2, codename: Delicious Thin Mints
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">...</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -370,7 +372,9 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <span class="line-number">3</span>
 <span class="line-number">4</span>
 <span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma starting in single mode...
+</span><span class="line">* Version 2.3.2, codename: Delicious Thin Mints
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">* Listening on unix:///var/run/my_app.sock
@@ -536,7 +540,9 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
 <p>Now to restart our puma, we do:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state restart
+</span><span class="line"># Command restart sent success</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>and if you want to stop puma:</p>
 
@@ -642,7 +648,7 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">bundle exec cap puma:start
-</span><span class="line">bundle exec cap puma:restart 
+</span><span class="line">bundle exec cap puma:restart
 </span><span class="line">bundle exec cap puma:stop</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 </div>
@@ -717,6 +723,10 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/learn-to-know-myself-better/">Learn to know myself better</a>
+      </li>
+    
+      <li class="post">
         <a href="/minitest-let-is-lazy/">minitest let() is lazy</a>
       </li>
     
@@ -730,10 +740,6 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
     
       <li class="post">
         <a href="/how-to-setup-rails-app-with-puma-and-nginx/">How to setup Rails app with puma and NGINX</a>
-      </li>
-    
-      <li class="post">
-        <a href="/install-ubuntu-with-pxe-via-osx/">Install Ubuntu with PXE via OSX</a>
       </li>
     
   </ul>

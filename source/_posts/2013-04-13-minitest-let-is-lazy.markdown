@@ -5,6 +5,7 @@ date: 2013-04-13 10:31
 comments: true
 categories:
 tags: testing, ruby, rails, minitest
+author: "Trung Lê"
 ---
 
 {{ post.title }}

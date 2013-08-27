@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-06-26T07:41:54+10:00</updated>
+  <updated>2013-08-27T23:05:01+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,28 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Learn to know myself better]]></title>
+    <link href="http://ruby-journal.com/learn-to-know-myself-better/"/>
+    <updated>2013-08-27T22:59:00+10:00</updated>
+    <id>http://ruby-journal.com/learn-to-know-myself-better</id>
+    <content type="html"><![CDATA[
+<p>Unlike some of my friends, I <em>occassionally</em> write or blog. Because I don&#8217;t know how to express myself in verbal or writting form. In fact I suck at both. It is not because I hate them, on the contrary I <em>love</em> communication and always get fascinated by charismatic speeches. I have been always avoiding confronting this very own problem of mine. Gradually I refrain to question the problem at all.</p>
+
+<!--more-->
+
+<p>However today is special. When everyone&#8217;s busy with hectic life, I am lying here, on the hospital bed waiting for the surgery. I have been admitted to hospital for 3 days, at the beginning the fear of surgery makes I anxious and scared. I felt like I was falling into a pool of mixed feelings in which I could not figure out how to get out of it. I really want to write down this very feeling but I feel powerless at my inability to express. On the day three, all the anxeties and anger seems gone, I felt very peaceful and calm, as if I truly reach my own point of solitude. I learn to be patient and accept things that I could not control and most importantly I learn to accept myself.</p>
+
+<p>I was born <strong>different</strong>.</p>
+
+<p>I have never been good at talking and writting but I am gifted with different ability. Ability to conceive and interpret things visually, I could remember shapes and pictures and be able to draw them from memory and I could draw many shapes before I know how to write alphabets. My brain is programmed in a very graphical but <strong>organic</strong> way. It&#8217;s like Van Goh or Picasso artworks rather than Gantt or Pie charts. There are no rules to predicate how the artwork should be interpreted, just like a Picasso painting, it could mean a universe to some and a doodle work to some. The strength is that you are able to perceive things in multi-paradigms. However the caveat is that you are drown in the multiple streams of thoughts that you hardly be able to express ideas in a coherent way. And just like arts, it takes skills and time to build up the depth to appreciate.</p>
+
+<p>So stop blaming other external factors before you have asserted yourself. Please ignoring all prejudices and expectations. Give yourself space and time to learn more about yourself. It&#8217;ll be a long journey but a rewarding one.</p>
+
+<p>Good luck</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[minitest let() is lazy]]></title>
@@ -201,7 +223,7 @@
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">rvm pkg install openssl</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Secondly, the readline library on OSX 10.7+ suffers UTF-8 issue in which method in UTF-8 is converted to characters under <code>irb</code>, the 
+<p>Secondly, the readline library on OSX 10.7+ suffers UTF-8 issue in which method in UTF-8 is converted to characters under <code>irb</code>, the
 fix is to use latest version</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
@@ -383,7 +405,7 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
 <p>With Rails 3+ app, simply append to <code>Gemfile</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', '~&gt; 2.1.0'</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', '~&gt; 2.3.2'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>then <code>bundle install</code></p>
 
@@ -393,7 +415,9 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma starting in single mode...
+</span><span class="line">* Version 2.3.2, codename: Delicious Thin Mints
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">...</span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -596,7 +620,9 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <span class="line-number">3</span>
 <span class="line-number">4</span>
 <span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma starting in single mode...
+</span><span class="line">* Version 2.3.2, codename: Delicious Thin Mints
 </span><span class="line">* Min threads: 0, max threads: 16
 </span><span class="line">* Environment: development
 </span><span class="line">* Listening on unix:///var/run/my_app.sock
@@ -762,7 +788,9 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
 <p>Now to restart our puma, we do:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state restart
+</span><span class="line"># Command restart sent success</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>and if you want to stop puma:</p>
 
@@ -868,7 +896,7 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">bundle exec cap puma:start
-</span><span class="line">bundle exec cap puma:restart 
+</span><span class="line">bundle exec cap puma:restart
 </span><span class="line">bundle exec cap puma:stop</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 ]]></content>
@@ -2099,7 +2127,7 @@ you want to be exposed to Liquid:</p>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class="line">  <span class="nb">require</span> <span class="s1">&#39;attributes_to_liquid_methods_mapper&#39;</span>
 </span><span class="line">  <span class="kp">include</span> <span class="no">AttributesToLiquidMethodsMapper</span>
 </span><span class="line"><span class="k">end</span>
@@ -2128,11 +2156,11 @@ to create fixtures.</p>
 <span class="line-number">5</span>
 <span class="line-number">6</span>
 <span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Car</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Car</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class="line">  <span class="n">belongs_to</span> <span class="ss">:borrowable</span><span class="p">,</span> <span class="ss">:polymorphic</span> <span class="o">=&gt;</span> <span class="kp">true</span>
 </span><span class="line"><span class="k">end</span>
 </span><span class="line">
-</span><span class="line"><span class="k">class</span> <span class="nc">Company</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Company</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class="line">  <span class="n">has_many</span> <span class="ss">:cars</span><span class="p">,</span> <span class="ss">:as</span> <span class="o">=&gt;</span> <span class="ss">:borrowable</span>
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -2152,12 +2180,12 @@ of testing.</p>
 <span class="line-number">9</span>
 <span class="line-number">10</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># Company fixtures</span>
-</span><span class="line"><span class="n">google</span><span class="p">:</span>
+</span><span class="line"><span class="ss">google</span><span class="p">:</span>
 </span><span class="line">  <span class="nb">id</span><span class="p">:</span> <span class="mi">1</span>
 </span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">Google</span>
 </span><span class="line">
 </span><span class="line"><span class="c1"># car fixtures</span>
-</span><span class="line"><span class="n">ferrari</span><span class="p">:</span>
+</span><span class="line"><span class="ss">ferrari</span><span class="p">:</span>
 </span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">F430</span>
 </span><span class="line">  <span class="n">borrowable_id</span><span class="p">:</span> <span class="mi">1</span>
 </span><span class="line">  <span class="n">borrowable_type</span><span class="p">:</span> <span class="no">Company</span>
@@ -2169,9 +2197,9 @@ the above car fixture would be:</p>
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">ferrari</span><span class="p">:</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">ferrari</span><span class="p">:</span>
 </span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">F430</span>
-</span><span class="line">  <span class="n">borrowable</span><span class="p">:</span> <span class="n">google</span> <span class="p">(</span><span class="no">Company</span><span class="p">)</span>
+</span><span class="line">  <span class="ss">borrowable</span><span class="p">:</span> <span class="n">google</span> <span class="p">(</span><span class="no">Company</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Please be noted that the syntax of line <code>borrowable</code> now has an additonal <code>(Company)</code>
