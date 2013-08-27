@@ -13,7 +13,7 @@ Unlike some of my friends, I *occassionally* write or blog. Because I don't know
 
 <!--more-->
 
-However today is special. When everyone's busy with hectic life, I am lying here, on the hospital bed waiting for the surgery. I have been admitted to hospital for 3 days, at the beginning the fear of surgery makes I anxious and scared. I felt like I was falling into a pool of mixed feelings in which I could not figure out how to get out of it. I really want to write down this very feeling but I feel powerless at my inability to express. On the day three, all the anxeties and anger seems gone, I felt very peaceful and calm, as if I truly reach my own point of solitude. I learn to be patient and accept things that I could not control and most importantly I learn to accept myself.
+However today is special. When everyone's busy with hectic life, I am lying here, on the hospital bed waiting for the surgery. I have been admitted to hospital for 3 days, at the beginning the fear of surgery makes me anxious and terrified. The urge to express what are going in my head drove me crazy and hopeless. I could not able to focus until the day three, on which all the anxeties seems gone, I felt very peaceful and calm, as if I truly reach my own point of solitude. I learn to be patient and accept things that I could not control and most importantly I learn to accept myself.
 
 I was born __different__.
 
