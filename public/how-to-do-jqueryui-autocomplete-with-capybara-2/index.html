@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Exposing ActiveRecord model attributes to Liquid dynamically - Ruby Journal</title>
+  <title>How to do jQuery UI Autocomplete with capybara 2 - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Liquid is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. &hellip;">
+  <meta name="description" content="In this tutorial, I&#8217;ll show you how to do jQuery UI Autocomplete the better way with Capybara 2!
+That is getting rid of sleep that many &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +19,7 @@ to liquid. &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">
+  <link rel="canonical" href="http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -80,7 +79,7 @@ to liquid. &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Exposing ActiveRecord Model Attributes to Liquid Dynamically</h1>
+      <h1 class="entry-title">How to Do jQuery UI Autocomplete With Capybara 2</h1>
     
     
       <p class="meta">
@@ -96,7 +95,7 @@ to liquid. &hellip;">
   
 
 
-<time datetime="2012-03-12T12:52:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2013-09-12T14:04:00+10:00" pubdate data-updated="true">Sep 12<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -106,20 +105,29 @@ to liquid. &hellip;">
 
 
 <div class="entry-content">
-<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
-model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
-to tell which attributes / call-able methods of the instance that could be passed
-with the <code>liquid_methods</code> call. In most of cases, people tend to use the latter method
-because they could narrow the exposure scope to liquid.</p>
+<p>In this tutorial, I&#8217;ll show you how to do jQuery UI Autocomplete the better way with Capybara 2!
+That is getting rid of <code>sleep</code> that many solutions on the Internet suggested. Furthermore this
+solution works both with selenium and polstergeist driver.</p>
 
-<p>However, what if your model has so many attributes and typing all them out for
-the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
-creating a module:</p>
+<!--more-->
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<p>If you search on the Internet on how to do autocomplete with capybara, you&#8217;ll normally find
+solutions for Capybara 1.x like below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">s</span><span class="o">.</span><span class="n">fill_in</span> <span class="s2">&quot;Make&quot;</span><span class="p">,</span> <span class="ss">:with</span> <span class="o">=&gt;</span> <span class="s2">&quot;Make&quot;</span>
+</span><span class="line"><span class="nb">sleep</span> <span class="mi">3</span>
+</span><span class="line"><span class="n">page</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;$(&#39;.ui-menu-item a:contains(</span><span class="se">\&quot;</span><span class="s2">Make Two</span><span class="se">\&quot;</span><span class="s2">)&#39;).trigger(&#39;mouseenter&#39;).click();&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>It was a fine solution however the <code>sleep</code> call is not good. It tells the driver to passively
+sleep while waiting for JS loading up. As of Capybara 2, there is no need to call <code>sleep</code> as
+finder API will actively look for existence of the node and raise error if not found. Here is
+a better solution:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
@@ -128,31 +136,36 @@ creating a module:</p>
 <span class="line-number">7</span>
 <span class="line-number">8</span>
 <span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class="line">    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
-</span><span class="line">        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">fill_autocomplete</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="p">{})</span>
+</span><span class="line">  <span class="n">fill_in</span> <span class="n">field</span><span class="p">,</span> <span class="ss">with</span><span class="p">:</span> <span class="n">options</span><span class="o">[</span><span class="ss">:with</span><span class="o">]</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{ $(&#39;#</span><span class="si">#{</span><span class="n">field</span><span class="si">}</span><span class="sx">&#39;).trigger(&#39;focus&#39;) }</span>
+</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{ $(&#39;#</span><span class="si">#{</span><span class="n">field</span><span class="si">}</span><span class="sx">&#39;).trigger(&#39;keydown&#39;) }</span>
+</span><span class="line">  <span class="n">selector</span> <span class="o">=</span> <span class="sx">%Q{ul.ui-autocomplete li.ui-menu-item a:contains(&quot;</span><span class="si">#{</span><span class="n">options</span><span class="o">[</span><span class="ss">:select</span><span class="o">]</span><span class="si">}</span><span class="sx">&quot;)}</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">should</span> <span class="n">have_selector</span><span class="p">(</span><span class="s1">&#39;ul.ui-autocomplete li.ui-menu-item a&#39;</span><span class="p">)</span>
+</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{ $(&#39;</span><span class="si">#{</span><span class="n">selector</span><span class="si">}</span><span class="sx">&#39;).trigger(&#39;mouseenter&#39;).click() }</span>
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>And you also need to include the above module in the ActiveRecord classes that
-you want to be exposed to Liquid:</p>
+<p>To use it, you call:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="nb">require</span> <span class="s1">&#39;attributes_to_liquid_methods_mapper&#39;</span>
-</span><span class="line">  <span class="kp">include</span> <span class="no">AttributesToLiquidMethodsMapper</span>
-</span><span class="line"><span class="k">end</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">fill_autocomplete</span><span class="p">(</span><span class="s1">&#39;field_id&#39;</span><span class="p">,</span> <span class="ss">with</span><span class="p">:</span> <span class="s1">&#39;term&#39;</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
+<p>Please be noted that <code>field</code> parameter must be the CSS ID, not label nor name.</p>
+
+<p>Let me digest the above code, first, I fill in the text field and I want the autocomplete
+to kick in by trigger focus and keydown event on the field using JS. Then I check
+the existence of <code>li.ui-menu-item a</code> instead of doing <code>sleep</code> to ensure that the JS
+has popped the dropdown correctly. The final step is just to trigger mouseentter event to
+do mouse hover then click.</p>
+
+<p>Using <code>have_selector</code> is definitely a nicer way to check for JS initialization and I
+encourage you apply this technique as often as possible. You&#8217;ll thank me later for saving
+you from randomly failed test. That&#8217;s all for now. Good day!</p>
 </div>
 
 
@@ -175,21 +188,15 @@ you want to be exposed to Liquid:</p>
   
 
 
-<time datetime="2012-03-12T12:52:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+<time datetime="2013-09-12T14:04:00+10:00" pubdate data-updated="true">Sep 12<span>th</span>, 2013</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/rails/'>rails</a>
-  
-</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/" data-via="joneslee85" data-counturl="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -202,10 +209,8 @@ you want to be exposed to Liquid:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/rails/define-fixtures-with-polymorphic-association/" title="Previous Post: Define Fixtures with Polymorphic Association">&laquo; Define Fixtures with Polymorphic Association</a>
+        <a class="basic-alignment left" href="/how-to-fill-in-fckeditor-with-capybara-2/" title="Previous Post: How to fill in FCKeditor with capybara 2">&laquo; How to fill in FCKeditor with capybara 2</a>
       
-      
-        <a class="basic-alignment right" href="/heroku/install-ghostscript-on-heroku/" title="Next Post: Install Ghostscript on Heroku Cedar">Install Ghostscript on Heroku Cedar &raquo;</a>
       
     </p>
   </footer>
@@ -331,8 +336,8 @@ you want to be exposed to Liquid:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/';
-        var disqus_url = 'http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/';
+        var disqus_identifier = 'http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/';
+        var disqus_url = 'http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/';
         var disqus_script = 'embed.js';
       
     (function () {
