@@ -184,6 +184,19 @@ server {
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
   }
+
+  location ~* ^/assets/ {
+    # Per RFC2616 - 1 year maximum expiry
+    expires 1y;
+    add_header Cache-Control public;
+
+    # Some browsers still send conditional-GET requests if there's a
+    # Last-Modified header or an ETag header even if they haven't
+    # reached the expiry date sent in the Expires header.
+    add_header Last-Modified "";
+    add_header ETag "";
+    break;
+  }
 }
 ```
 
@@ -219,6 +232,19 @@ server {
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
   }
+
+  location ~* ^/assets/ {
+    # Per RFC2616 - 1 year maximum expiry
+    expires 1y;
+    add_header Cache-Control public;
+
+    # Some browsers still send conditional-GET requests if there's a
+    # Last-Modified header or an ETag header even if they haven't
+    # reached the expiry date sent in the Expires header.
+    add_header Last-Modified "";
+    add_header ETag "";
+    break;
+  }
 }
 ```
 
@@ -240,7 +266,7 @@ Now we need to tell puma to start our app and bind it to a Unix socket:
 
 ```
 cd /var/www/my_app
-RAILS_ENV=production bundle exec puma -e production -b unix:///var/run/my_app.sock
+bundle exec puma -e production -b unix:///var/run/my_app.sock
 ```
 
 if nothing goes wrong, you should see this:
@@ -261,7 +287,7 @@ Once you have verified that our puma has correctly serve the request, we now can
 Press `CTRL-C` to stop the foreground running puma processing and run command with `-d` parameter:
 
 ```
-RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock
+bundle exec puma -e production -d -b unix:///var/run/my_app.sock
 ```
 
 You could verify if the puma process is in background or not:
@@ -293,7 +319,7 @@ you can verify if the process has been killed or not with `ps`.
 If you want UNIX fetch you the PID, you can start puma server with `--pidfile` params:
 
 ```
-RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid
+bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid
 ```
 
 The PID will be store in `/var/run/puma.pid` and now you could just `cat` the PID out easily:
@@ -351,7 +377,7 @@ bundle exec pumactl -p <pid> resart
 And in the case where you tell puma to store its PID in pid file:
 
 ```
-RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid
+bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid
 ```
 
 and then we could restart the process with:
@@ -381,7 +407,7 @@ sudo killall puma
 then we start our server with `-S` parameter:
 
 ```
-RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock -S /var/run/my_app.state
+bundle exec puma -e production -d -b unix:///var/run/my_app.sock -S /var/run/my_app.state
 ```
 
 puma would generate `/var/run/my_app.state` file with content:

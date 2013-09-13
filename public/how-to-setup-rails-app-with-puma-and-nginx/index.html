@@ -285,6 +285,19 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <span class="line-number">13</span>
 <span class="line-number">14</span>
 <span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">upstream my_app {
 </span><span class="line">  server unix:///var/run/my_app.sock;
 </span><span class="line">}
@@ -298,6 +311,19 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 </span><span class="line">    proxy_pass http://my_app; # match the name of upstream directive which is defined above
 </span><span class="line">    proxy_set_header Host $host;
 </span><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class="line">  }
+</span><span class="line">
+</span><span class="line">  location ~* ^/assets/ {
+</span><span class="line">    # Per RFC2616 - 1 year maximum expiry
+</span><span class="line">    expires 1y;
+</span><span class="line">    add_header Cache-Control public;
+</span><span class="line">
+</span><span class="line">    # Some browsers still send conditional-GET requests if there's a
+</span><span class="line">    # Last-Modified header or an ETag header even if they haven't
+</span><span class="line">    # reached the expiry date sent in the Expires header.
+</span><span class="line">    add_header Last-Modified "";
+</span><span class="line">    add_header ETag "";
+</span><span class="line">    break;
 </span><span class="line">  }
 </span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
 
@@ -330,6 +356,19 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <span class="line-number">13</span>
 <span class="line-number">14</span>
 <span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">upstream my_app {
 </span><span class="line">  server unix:///var/run/my_app.sock;
 </span><span class="line">}
@@ -343,6 +382,19 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 </span><span class="line">    proxy_pass http://my_app; # match the name of upstream directive which is defined above
 </span><span class="line">    proxy_set_header Host $host;
 </span><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class="line">  }
+</span><span class="line">
+</span><span class="line">  location ~* ^/assets/ {
+</span><span class="line">    # Per RFC2616 - 1 year maximum expiry
+</span><span class="line">    expires 1y;
+</span><span class="line">    add_header Cache-Control public;
+</span><span class="line">
+</span><span class="line">    # Some browsers still send conditional-GET requests if there's a
+</span><span class="line">    # Last-Modified header or an ETag header even if they haven't
+</span><span class="line">    # reached the expiry date sent in the Expires header.
+</span><span class="line">    add_header Last-Modified "";
+</span><span class="line">    add_header ETag "";
+</span><span class="line">    break;
 </span><span class="line">  }
 </span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
 
@@ -363,7 +415,7 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">cd /var/www/my_app
-</span><span class="line">RAILS_ENV=production bundle exec puma -e production -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
+</span><span class="line">bundle exec puma -e production -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>if nothing goes wrong, you should see this:</p>
 
@@ -387,7 +439,7 @@ Next we will add a virtual host and use <code>proxy_pass</code> directive to tel
 <p>Press <code>CTRL-C</code> to stop the foreground running puma processing and run command with <code>-d</code> parameter:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec puma -e production -d -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>You could verify if the puma process is in background or not:</p>
 
@@ -416,7 +468,7 @@ to the puma PID, in our case the PID is 9594:</p>
 <p>If you want UNIX fetch you the PID, you can start puma server with <code>--pidfile</code> params:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>The PID will be store in <code>/var/run/puma.pid</code> and now you could just <code>cat</code> the PID out easily:</p>
 
@@ -472,7 +524,7 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
 <p>And in the case where you tell puma to store its PID in pid file:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>and then we could restart the process with:</p>
 
@@ -498,7 +550,7 @@ manager that help ease your admin job, introducing the awesome <code>pumactl</co
 <p>then we start our server with <code>-S</code> parameter:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock -S /var/run/my_app.state</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec puma -e production -d -b unix:///var/run/my_app.sock -S /var/run/my_app.state</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>puma would generate <code>/var/run/my_app.state</code> file with content:</p>
 
