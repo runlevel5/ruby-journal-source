@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-09-13T11:46:32+10:00</updated>
+  <updated>2013-09-16T17:00:43+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,149 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to write Rails View test with RSpec]]></title>
+    <link href="http://ruby-journal.com/how-to-write-rails-view-test-with-rspec/"/>
+    <updated>2013-09-16T16:18:00+10:00</updated>
+    <id>http://ruby-journal.com/how-to-write-rails-view-test-with-rspec</id>
+    <content type="html"><![CDATA[
+<p>In this short tutorial, I will show you how to do a View test with Rspec + capybara</p>
+
+<!--more-->
+
+<p>To my surprise that not many people is aware of View test provided by rspec-rails gem. It is partially
+because they migrate from default Rails stack testing in which functional test performs both controllers
+and views testing.</p>
+
+<p>Testing View is to assert the template contain the piece of expected informations that is parsed from the controllers.</p>
+
+<p>The default Rails stack ships with ActionDispatch::Assertions::SelectorAssertions which consits of method &#8216;assert_select&#8217;
+to traverse through our DOM nodes whilst default rspec does not provide any CSS or XPath selector method, the only available
+method is <code>contain</code>.</p>
+
+<p>So if we have our view like the example below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="erb"><span class="line"><span class="x"># app/views/products/show.html.erb</span>
+</span><span class="line">
+</span><span class="line"><span class="x">&lt;table id=&quot;product_</span><span class="cp">&lt;%=</span> <span class="vi">@product</span><span class="o">.</span><span class="n">id</span> <span class="cp">%&gt;</span><span class="x">&quot;&gt;</span>
+</span><span class="line"><span class="x">  &lt;thead&gt;</span>
+</span><span class="line"><span class="x">    &lt;tr&gt;</span>
+</span><span class="line"><span class="x">      &lt;th&gt;Name&lt;/th&gt;</span>
+</span><span class="line"><span class="x">      &lt;th&gt;Price&lt;/th&gt;</span>
+</span><span class="line"><span class="x">    &lt;/tr&gt;</span>
+</span><span class="line"><span class="x">  &lt;/thead&gt;</span>
+</span><span class="line"><span class="x">  &lt;tbody&gt;</span>
+</span><span class="line"><span class="x">    &lt;tr&gt;</span>
+</span><span class="line"><span class="x">      &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="vi">@product</span><span class="o">.</span><span class="n">name</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+</span><span class="line"><span class="x">      &lt;td&gt;</span><span class="cp">&lt;%=</span> <span class="vi">@product</span><span class="o">.</span><span class="n">price</span> <span class="cp">%&gt;</span><span class="x">&lt;/td&gt;</span>
+</span><span class="line"><span class="x">    &lt;/tr&gt;</span>
+</span><span class="line"><span class="x">  &lt;/tbody&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>we could write our spec:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># spec/views/products/show.html.erb_spec.rb</span>
+</span><span class="line">
+</span><span class="line"><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="n">describe</span> <span class="s1">&#39;products/show.html.erb&#39;</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">it</span> <span class="s1">&#39;displays product details correctly&#39;</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">assign</span><span class="p">(</span><span class="ss">:product</span><span class="p">,</span> <span class="no">Product</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Shirt&#39;</span><span class="p">,</span> <span class="ss">price</span><span class="p">:</span> <span class="mi">50</span><span class="o">.</span><span class="mi">0</span><span class="p">))</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">render</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">rendered</span><span class="o">.</span><span class="n">should</span> <span class="n">contain</span><span class="p">(</span><span class="s1">&#39;Shirt&#39;</span><span class="p">)</span>
+</span><span class="line">    <span class="n">rendered</span><span class="o">.</span><span class="n">should</span> <span class="n">contain</span><span class="p">(</span><span class="s1">&#39;50.0&#39;</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the View spec is not associated with controller, thus we have to assign the @product into
+<code>products/show.html.erb</code> template with method <code>#assign</code>. The <code>#render</code> method is the same
+as <code>ActionView#render</code>. Lastly, the <code>#rendered</code> returns the HTML response, of which assertions
+can be performed upon.</p>
+
+<p>The <code>contain</code> matcher is not suffice to perform explicit check on DOM level. Therefore I
+use capybara. Some might prefer webrat. Please ensure you install capybara with Gemfile
+and add this line into your <code>spec/spec_helper.rb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># spec/spec_helper.rb</span>
+</span><span class="line">
+</span><span class="line"><span class="nb">require</span> <span class="s1">&#39;capybara/rspec&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>that inject all rspec matchers that capybara provides, in which we are interested in <code>#has_selector</code> matcher.</p>
+
+<p>and the above spec can be refactored to:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># spec/views/products/show.html.erb_spec.rb</span>
+</span><span class="line">
+</span><span class="line"><span class="nb">require</span> <span class="s1">&#39;spec_helper&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="n">describe</span> <span class="s1">&#39;products/show.html.erb&#39;</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">it</span> <span class="s1">&#39;displays product details correctly&#39;</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">assign</span><span class="p">(</span><span class="ss">:product</span><span class="p">,</span> <span class="no">Product</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Shirt&#39;</span><span class="p">,</span> <span class="ss">price</span><span class="p">:</span> <span class="mi">50</span><span class="o">.</span><span class="mi">0</span><span class="p">))</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">render</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">rendered</span><span class="o">.</span><span class="n">should</span> <span class="n">have_selector</span><span class="p">(</span><span class="s2">&quot;table#product_</span><span class="si">#{</span><span class="vi">@product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> tbody tr:nth-of-type(1) td:nth-of-type(1)&quot;</span><span class="p">,</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Shirt&#39;</span><span class="p">)</span>
+</span><span class="line">    <span class="n">rendered</span><span class="o">.</span><span class="n">should</span> <span class="n">have_selector</span><span class="p">(</span><span class="s2">&quot;table#product_</span><span class="si">#{</span><span class="vi">@product</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> tbody tr:nth-of-type(1) td:nth-of-type(2)&quot;</span><span class="p">,</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;50.0&#39;</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>#has_selector</code> accept CSS and XPath rule and comes with many userful options, it fills in the gap of ActionDispatch::Assertions::SelectorAssertions.</p>
+
+<p>I hope you like this short tutorial, comments are welcome.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to do jQuery UI Autocomplete with capybara 2]]></title>
