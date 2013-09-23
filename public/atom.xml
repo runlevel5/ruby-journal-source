@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-09-16T17:00:43+10:00</updated>
+  <updated>2013-09-23T17:05:02+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,88 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to track changes of a model in a `after_callbacks` in Rails 3 or newer]]></title>
+    <link href="http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/"/>
+    <updated>2013-09-23T16:43:00+10:00</updated>
+    <id>http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer</id>
+    <content type="html"><![CDATA[
+<p>You can track changes to a ActiveRecord model with <code>ActiveRecord::Dirty#changed?</code>. Yet there is one caveat though, the tracking is lost after the model is saved. In this tutorial I&#8217;ll show how to track the changes to a record even the record has been saved, this comes handy when being used with ActiveRecord <code>after</code> callbacks</p>
+
+<!--more-->
+
+<p>Imagine that we have a <code>Product</code> model with <code>name</code>, we make change to <code>name</code> with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; &quot;Diamond&quot;</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Ruby&#39;</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">changed?</span> <span class="c1"># =&gt; true</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name_changed?</span> <span class="c1"># =&gt; true</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>By using ActiveRecord::Dirty, we could tell if the model or attribute <code>name</code> is changed.</p>
+
+<p>If we save our model</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">save</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">changed?</span> <span class="c1"># =&gt; false</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name_changed?</span> <span class="c1"># =&gt; false</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>false</code> value indicates that ActiveRecord::Dirty is not persisent after the model is saved. What if now you are being asked to add in a code to notify the inventory system if product name is changed? We can
+simply workaround by using <code>around</code> callback. Here is details:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">around_update</span> <span class="ss">:notify_systtem_if_name_is_changed</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">notify_systtem_if_name_is_changed</span>
+</span><span class="line">    <span class="n">name_changed</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">name_changed?</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">yield</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">notify_system</span> <span class="k">if</span> <span class="n">named_changed</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>around</code> callback is introduced in Rails 3. This callback consists of 3 parts:</p>
+
+<ul>
+  <li>The part before <code>yield</code> is codes prior to the action is called</li>
+  <li>The <code>yield</code> is action that gets called</li>
+  <li>The part after <code>yield</code> is codes after the action is called</li>
+</ul>
+
+<p>In our example above, we store the changing state of attribute <code>name</code> into <code>named_change</code> variable. The <code>yield</code> executes the <code>update</code> action. The changing state then can be referenced afterward and will send out notification if name is truly changed.</p>
+
+<p>The <code>around</code> callbacks are very powerful features of ActiveRecord. I hope that you should take advantage of it more. See you in the next tutorial.</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to write Rails View test with RSpec]]></title>

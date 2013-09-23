@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Learn to know myself better - Ruby Journal</title>
+  <title>How to track changes of a model in a `after_callbacks` in Rails 3 or newer - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Unlike some of my friends, I occassionally write or blog. Because I don&#8217;t know how to express myself in verbal or writting form. In fact I &hellip;">
+  <meta name="description" content="You can track changes to a ActiveRecord model with ActiveRecord::Dirty#changed?. Yet there is one caveat though, the tracking is lost after the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/learn-to-know-myself-better/">
+  <link rel="canonical" href="http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">Learn to Know Myself Better</h1>
+      <h1 class="entry-title">How to Track Changes of a Model in a `after_callbacks` in Rails 3 or Newer</h1>
     
     
       <p class="meta">
@@ -94,7 +94,7 @@
   
 
 
-<time datetime="2013-08-27T22:59:00+10:00" pubdate data-updated="true">Aug 27<span>th</span>, 2013</time>
+<time datetime="2013-09-23T16:43:00+10:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -104,19 +104,79 @@
 
 
 <div class="entry-content">
-<p>Unlike some of my friends, I <em>occassionally</em> write or blog. Because I don&#8217;t know how to express myself in verbal or writting form. In fact I suck at both. It is not because I hate them, on the contrary I <em>love</em> communication and always get fascinated by charismatic speeches. I have been always avoiding confronting this very own problem of mine. Gradually I refrain to question the problem at all.</p>
+<p>You can track changes to a ActiveRecord model with <code>ActiveRecord::Dirty#changed?</code>. Yet there is one caveat though, the tracking is lost after the model is saved. In this tutorial I&#8217;ll show how to track the changes to a record even the record has been saved, this comes handy when being used with ActiveRecord <code>after</code> callbacks</p>
 
 <!--more-->
 
-<p>However today is special. When everyone&#8217;s busy with hectic life, I am lying here, on the hospital bed waiting for the surgery. I have been admitted to hospital for 3 days, at the beginning the fear of surgery makes me anxious and terrified. The urge to express what are going in my head drove me crazy and hopeless. I could not able to focus until the day three, on which all the anxeties seems gone, I felt very peaceful and calm, as if I truly reach my own point of solitude. I learn to be patient and accept things that I could not control and most importantly I learn to accept myself.</p>
+<p>Imagine that we have a <code>Product</code> model with <code>name</code>, we make change to <code>name</code> with:</p>
 
-<p>I was born <strong>different</strong>.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; &quot;Diamond&quot;</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Ruby&#39;</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">changed?</span> <span class="c1"># =&gt; true</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name_changed?</span> <span class="c1"># =&gt; true</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>I have never been good at talking and writting but I am gifted with different ability. Ability to conceive and interpret things visually, I could remember shapes and pictures and be able to draw them from memory and I could draw many shapes before I know how to write alphabets. My brain is programmed in a very graphical but <strong>organic</strong> way. It&#8217;s like Van Goh or Picasso artworks rather than Gantt or Pie charts. There are no rules to predicate how the artwork should be interpreted, just like a Picasso painting, it could mean a universe to some and a doodle work to some. The strength is that you are able to perceive things in multi-paradigms. However the caveat is that you are drown in the multiple streams of thoughts that you hardly be able to express ideas in a coherent way. And just like arts, it takes skills and time to build up the depth to appreciate.</p>
+<p>By using ActiveRecord::Dirty, we could tell if the model or attribute <code>name</code> is changed.</p>
 
-<p>So stop blaming other external factors before you have asserted yourself. Please ignoring all prejudices and expectations. Give yourself space and time to learn more about yourself. It&#8217;ll be a long journey but a rewarding one.</p>
+<p>If we save our model</p>
 
-<p>Good luck</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">save</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">changed?</span> <span class="c1"># =&gt; false</span>
+</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name_changed?</span> <span class="c1"># =&gt; false</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>false</code> value indicates that ActiveRecord::Dirty is not persisent after the model is saved. What if now you are being asked to add in a code to notify the inventory system if product name is changed? We can
+simply workaround by using <code>around</code> callback. Here is details:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">around_update</span> <span class="ss">:notify_systtem_if_name_is_changed</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">notify_systtem_if_name_is_changed</span>
+</span><span class="line">    <span class="n">name_changed</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">name_changed?</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">yield</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">notify_system</span> <span class="k">if</span> <span class="n">named_changed</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>around</code> callback is introduced in Rails 3. This callback consists of 3 parts:</p>
+
+<ul>
+  <li>The part before <code>yield</code> is codes prior to the action is called</li>
+  <li>The <code>yield</code> is action that gets called</li>
+  <li>The part after <code>yield</code> is codes after the action is called</li>
+</ul>
+
+<p>In our example above, we store the changing state of attribute <code>name</code> into <code>named_change</code> variable. The <code>yield</code> executes the <code>update</code> action. The changing state then can be referenced afterward and will send out notification if name is truly changed.</p>
+
+<p>The <code>around</code> callbacks are very powerful features of ActiveRecord. I hope that you should take advantage of it more. See you in the next tutorial.</p>
+
 </div>
 
 
@@ -139,7 +199,7 @@
   
 
 
-<time datetime="2013-08-27T22:59:00+10:00" pubdate data-updated="true">Aug 27<span>th</span>, 2013</time>
+<time datetime="2013-09-23T16:43:00+10:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2013</time>
       
 
 
@@ -147,7 +207,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/learn-to-know-myself-better/" data-via="joneslee85" data-counturl="http://ruby-journal.com/learn-to-know-myself-better/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -160,10 +220,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/minitest-let-is-lazy/" title="Previous Post: minitest let() is lazy">&laquo; minitest let() is lazy</a>
+        <a class="basic-alignment left" href="/how-to-write-rails-view-test-with-rspec/" title="Previous Post: How to write Rails View test with RSpec">&laquo; How to write Rails View test with RSpec</a>
       
-      
-        <a class="basic-alignment right" href="/how-to-fill-in-fckeditor-with-capybara-2/" title="Next Post: How to fill in FCKeditor with capybara 2">How to fill in FCKeditor with capybara 2 &raquo;</a>
       
     </p>
   </footer>
@@ -289,8 +347,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/learn-to-know-myself-better/';
-        var disqus_url = 'http://ruby-journal.com/learn-to-know-myself-better/';
+        var disqus_identifier = 'http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/';
+        var disqus_url = 'http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/';
         var disqus_script = 'embed.js';
       
     (function () {
