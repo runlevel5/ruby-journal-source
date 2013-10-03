@@ -13,7 +13,7 @@ Majority of Ruby 2.0 syntaxes are backward-compatible with Ruby 1.9. Yet there i
 
 <!--more-->
 
-So, in Ruby 2.0, you could declare shorthand `lambda` with `=>`. Here is example:
+So, in Ruby 2.0, you could declare shorthand `lambda` with `->`. Here is example:
 
 ```ruby
 hello_world = -> (message) { puts message }
