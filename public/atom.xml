@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-10-03T19:09:09+10:00</updated>
+  <updated>2013-10-03T19:54:21+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,50 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0]]></title>
+    <link href="http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/"/>
+    <updated>2013-10-03T19:45:00+10:00</updated>
+    <id>http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0</id>
+    <content type="html"><![CDATA[
+<p>Majority of Ruby 2.0 syntaxes are backward-compatible with Ruby 1.9. Yet there is one tiny change in the way that Ruby 2.0 does lambda rocket that would break backward-compatability with Ruby 1.9. That is&#8230;a single space. Yes, you heard it correctly.</p>
+
+<!--more-->
+
+<p>So, in Ruby 2.0, you could declare shorthand <code>lambda</code> with <code>=&gt;</code>. Here is example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The above code runs fine under 2.0 yet failed spectacularly with 1.9:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">SyntaxError</span><span class="p">:</span> <span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">1</span><span class="p">:</span> <span class="n">syntax</span> <span class="n">error</span><span class="p">,</span> <span class="n">unexpected</span> <span class="n">tLPAREN_ARG</span><span class="p">,</span> <span class="n">expecting</span> <span class="n">keyword_do_LAMBDA</span> <span class="ow">or</span> <span class="n">tLAMBEG</span>
+</span><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
+</span><span class="line">                  <span class="o">^</span>
+</span><span class="line"><span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">1</span><span class="p">:</span> <span class="n">syntax</span> <span class="n">error</span><span class="p">,</span> <span class="n">unexpected</span> <span class="n">tLAMBEG</span><span class="p">,</span> <span class="n">expecting</span> <span class="vg">$end</span>
+</span><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
+</span><span class="line">                            <span class="o">^</span>
+</span><span class="line">  <span class="n">from</span> <span class="sr">/Users/</span><span class="n">trung_le</span><span class="o">/.</span><span class="n">rubies</span><span class="o">/</span><span class="n">ruby</span><span class="o">-</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">3</span><span class="o">-</span><span class="n">p448</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="ss">irb</span><span class="p">:</span><span class="mi">12</span><span class="ss">:in</span> <span class="sb">`&lt;main&gt;&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>In order to fix this issue, we have to rid of the space between <code>-&gt;</code> and <code>(message)</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Weird, isn&#8217;t it? At least you are aware of this discrepancy now.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Rails 4 changes habtm join table naming convention]]></title>
