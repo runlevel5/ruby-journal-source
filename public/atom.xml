@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-09-23T17:05:02+10:00</updated>
+  <updated>2013-10-03T19:09:09+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,76 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Rails 4 changes habtm join table naming convention]]></title>
+    <link href="http://ruby-journal.com/rails-4-changes-join-table-naming-convention/"/>
+    <updated>2013-10-03T18:55:00+10:00</updated>
+    <id>http://ruby-journal.com/rails-4-changes-join-table-naming-convention</id>
+    <content type="html"><![CDATA[
+<p>When upgrading my app from Rails 3.2.14 to Rails 4, I bumped into an error in which
+habtm association complains missing DB join table. To my surprise, Rails 4 has changed the default naming convention for join table.</p>
+
+<!--more-->
+
+<p>Here is the Rails 3 code:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ContactPlan</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">has_and_belongs_to_many</span> <span class="ss">:contact_types</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">ContactType</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">has_and_belongs_to_many</span> <span class="ss">:contact_plans</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">CreateContactPlansContactTypes</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
+</span><span class="line">  <span class="n">create_table</span> <span class="ss">:contact_plans_contact_types</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+</span><span class="line">    <span class="n">t</span><span class="o">.</span><span class="n">integer</span> <span class="ss">:contact_plan_id</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+</span><span class="line">    <span class="n">t</span><span class="o">.</span><span class="n">integer</span> <span class="ss">:contact_type_id</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see from above migrarion, my join table naming is <code>contact_plans_contact_types</code>. Yet Rails 4 fails to run the migration and asks for the existence of <code>contact_plans_types</code>. If you are upgrading from Rails 3 app, I highly recommend you avoid renaming this join table. Instead, you should explicitly declare the join table for habtm association:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ContactPlan</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">has_and_belongs_to_many</span> <span class="ss">:contact_types</span><span class="p">,</span> <span class="n">join_table</span><span class="p">:</span> <span class="ss">:contact_plans_contact_types</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">ContactType</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">has_and_belongs_to_many</span> <span class="ss">:contact_plans</span><span class="p">,</span> <span class="n">join_table</span><span class="p">:</span> <span class="ss">:contact_plans_contact_types</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This technique mitigates regressions. And you can always go back to renaming if you feel like after stablising the build.</p>
+
+<p>I can see that Rails 4 try to be smart by detecting duplication in model naming. I welcome this sort of change as it would reduce the complexity in the naming. Furthermore, if you bump into this issue, it is very likely that you should rethink your model naming.</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to track changes of a model in a `after_callbacks` in Rails 3 or newer]]></title>
