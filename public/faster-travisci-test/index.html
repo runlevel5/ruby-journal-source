@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>How to do jQuery UI Autocomplete with capybara 2 - Ruby Journal</title>
+  <title>Faster TravisCI test - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="In this tutorial, I&#8217;ll show you how to do jQuery UI Autocomplete the better way with Capybara 2!
-That is getting rid of sleep that many &hellip;">
+  <meta name="description" content="Running test suite is time consuming. There are various techniques to optimize the runtime performance of the CI by stub/mock, parallel_test, etc. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ That is getting rid of sleep that many &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/">
+  <link rel="canonical" href="http://ruby-journal.com/faster-travisci-test/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +78,7 @@ That is getting rid of sleep that many &hellip;">
   
   <header>
     
-      <h1 class="entry-title">How to Do jQuery UI Autocomplete With Capybara 2</h1>
+      <h1 class="entry-title">Faster TravisCI Test</h1>
     
     
       <p class="meta">
@@ -95,7 +94,7 @@ That is getting rid of sleep that many &hellip;">
   
 
 
-<time datetime="2013-09-12T14:04:00+10:00" pubdate data-updated="true">Sep 12<span>th</span>, 2013</time>
+<time datetime="2013-10-11T12:37:00+11:00" pubdate data-updated="true">Oct 11<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,29 +104,24 @@ That is getting rid of sleep that many &hellip;">
 
 
 <div class="entry-content">
-<p>In this tutorial, I&#8217;ll show you how to do jQuery UI Autocomplete the better way with Capybara 2!
-That is getting rid of <code>sleep</code> that many solutions on the Internet suggested. Furthermore this
-solution works both with selenium and polstergeist driver.</p>
+<p>Running test suite is time consuming. There are various techniques to optimize the runtime performance of the CI by stub/mock, parallel_test, etc. In this short tutorial, I&#8217;ll show you how to optimize your TravisCI test suite by splitting your test suit into concurrent jobs, which drastically improve the build time.</p>
 
 <!--more-->
 
-<p>If you search on the Internet on how to do autocomplete with capybara, you&#8217;ll normally find
-solutions for Capybara 1.x like below:</p>
+<p>I have a Rails app with rspec. Here are specs that are run sequentially:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">s</span><span class="o">.</span><span class="n">fill_in</span> <span class="s2">&quot;Make&quot;</span><span class="p">,</span> <span class="ss">:with</span> <span class="o">=&gt;</span> <span class="s2">&quot;Make&quot;</span>
-</span><span class="line"><span class="nb">sleep</span> <span class="mi">3</span>
-</span><span class="line"><span class="n">page</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;$(&#39;.ui-menu-item a:contains(</span><span class="se">\&quot;</span><span class="s2">Make Two</span><span class="se">\&quot;</span><span class="s2">)&#39;).trigger(&#39;mouseenter&#39;).click();&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+<ul>
+  <li>models</li>
+  <li>controllers</li>
+  <li>helpers</li>
+  <li>routing</li>
+  <li>views</li>
+  <li>features</li>
+</ul>
 
-<p>It was a fine solution however the <code>sleep</code> call is not good. It tells the driver to passively
-sleep while waiting for JS loading up. As of Capybara 2, there is no need to call <code>sleep</code> as
-finder API will actively look for existence of the node and raise error if not found. Here is
-a better solution:</p>
+<p>Running specs sequentially is slow. Travis can break these specs into concurrent jobs for you. You need to modify your <code>.travis.yml</code>:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
@@ -137,35 +131,35 @@ a better solution:</p>
 <span class="line-number">8</span>
 <span class="line-number">9</span>
 <span class="line-number">10</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">fill_autocomplete</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="p">{})</span>
-</span><span class="line">  <span class="n">fill_in</span> <span class="n">field</span><span class="p">,</span> <span class="ss">with</span><span class="p">:</span> <span class="n">options</span><span class="o">[</span><span class="ss">:with</span><span class="o">]</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{ $(&#39;#</span><span class="si">#{</span><span class="n">field</span><span class="si">}</span><span class="sx">&#39;).trigger(&#39;focus&#39;) }</span>
-</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{ $(&#39;#</span><span class="si">#{</span><span class="n">field</span><span class="si">}</span><span class="sx">&#39;).trigger(&#39;keydown&#39;) }</span>
-</span><span class="line">  <span class="n">selector</span> <span class="o">=</span> <span class="sx">%Q{ul.ui-autocomplete li.ui-menu-item a:contains(&quot;</span><span class="si">#{</span><span class="n">options</span><span class="o">[</span><span class="ss">:select</span><span class="o">]</span><span class="si">}</span><span class="sx">&quot;)}</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">should</span> <span class="n">have_selector</span><span class="p">(</span><span class="s1">&#39;ul.ui-autocomplete li.ui-menu-item a&#39;</span><span class="p">)</span>
-</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{ $(&#39;</span><span class="si">#{</span><span class="n">selector</span><span class="si">}</span><span class="sx">&#39;).trigger(&#39;mouseenter&#39;).click() }</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">language: ruby
+</span><span class="line">rvm:
+</span><span class="line">  - 2.0.0
+</span><span class="line">bundler_args: --without development production --quiet
+</span><span class="line">env:
+</span><span class="line">  - TEST_SUITE=features
+</span><span class="line">  - TEST_SUITE=controllers
+</span><span class="line">  - TEST_SUITE=helpers
+</span><span class="line">  - TEST_SUITE=models
+</span><span class="line">  - TEST_SUITE=routing
+</span><span class="line">  - TEST_SUITE=views
+</span><span class="line">script:
+</span><span class="line">  - bundle exec rspec spec/$TEST_SUITE/*</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>To use it, you call:</p>
+<p>As you can see in the above YAML file, we set <code>$TEST_SUITE</code> env variable with the name of our spec folders. This variable will get substitute into <code>bundle exec rspec spec/$TEST_SUITE/*</code> call.</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">fill_autocomplete</span><span class="p">(</span><span class="s1">&#39;field_id&#39;</span><span class="p">,</span> <span class="ss">with</span><span class="p">:</span> <span class="s1">&#39;term&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>Once you push new change to your GitHub, TravisCI now run 6 concurrent jobs at the same time. My build before take 45mins, now reduce to 18mins. That&#8217;s a great improvement. Please be noted that, please upgrade to 10 concurrent build plan if you are using Travis Pro service.</p>
 
-<p>Please be noted that <code>field</code> parameter must be the CSS ID, not label nor name.</p>
+<p>Furthmore, you could cut at least 3 more mins by enabling the experimental bundler caching (which is only available for Travis Pro plan now). Append to your <code>.travis.yml</code>:</p>
 
-<p>Let me digest the above code, first, I fill in the text field and I want the autocomplete
-to kick in by trigger focus and keydown event on the field using JS. Then I check
-the existence of <code>li.ui-menu-item a</code> instead of doing <code>sleep</code> to ensure that the JS
-has popped the dropdown correctly. The final step is just to trigger mouseentter event to
-do mouse hover then click.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">cache: bundler</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Using <code>have_selector</code> is definitely a nicer way to check for JS initialization and I
-encourage you apply this technique as often as possible. You&#8217;ll thank me later for saving
-you from randomly failed test. That&#8217;s all for now. Good day!</p>
+<p>Travis will cache your bundler and next build will not waste their time with bundler install anymore which save time.</p>
+
+<p>By using <code>env</code> and <code>cache</code> option, you could reduce the build time by at least 60%. You could push further by breaking your slow specs and group them together and have them run separately too. Or you could introduce parallel_test gem into your app, this would save you at least 30% more. I hope you enjoy the tutorial and see you next time.</p>
 </div>
 
 
@@ -188,7 +182,7 @@ you from randomly failed test. That&#8217;s all for now. Good day!</p>
   
 
 
-<time datetime="2013-09-12T14:04:00+10:00" pubdate data-updated="true">Sep 12<span>th</span>, 2013</time>
+<time datetime="2013-10-11T12:37:00+11:00" pubdate data-updated="true">Oct 11<span>th</span>, 2013</time>
       
 
 
@@ -196,7 +190,7 @@ you from randomly failed test. That&#8217;s all for now. Good day!</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/faster-travisci-test/" data-via="joneslee85" data-counturl="http://ruby-journal.com/faster-travisci-test/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -209,10 +203,8 @@ you from randomly failed test. That&#8217;s all for now. Good day!</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/how-to-fill-in-fckeditor-with-capybara-2/" title="Previous Post: How to fill in FCKeditor with capybara 2">&laquo; How to fill in FCKeditor with capybara 2</a>
+        <a class="basic-alignment left" href="/how-to-uninstall-all-ruby-gems/" title="Previous Post: How to uninstall all Ruby gems">&laquo; How to uninstall all Ruby gems</a>
       
-      
-        <a class="basic-alignment right" href="/how-to-write-rails-view-test-with-rspec/" title="Next Post: How to write Rails View test with RSpec">How to write Rails View test with RSpec &raquo;</a>
       
     </p>
   </footer>
@@ -338,8 +330,8 @@ you from randomly failed test. That&#8217;s all for now. Good day!</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/';
-        var disqus_url = 'http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/';
+        var disqus_identifier = 'http://ruby-journal.com/faster-travisci-test/';
+        var disqus_url = 'http://ruby-journal.com/faster-travisci-test/';
         var disqus_script = 'embed.js';
       
     (function () {
