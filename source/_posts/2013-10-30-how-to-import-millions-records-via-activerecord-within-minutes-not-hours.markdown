@@ -20,7 +20,27 @@ At work, I am assigned a task to import millions rows of records from a 300MB CS
 FILE=/tmp/big_file.csv rake data:import
 ```
 
-And soon I bumped into performance issue because ActiveRecord could not release garbage effectively. The script tooks *~2hrs* to complete. This is unacceptable to my standard.
+And the rake task would call my `ProductsImporter.run` method, summarised below:
+
+```ruby
+class ProductsImporter
+
+  def self.run
+    ...
+    # read the CSV files and assigns rows to variable rows
+
+    ActiveRecord::Base.transaction do
+      rows.each do |row|
+        p = Product.find_or_initialize_by_product_id(row[:product_id])
+        p.assign_attributes(row)
+        p.save!
+      end
+    end
+  end
+end
+```
+
+And soon I bumped into performance issue because ActiveRecord::Transaction could not release garbage effectively. The script tooks *~2hrs* to complete. This is unacceptable to my standard.
 
 There are various workarounds on the net such as using `ar_import` gem which uses SQL INSERT. However I do not like these SQL solutions as there are so many callbacks with my models and data integrity is very important. So I come up with an alternative solution:
 

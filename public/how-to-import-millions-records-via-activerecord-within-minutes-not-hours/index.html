@@ -113,7 +113,41 @@
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">FILE=/tmp/big_file.csv rake data:import</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>And soon I bumped into performance issue because ActiveRecord could not release garbage effectively. The script tooks <em>~2hrs</em> to complete. This is unacceptable to my standard.</p>
+<p>And the rake task would call my <code>ProductsImporter.run</code> method, summarised below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ProductsImporter</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">run</span>
+</span><span class="line">    <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class="line">    <span class="c1"># read the CSV files and assigns rows to variable rows</span>
+</span><span class="line">
+</span><span class="line">    <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span><span class="o">.</span><span class="n">transaction</span> <span class="k">do</span>
+</span><span class="line">      <span class="n">rows</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">row</span><span class="o">|</span>
+</span><span class="line">        <span class="nb">p</span> <span class="o">=</span> <span class="no">Product</span><span class="o">.</span><span class="n">find_or_initialize_by_product_id</span><span class="p">(</span><span class="n">row</span><span class="o">[</span><span class="ss">:product_id</span><span class="o">]</span><span class="p">)</span>
+</span><span class="line">        <span class="nb">p</span><span class="o">.</span><span class="n">assign_attributes</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</span><span class="line">        <span class="nb">p</span><span class="o">.</span><span class="n">save!</span>
+</span><span class="line">      <span class="k">end</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And soon I bumped into performance issue because ActiveRecord::Transaction could not release garbage effectively. The script tooks <em>~2hrs</em> to complete. This is unacceptable to my standard.</p>
 
 <p>There are various workarounds on the net such as using <code>ar_import</code> gem which uses SQL INSERT. However I do not like these SQL solutions as there are so many callbacks with my models and data integrity is very important. So I come up with an alternative solution:</p>
 
