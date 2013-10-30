@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Debug your failed test in Travis CI - Ruby Journal</title>
+  <title>How to import millions records via ActiveRecord within minutes not hours - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Ever wondering why some tests passed locally but failed on Travis?
-Ever questioning how could I go about to debug why that failed test on remote &hellip;">
+  <meta name="description" content="In today tutorial, I&#8217;ll show you how to optimise a ActiveRecord import script by 300%. My solution is better than other solution as it doesn&# &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ Ever questioning how could I go about to debug why that failed test on remote &h
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/">
+  <link rel="canonical" href="http://ruby-journal.com/rails/activerecord/unix/bash/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +78,7 @@ Ever questioning how could I go about to debug why that failed test on remote &h
   
   <header>
     
-      <h1 class="entry-title">Debug Your Failed Test in Travis CI</h1>
+      <h1 class="entry-title">How to Import Millions Records via ActiveRecord Within Minutes Not Hours</h1>
     
     
       <p class="meta">
@@ -95,7 +94,7 @@ Ever questioning how could I go about to debug why that failed test on remote &h
   
 
 
-<time datetime="2012-08-24T13:04:00+10:00" pubdate data-updated="true">Aug 24<span>th</span>, 2012</time>
+<time datetime="2013-10-30T17:23:00+11:00" pubdate data-updated="true">Oct 30<span>th</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,92 +104,93 @@ Ever questioning how could I go about to debug why that failed test on remote &h
 
 
 <div class="entry-content">
-<p>Ever wondering why some tests passed locally but failed on Travis?
-Ever questioning how could I go about to debug why that failed test on remote Travis?
-Read on as I show you how</p>
+<p>In today tutorial, I&#8217;ll show you how to optimise a ActiveRecord import script by 300%. My solution is better than other solution as it doesn&#8217;t use any SQL hack, thus you can retain the integrity with the data by running it through ActiveRecord normally.</p>
 
-<p><br />
-<br />
-<br />
-<!--more--></p>
+<!--more-->
 
-<p>In one occassion, I had a failed Ruby test on Travis which infact passed on my local box. So I tried
-to put in <code>debugger</code> and see if Travis could let me drop into Irb or not. It turns out Travis hang
-for quite a while until timed out. So debug remotely doesn&#8217;t work.</p>
-
-<p>Right, plan B then. I spent some time dig into Travis documentation and learned that Travis server
-provisioned new VM image for every test. So if I could get my hand on the VMs, I could replicate the
-same environment that Travis run the test locally. Sound rational, doesn&#8217;t it? Unfortunately, I could
-not find any traces nor URL where to download those VMs. Thanks to Josh at Travis, he sent me the URL
-to VMs.</p>
-
-<h2 id="download-vm">Download VM</h2>
-
-<p>Travis VM are packaged Vagrant box.</p>
-
-<p>You coud download VM here at:</p>
+<p>At work, I am assigned a task to import millions rows of records from a 300MB CSV file into Rails app. The rake task takes in FILE and process it with ActiveRecord.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">files.travis-ci.org/boxes/provisioned/travis-(box_name).box</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">FILE=/tmp/big_file.csv rake data:import</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>in which <code>(box_name)</code> is the language you use, <code>ruby</code>, <code>php</code>, etc.</p>
+<p>And soon I bumped into performance issue because ActiveRecord could not release garbage effectively. The script tooks <em>~2hrs</em> to complete. This is unacceptable to my standard.</p>
 
-<p>For my case, I was testing a Rails app, so I downloaded the ruby box:</p>
+<p>There are various workarounds on the net such as using <code>ar_import</code> gem which uses SQL INSERT. However I do not like these SQL solutions as there are so many callbacks with my models and data integrity is very important. So I come up with an alternative solution:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">wget files.travis-ci.org/boxes/provisioned/travis-ruby.box</span></code></pre></td></tr></table></div></figure></notextile></div>
+<ul>
+  <li>Split the big_file.csv into smaller files</li>
+  <li>Loop through these smaller chunks and recursively run rake task on each</li>
+</ul>
 
-<p>Please note that those files are large in size ~&gt; 3GB</p>
+<p>So now you wonder how the above solution works better. It is because now we run many small processes in which Rails won&#8217;t have to deal much with big GC. Once a process is completed, memory will be instantly released. Now, let&#8217;s code this up using shell script, I chose bash as example (please adapt to fit your purpose):</p>
 
-<h2 id="install-vagrant">Install Vagrant</h2>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="c">#! /bin/bash</span>
+</span><span class="line">
+</span><span class="line"><span class="nv">NUMBER_OF_SPLIT_LINES</span><span class="o">=</span>50000
+</span><span class="line"><span class="nv">SPLIT_FILE_PREFIX</span><span class="o">=</span><span class="s1">&#39;small_&#39;</span>
+</span><span class="line"><span class="nv">BIG_FILE_PATH</span><span class="o">=</span>/tmp/big_file.csv
+</span><span class="line"><span class="nv">SPLIT_FILES</span><span class="o">=</span>/tmp/<span class="nv">$SPLIT_FILE_PREFIX</span>*
+</span><span class="line">
+</span><span class="line">temp_home <span class="o">()</span> <span class="o">{</span>
+</span><span class="line">  <span class="nb">cd</span> /tmp
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">rails_app_home <span class="o">()</span> <span class="o">{</span>
+</span><span class="line">  <span class="nb">cd</span> /your_app
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">split_big_csv_into_small_chunks <span class="o">()</span> <span class="o">{</span>
+</span><span class="line">  <span class="nb">echo</span> <span class="s2">&quot;Split $BIG_FILE_PATH file into small chunks with size $NUMBER_OF_SPLIT_LINES lines...&quot;</span>
+</span><span class="line">  temp_home <span class="o">&amp;&amp;</span> split -l <span class="nv">$NUMBER_OF_SPLIT_LINES</span> <span class="nv">$BIG_FILE_PATH</span> <span class="nv">$SPLIT_FILE_PREFIX</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">process_split_files <span class="o">()</span> <span class="o">{</span>
+</span><span class="line">  <span class="k">for </span>f in <span class="nv">$SPLIT_FILES</span>
+</span><span class="line">  <span class="k">do</span>
+</span><span class="line"><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;Processing $f file...&quot;</span>
+</span><span class="line">    rails_app_home <span class="o">&amp;&amp;</span> <span class="nv">FILE</span><span class="o">=</span><span class="nv">$f</span> rake data:import
+</span><span class="line">  <span class="k">done</span>
+</span><span class="line"><span class="o">}</span>
+</span><span class="line">
+</span><span class="line">split_big_csv_into_small_chunks
+</span><span class="line">process_split_files
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Head to http://vagrantup.com/ and download the package for your OS.</p>
+<p>Let&#8217;s go through the above script. I use <code>split</code> UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run.</p>
 
-<h2 id="install-virtualbox">Install Virtualbox</h2>
+<p>Now, how many minutes you think our bash script would take to finish? It is <em>3 mintutes</em> - no kidding! This is a massive gain compared to 2hrs.</p>
 
-<p>Head to https://www.virtualbox.org/ and download the app for your OS.</p>
-
-<h2 id="import-the-vm-box">Import the VM box</h2>
-
-<p>Once you have downloaded the VM box, the image can be imported to your system. In my case:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant box add travis-ruby travis-ruby.box</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>If imported successfully, you should be able to see <code>travis-ruby</code> in the box list with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant box list</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<h2 id="bootstrap">Bootstrap</h2>
-
-<p>Let&#8217;s get our box up so we could SSH and start playing around with it:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant init travis-ruby</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>A new <code>Vargrantfile</code> will be created for you in the current folder.
-We could bring the box up with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant up</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And now you can SSH into with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant ssh</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Once you are in the box terminal, we run the post-install script:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ sh ./postinstall.sh</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>This script install all essential packages like compilers, libraries.</p>
-
-<h2 id="debug-your-test">Debug your test</h2>
-
-<p>Copy your application to this VM box via <code>scp</code> or <code>git clone</code> and debug the test like you debug it on your local box.</p>
-
+<p>Ruby/Rails are not the best for dealing with huge chunk of memory. So before deciding to try some SQL way, you can be pragmatic and abuse UNIX by spawning as many processes as your computer can handle and you&#8217;ll be surprised on how much gain you would achieve. Good luck!</p>
 </div>
 
 
@@ -213,15 +213,21 @@ We could bring the box up with:</p>
   
 
 
-<time datetime="2012-08-24T13:04:00+10:00" pubdate data-updated="true">Aug 24<span>th</span>, 2012</time>
+<time datetime="2013-10-30T17:23:00+11:00" pubdate data-updated="true">Oct 30<span>th</span>, 2013</time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/activerecord/'>activerecord</a>, <a class='category' href='/blog/categories/bash/'>bash</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/unix/'>unix</a>
+  
+</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/" data-via="joneslee85" data-counturl="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/rails/activerecord/unix/bash/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/" data-via="joneslee85" data-counturl="http://ruby-journal.com/rails/activerecord/unix/bash/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -234,10 +240,8 @@ We could bring the box up with:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/install-postgres-dot-app-on-osx-10-dot-7-plus/" title="Previous Post: Install Postgres.app on OSX 10.7+">&laquo; Install Postgres.app on OSX 10.7+</a>
+        <a class="basic-alignment left" href="/faster-travisci-test/" title="Previous Post: Faster TravisCI test">&laquo; Faster TravisCI test</a>
       
-      
-        <a class="basic-alignment right" href="/install-ubuntu-with-pxe-via-osx/" title="Next Post: Install Ubuntu with PXE via OSX">Install Ubuntu with PXE via OSX &raquo;</a>
       
     </p>
   </footer>
@@ -363,8 +367,8 @@ We could bring the box up with:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/debug-your-failed-test-in-travis-ci/';
-        var disqus_url = 'http://ruby-journal.com/debug-your-failed-test-in-travis-ci/';
+        var disqus_identifier = 'http://ruby-journal.com/rails/activerecord/unix/bash/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/';
+        var disqus_url = 'http://ruby-journal.com/rails/activerecord/unix/bash/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/';
         var disqus_script = 'embed.js';
       
     (function () {
