@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-10-30T17:52:44+11:00</updated>
+  <updated>2013-10-30T17:58:33+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[How to import millions records via ActiveRecord within minutes not hours]]></title>
-    <link href="http://ruby-journal.com/rails/activerecord/unix/bash/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/"/>
+    <link href="http://ruby-journal.com/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/"/>
     <updated>2013-10-30T17:23:00+11:00</updated>
-    <id>http://ruby-journal.com/rails/activerecord/unix/bash/how-to-import-millions-records-via-activerecord-within-minutes-not-hours</id>
+    <id>http://ruby-journal.com/how-to-import-millions-records-via-activerecord-within-minutes-not-hours</id>
     <content type="html"><![CDATA[
 <p>In today tutorial, I&#8217;ll show you how to optimise a ActiveRecord import script by 300%. My solution is better than other solution as it doesn&#8217;t use any SQL hack, thus you can retain the integrity with the data by running it through ActiveRecord normally.</p>
 

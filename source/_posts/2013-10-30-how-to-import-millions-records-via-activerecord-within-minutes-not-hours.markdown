@@ -3,7 +3,8 @@ layout: post
 title: "How to import millions records via ActiveRecord within minutes not hours"
 date: 2013-10-30 17:23
 comments: true
-categories: rails activerecord unix bash
+categories:
+tags: rails activerecord unix bash
 author: "Trung Lê"
 ---
 

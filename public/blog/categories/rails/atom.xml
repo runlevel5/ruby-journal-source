@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Ruby Journal]]></title>
   <link href="http://ruby-journal.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-10-30T17:52:46+11:00</updated>
+  <updated>2013-10-30T17:58:36+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,75 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[How to import millions records via ActiveRecord within minutes not hours]]></title>
-    <link href="http://ruby-journal.com/rails/activerecord/unix/bash/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/"/>
-    <updated>2013-10-30T17:23:00+11:00</updated>
-    <id>http://ruby-journal.com/rails/activerecord/unix/bash/how-to-import-millions-records-via-activerecord-within-minutes-not-hours</id>
-    <content type="html"><![CDATA[<p>{{ post.title }}</p>
-
-<p>In today tutorial, I’ll show you how to optimise a ActiveRecord import script by 300%. My solution is better than other solution as it doesn’t use any SQL hack, thus you can retain the integrity with the data by running it through ActiveRecord normally.</p>
-
-<!--more-->
-
-<p>At work, I am assigned a task to import millions rows of records from a 300MB CSV file into Rails app. The rake task takes in FILE and process it with ActiveRecord.</p>
-
-<p><code>
-FILE=/tmp/big_file.csv rake data:import
-</code></p>
-
-<p>And soon I bumped into performance issue because ActiveRecord could not release garbage effectively. The script tooks <em>~2hrs</em> to complete. This is unacceptable to my standard.</p>
-
-<p>There are various workarounds on the net such as using <code>ar_import</code> gem which uses SQL INSERT. However I do not like these SQL solutions as there are so many callbacks with my models and data integrity is very important. So I come up with an alternative solution:</p>
-
-<ul>
-  <li>Split the big_file.csv into smaller files</li>
-  <li>Loop through these smaller chunks and recursively run rake task on each</li>
-</ul>
-
-<p>So now you wonder how the above solution works better. It is because now we run many small processes in which Rails won’t have to deal much with big GC. Once a process is completed, memory will be instantly released. Now, let’s code this up using shell script, I chose bash as example (please adapt to fit your purpose):</p>
-
-<p>```bash
-#! /bin/bash</p>
-
-<p>NUMBER_OF_SPLIT_LINES=50000
-SPLIT_FILE_PREFIX=’small_’
-BIG_FILE_PATH=/tmp/big_file.csv
-SPLIT_FILES=/tmp/$SPLIT_FILE_PREFIX*</p>
-
-<p>temp_home () {
-  cd /tmp
-}</p>
-
-<p>rails_app_home () {
-  cd /your_app
-}</p>
-
-<p>split_big_csv_into_small_chunks () {
-  echo “Split $BIG_FILE_PATH file into small chunks with size $NUMBER_OF_SPLIT_LINES lines…”
-  temp_home &amp;&amp; split -l $NUMBER_OF_SPLIT_LINES $BIG_FILE_PATH $SPLIT_FILE_PREFIX
-}</p>
-
-<p>process_split_files () {
-  for f in $SPLIT_FILES
-  do
-    echo “Processing $f file…”
-    rails_app_home &amp;&amp; FILE=$f rake data:import
-  done
-}</p>
-
-<p>split_big_csv_into_small_chunks
-process_split_files
-```</p>
-
-<p>Let’s go through the above script. I use <code>split</code> UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run.</p>
-
-<p>Now, how many minutes you think our bash script would take to finish? It is <em>3 mintutes</em> - no kidding! This is a massive gain compared to 2hrs.</p>
-
-<p>Ruby/Rails are not the best for dealing with huge chunk of memory. So before deciding to try some SQL way, you can be pragmatic and abuse UNIX by spawning as many processes as your computer can handle and you’ll be surprised on how much gain you would achieve. Good luck!</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Exposing ActiveRecord model attributes to Liquid dynamically]]></title>
