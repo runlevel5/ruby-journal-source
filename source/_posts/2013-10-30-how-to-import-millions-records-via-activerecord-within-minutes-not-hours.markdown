@@ -74,7 +74,7 @@ process_split_files () {
   for f in $SPLIT_FILES
   do
     echo "Processing $f file..."
-    rails_app_home && FILE=$f rake data:import
+    rails_app_home && FILE=$f nohup rake data:import &
   done
 }
 
@@ -82,7 +82,7 @@ split_big_csv_into_small_chunks
 process_split_files
 ```
 
-Let's go through the above script. I use `split` UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run.
+Let's go through the above script. I use `split` UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run. I utilise `nohup` to make sure my script is not killed by SIGHUP (in my case, I run this script on remote host via SSH). Be noted that, I run each process in the background.
 
 Now, how many minutes you think our bash script would take to finish? It is *3 mintutes* - no kidding! This is a massive gain compared to 2hrs.
 

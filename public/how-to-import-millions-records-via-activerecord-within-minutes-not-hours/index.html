@@ -212,7 +212,7 @@
 </span><span class="line">  <span class="k">for </span>f in <span class="nv">$SPLIT_FILES</span>
 </span><span class="line">  <span class="k">do</span>
 </span><span class="line"><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;Processing $f file...&quot;</span>
-</span><span class="line">    rails_app_home <span class="o">&amp;&amp;</span> <span class="nv">FILE</span><span class="o">=</span><span class="nv">$f</span> rake data:import
+</span><span class="line">    rails_app_home <span class="o">&amp;&amp;</span> <span class="nv">FILE</span><span class="o">=</span><span class="nv">$f</span> nohup rake data:import &amp;
 </span><span class="line">  <span class="k">done</span>
 </span><span class="line"><span class="o">}</span>
 </span><span class="line">
@@ -220,7 +220,7 @@
 </span><span class="line">process_split_files
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Let&#8217;s go through the above script. I use <code>split</code> UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run.</p>
+<p>Let&#8217;s go through the above script. I use <code>split</code> UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run. I utilise <code>nohup</code> to make sure my script is not killed by SIGHUP (in my case, I run this script on remote host via SSH). Be noted that, I run each process in the background.</p>
 
 <p>Now, how many minutes you think our bash script would take to finish? It is <em>3 mintutes</em> - no kidding! This is a massive gain compared to 2hrs.</p>
 
@@ -290,6 +290,8 @@
   <p>I am a humble Ruby enthusiast.</p>
   <p>I love art, reading history book, table tennis, golf</p>
 </section>
+
+<iframe width='180' height='260' src='http://wizpert.com/wizapi/widget?beta_key=3ba42&ep=19785&size=standard&topic_slug=rails-programming' frameborder='0' scrolling='no' allowfullscreen></iframe>
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">

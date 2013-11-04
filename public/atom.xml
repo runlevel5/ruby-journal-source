@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-10-30T18:23:35+11:00</updated>
+  <updated>2013-11-04T23:41:37+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -127,7 +127,7 @@
 </span><span class="line">  <span class="k">for </span>f in <span class="nv">$SPLIT_FILES</span>
 </span><span class="line">  <span class="k">do</span>
 </span><span class="line"><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;Processing $f file...&quot;</span>
-</span><span class="line">    rails_app_home <span class="o">&amp;&amp;</span> <span class="nv">FILE</span><span class="o">=</span><span class="nv">$f</span> rake data:import
+</span><span class="line">    rails_app_home <span class="o">&amp;&amp;</span> <span class="nv">FILE</span><span class="o">=</span><span class="nv">$f</span> nohup rake data:import &amp;
 </span><span class="line">  <span class="k">done</span>
 </span><span class="line"><span class="o">}</span>
 </span><span class="line">
@@ -135,7 +135,7 @@
 </span><span class="line">process_split_files
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Let&#8217;s go through the above script. I use <code>split</code> UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run.</p>
+<p>Let&#8217;s go through the above script. I use <code>split</code> UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run. I utilise <code>nohup</code> to make sure my script is not killed by SIGHUP (in my case, I run this script on remote host via SSH). Be noted that, I run each process in the background.</p>
 
 <p>Now, how many minutes you think our bash script would take to finish? It is <em>3 mintutes</em> - no kidding! This is a massive gain compared to 2hrs.</p>
 
