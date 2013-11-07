@@ -84,6 +84,8 @@ process_split_files
 
 Let's go through the above script. I use `split` UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run. I utilise `nohup` to make sure my script is not killed by SIGHUP (in my case, I run this script on remote host via SSH). Be noted that, I run each process in the background.
 
+If you want a better performant version of `split`, I highly recommend you give `csv_split` a try, please download it at https://github.com/PerformanceHorizonGroup/csv-split.
+
 Now, how many minutes you think our bash script would take to finish? It is *3 mintutes* - no kidding! This is a massive gain compared to 2hrs.
 
 Ruby/Rails are not the best for dealing with huge chunk of memory. So before deciding to try some SQL way, you can be pragmatic and abuse UNIX by spawning as many processes as your computer can handle and you'll be surprised on how much gain you would achieve. Good luck!
