@@ -4,7 +4,11 @@ title: "Digesting pumactl"
 date: 2013-11-22 16:39
 comments: true
 categories:
+tags: rails puma unix bash
+author: "Trung Lê"
 ---
+
+{{ post.title }}
 
 Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
 for many production servers in the world. Given its short time of development, you'll likely
@@ -14,6 +18,8 @@ ago), thus people seeks different approaches with custom bash script by calling 
 upstart, monit, etc. However, today when I revisit `pumactl`, this tool has been polished and
 now does exactly what it promises. In this short article, I'll go through with you how to use
 `pumactl` to manage your puma processes.
+
+<!--more-->
 
 ## Anatomy of puma processes
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-11-22T17:33:15+11:00</updated>
+  <updated>2013-11-22T17:38:41+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -18,14 +18,17 @@
     <link href="http://ruby-journal.com/digesting-pumactl/"/>
     <updated>2013-11-22T16:39:00+11:00</updated>
     <id>http://ruby-journal.com/digesting-pumactl</id>
-    <content type="html"><![CDATA[<p>Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
-for many production servers in the world. Given its short time of development, you’ll likely
+    <content type="html"><![CDATA[
+<p>Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
+for many production servers in the world. Given its short time of development, you&#8217;ll likely
 to see issues. One of the issue that I and many people often bump into is processes management.
-By default, puma offers <code>pumactl</code>, yet this utitlity hasn’t lived up to expectation (this is a year
+By default, puma offers <code>pumactl</code>, yet this utitlity hasn&#8217;t lived up to expectation (this is a year
 ago), thus people seeks different approaches with custom bash script by calling <code>puma</code> directly,
 upstart, monit, etc. However, today when I revisit <code>pumactl</code>, this tool has been polished and
-now does exactly what it promises. In this short article, I’ll go through with you how to use
+now does exactly what it promises. In this short article, I&#8217;ll go through with you how to use
 <code>pumactl</code> to manage your puma processes.</p>
+
+<!--more-->
 
 <h2 id="anatomy-of-puma-processes">Anatomy of puma processes</h2>
 
@@ -120,12 +123,12 @@ as many of us relies on other system to manage status such as monit or god.</p>
 <h2 id="introduction-to-pumactl">Introduction to pumactl</h2>
 
 <p>As we can see that above operations can be tedious and error prone and definitely not fun to work
-with a big deployment scale. Introducing pumactl, this utility automates all of above tasks. Let’s
+with a big deployment scale. Introducing pumactl, this utility automates all of above tasks. Let&#8217;s
 see how we could reproduce all above steps</p>
 
 <h3 id="start-puma-process">Start puma process</h3>
 
-<p>We setup a config file that asks puma to store its PID in a pid file and run in daemon mode. We’ll
+<p>We setup a config file that asks puma to store its PID in a pid file and run in daemon mode. We&#8217;ll
 carry out a test on an Rails app. Create <code>config/puma.rb</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
@@ -205,7 +208,7 @@ our pid file is updated with 3001:</p>
 </pre></td><td class="code"><pre><code class=""><span class="line">$ cat /var/run/puma_app1.pid
 </span><span class="line">3001</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Magic! It’s working!</p>
+<p>Magic! It&#8217;s working!</p>
 
 <h3 id="graceful-restart-puma-process-1">Graceful restart puma process</h3>
 
@@ -244,7 +247,7 @@ our pid file is updated with 3001:</p>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>That’s it folk. Now you know how to use pumactl, why don’t you delete your custom script and replace
+<p>That&#8217;s it folk. Now you know how to use pumactl, why don&#8217;t you delete your custom script and replace
 it with pumactl. See you in the next article.</p>
 
 ]]></content>
