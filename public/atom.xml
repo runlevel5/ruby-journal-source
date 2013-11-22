@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-11-04T23:41:37+11:00</updated>
+  <updated>2013-11-22T17:33:15+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,243 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Digesting pumactl]]></title>
+    <link href="http://ruby-journal.com/digesting-pumactl/"/>
+    <updated>2013-11-22T16:39:00+11:00</updated>
+    <id>http://ruby-journal.com/digesting-pumactl</id>
+    <content type="html"><![CDATA[<p>Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
+for many production servers in the world. Given its short time of development, you’ll likely
+to see issues. One of the issue that I and many people often bump into is processes management.
+By default, puma offers <code>pumactl</code>, yet this utitlity hasn’t lived up to expectation (this is a year
+ago), thus people seeks different approaches with custom bash script by calling <code>puma</code> directly,
+upstart, monit, etc. However, today when I revisit <code>pumactl</code>, this tool has been polished and
+now does exactly what it promises. In this short article, I’ll go through with you how to use
+<code>pumactl</code> to manage your puma processes.</p>
+
+<h2 id="anatomy-of-puma-processes">Anatomy of puma processes</h2>
+
+<p>Like any other UNIX web server, puma is run as daemon, spawning child processes (in puma term,
+they called in puma cluster worker) to handle requests from the outside world.</p>
+
+<p>For example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
+</span><span class="line">1000      2527  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
+</span><span class="line">1000      2530  0.0  2.2 870928 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 2527
+</span><span class="line">1000      2533  0.0  2.3 870868 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 2527</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You can see above that process with PID 2527 is our mother process which spawn two children.
+Both children with PID 2530 and 2533 respectively clearly states that its mother is PID 2527.</p>
+
+<p>Next, we are going to look into how to manage puma process manually.</p>
+
+<h3 id="stop-puma-process">Stop puma process</h3>
+
+<p>To stop this process, we send a SIGTERM signal to PID 2557</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ kill -s SIGTERM 2557</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And we could check if the process has been cleanly killed with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma | grep 2557
+</span><span class="line"># yields no results</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="hard-restart-puma-process">Hard restart puma process</h3>
+
+<p>To restart this process, we send a SIGUSR2 signal to PID 2557.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ kill -s SIGUSR 2557</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please note, this action is equivalent to killing the mother process and start a new one. Avoid this thing in production environment at all cost. Because we do not want downtime.</p>
+
+<p>Checking the ps yields:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
+</span><span class="line">1000      3001  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
+</span><span class="line">1000      3010  0.0  2.2 880321 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 3001
+</span><span class="line">1000      3020  0.0  2.3 700828 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 3001</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The output shows that our PID 2557 is killed and a new PID 3001 is created.</p>
+
+<h3 id="graceful-restart-puma-process">Graceful restart puma process</h3>
+
+<p>In order to achieve zero downtime, we only kill these 2 children and respawn
+with 2 new one instead of killing the mother process. In puma term, they call it <code>phased-restart</code>,
+that is sending SIGUSR1 signal to PID 2557.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ kill -S SIGUSR1 2557</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Let verify the result:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
+</span><span class="line">1000      2527  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
+</span><span class="line">1000      3001  0.0  2.2 870928 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 2527
+</span><span class="line">1000      3002  0.0  2.3 870868 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 2527</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The 2 children are killed and two new spawn children appears. Just what we expect.</p>
+
+<h3 id="checking-status-of-puma-process">Checking status of puma process</h3>
+
+<p>In order to check process, you have to start puma with <code>-S</code> parameter, this points to a state
+file which stores all statuses of our puma process. Example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ puma -S /var/run/app.state</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now you could hook this file into any monitoring tools. I find this state file idea not helpful
+as many of us relies on other system to manage status such as monit or god.</p>
+
+<h2 id="introduction-to-pumactl">Introduction to pumactl</h2>
+
+<p>As we can see that above operations can be tedious and error prone and definitely not fun to work
+with a big deployment scale. Introducing pumactl, this utility automates all of above tasks. Let’s
+see how we could reproduce all above steps</p>
+
+<h3 id="start-puma-process">Start puma process</h3>
+
+<p>We setup a config file that asks puma to store its PID in a pid file and run in daemon mode. We’ll
+carry out a test on an Rails app. Create <code>config/puma.rb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">environment ENV['RAILS_ENV'] || 'production'
+</span><span class="line">daemonize
+</span><span class="line">
+</span><span class="line">workers    2 # should be same number of your CPU core
+</span><span class="line">threads    1, 6
+</span><span class="line">
+</span><span class="line">pidfile    "/var/run/puma_app1.pid"</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>We now can start puma with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Verify with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
+</span><span class="line">1000      2527  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
+</span><span class="line">1000      2530  0.0  2.2 870928 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 2527
+</span><span class="line">1000      2533  0.0  2.3 870868 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 2527</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>we can see above that pumactl will start our server with <code>puma -C config/puma.rb</code>. Sweet. Next
+we check to see if pid file store correct PID:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ cat /var/run/puma_app1.pid
+</span><span class="line">2527</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Just as expected.</p>
+
+<h3 id="stop-puma-process-1">Stop puma process</h3>
+
+<p>Simply with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>There is no output yielded with</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma | grep 2557</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>indicates that the process is cleanly killed</p>
+
+<h3 id="hard-restart-puma-process-1">Hard restart puma process</h3>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
+</span><span class="line">1000      3001  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
+</span><span class="line">1000      3010  0.0  2.2 880321 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 3001
+</span><span class="line">1000      3020  0.0  2.3 700828 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 3001</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The output shows that 2557 is killed and new PID 3001 is created. We could check to see if
+our pid file is updated with 3001:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ cat /var/run/puma_app1.pid
+</span><span class="line">3001</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Magic! It’s working!</p>
+
+<h3 id="graceful-restart-puma-process-1">Graceful restart puma process</h3>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb phased-restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and check again:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
+</span><span class="line">1000      2527  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
+</span><span class="line">1000      3001  0.0  2.2 870928 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 2527
+</span><span class="line">1000      3002  0.0  2.3 870868 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 2527</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>PID 2527 is still there and only its children are respawned. Perfect!</p>
+
+<h3 id="checking-status-of-puma-process-1">Checking status of puma process</h3>
+
+<p>Now we do not need other tool to tell if our PID is running, we could do with one command:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb status</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>if PID is running we would get output:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">PID 2557 is running</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>else</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">No puma process</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>That’s it folk. Now you know how to use pumactl, why don’t you delete your custom script and replace
+it with pumactl. See you in the next article.</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to import millions records via ActiveRecord within minutes not hours]]></title>
@@ -136,6 +373,8 @@
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Let&#8217;s go through the above script. I use <code>split</code> UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run. I utilise <code>nohup</code> to make sure my script is not killed by SIGHUP (in my case, I run this script on remote host via SSH). Be noted that, I run each process in the background.</p>
+
+<p>If you want a better performant version of <code>split</code>, I highly recommend you give <code>csv_split</code> a try, please download it at https://github.com/PerformanceHorizonGroup/csv-split.</p>
 
 <p>Now, how many minutes you think our bash script would take to finish? It is <em>3 mintutes</em> - no kidding! This is a massive gain compared to 2hrs.</p>
 
@@ -2858,62 +3097,6 @@ if the binary works by:</p>
 </span><span class="line">$ rm -rf ghostscript-9.05*</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>If you feel lazy, you could download my Ruby-wrapper of gs at <a href="https://github.com/joneslee85/ruby-ghostscript">https://github.com/joneslee85/ruby-ghostscript</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Exposing ActiveRecord model attributes to Liquid dynamically]]></title>
-    <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
-    <updated>2012-03-12T12:52:00+11:00</updated>
-    <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
-    <content type="html"><![CDATA[
-<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
-model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
-to tell which attributes / call-able methods of the instance that could be passed
-with the <code>liquid_methods</code> call. In most of cases, people tend to use the latter method
-because they could narrow the exposure scope to liquid.</p>
-
-<p>However, what if your model has so many attributes and typing all them out for
-the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
-creating a module:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class="line">    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
-</span><span class="line">        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And you also need to include the above module in the ActiveRecord classes that
-you want to be exposed to Liquid:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="nb">require</span> <span class="s1">&#39;attributes_to_liquid_methods_mapper&#39;</span>
-</span><span class="line">  <span class="kp">include</span> <span class="no">AttributesToLiquidMethodsMapper</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
 ]]></content>
   </entry>
   

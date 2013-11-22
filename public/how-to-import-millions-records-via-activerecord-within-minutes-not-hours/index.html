@@ -222,6 +222,8 @@
 
 <p>Let&#8217;s go through the above script. I use <code>split</code> UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run. I utilise <code>nohup</code> to make sure my script is not killed by SIGHUP (in my case, I run this script on remote host via SSH). Be noted that, I run each process in the background.</p>
 
+<p>If you want a better performant version of <code>split</code>, I highly recommend you give <code>csv_split</code> a try, please download it at https://github.com/PerformanceHorizonGroup/csv-split.</p>
+
 <p>Now, how many minutes you think our bash script would take to finish? It is <em>3 mintutes</em> - no kidding! This is a massive gain compared to 2hrs.</p>
 
 <p>Ruby/Rails are not the best for dealing with huge chunk of memory. So before deciding to try some SQL way, you can be pragmatic and abuse UNIX by spawning as many processes as your computer can handle and you&#8217;ll be surprised on how much gain you would achieve. Good luck!</p>
@@ -271,6 +273,8 @@
         <a class="basic-alignment left" href="/faster-travisci-test/" title="Previous Post: Faster TravisCI test">&laquo; Faster TravisCI test</a>
       
       
+        <a class="basic-alignment right" href="/digesting-pumactl/" title="Next Post: Digesting pumactl">Digesting pumactl &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -297,6 +301,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/digesting-pumactl/">Digesting pumactl</a>
+      </li>
+    
+      <li class="post">
         <a href="/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/">How to import millions records via ActiveRecord within minutes not hours</a>
       </li>
     
@@ -310,10 +318,6 @@
     
       <li class="post">
         <a href="/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/">Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0</a>
-      </li>
-    
-      <li class="post">
-        <a href="/rails-4-changes-join-table-naming-convention/">Rails 4 changes habtm join table naming convention</a>
       </li>
     
   </ul>

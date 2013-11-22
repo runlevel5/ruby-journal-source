@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Ruby Journal</title>
+  <title>Digesting pumactl - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
@@ -19,7 +19,7 @@ for many production servers in the world. Given its &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/">
+  <link rel="canonical" href="http://ruby-journal.com/digesting-pumactl/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -74,15 +74,12 @@ for many production servers in the world. Given its &hellip;">
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/digesting-pumactl/">Digesting Pumactl</a></h1>
+      <h1 class="entry-title">Digesting Pumactl</h1>
     
     
       <p class="meta">
@@ -100,14 +97,14 @@ for many production servers in the world. Given its &hellip;">
 
 <time datetime="2013-11-22T16:39:00+11:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2013</time>
         
-         | <a href="/digesting-pumactl/#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
+<div class="entry-content"><p>Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
 for many production servers in the world. Given its short time of development, you’ll likely
 to see issues. One of the issue that I and many people often bump into is processes management.
 By default, puma offers <code>pumactl</code>, yet this utitlity hasn’t lived up to expectation (this is a year
@@ -337,66 +334,16 @@ our pid file is updated with 3001:</p>
 it with pumactl. See you in the next article.</p>
 
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/">How to Import Millions Records via ActiveRecord Within Minutes Not Hours</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Trung Lê</span></span>
 
-<time datetime="2013-10-30T17:23:00+11:00" pubdate data-updated="true">Oct 30<span>th</span>, 2013</time>
-        
-         | <a href="/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>In today tutorial, I&#8217;ll show you how to optimise a ActiveRecord import script by 300%. My solution is better than other solution as it doesn&#8217;t use any SQL hack, thus you can retain the integrity with the data by running it through ActiveRecord normally.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/faster-travisci-test/">Faster TravisCI Test</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -408,348 +355,42 @@ it with pumactl. See you in the next article.</p>
   
 
 
-<time datetime="2013-10-11T12:37:00+11:00" pubdate data-updated="true">Oct 11<span>th</span>, 2013</time>
-        
-         | <a href="/faster-travisci-test/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>Running test suite is time consuming. There are various techniques to optimize the runtime performance of the CI by stub/mock, parallel_test, etc. In this short tutorial, I&#8217;ll show you how to optimize your TravisCI test suite by splitting your test suit into concurrent jobs, which drastically improve the build time.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/faster-travisci-test/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2013-11-22T16:39:00+11:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2013</time>
       
-  <header>
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/how-to-uninstall-all-ruby-gems/">How to Uninstall All Ruby Gems</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
+      <div class="sharing">
   
-
-
-<time datetime="2013-10-11T12:01:00+11:00" pubdate data-updated="true">Oct 11<span>th</span>, 2013</time>
-        
-         | <a href="/how-to-uninstall-all-ruby-gems/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>In order to uninstall all gems, you have to loop through all entries in <code>gem list</code> with bash scripting. This method is very inconveninent. Thanks to Rubygems 2.1.0, you now could do it with one command.</p>
-
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/digesting-pumactl/" data-via="joneslee85" data-counturl="http://ruby-journal.com/digesting-pumactl/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-uninstall-all-ruby-gems/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  
-    <article>
+    
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/">Becareful With Space in Lambda Rocket Syntax Between Ruby 1.9 and 2.0</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-10-03T19:45:00+10:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2013</time>
-        
-         | <a href="/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>Majority of Ruby 2.0 syntaxes are backward-compatible with Ruby 1.9. Yet there is one tiny change in the way that Ruby 2.0 does lambda rocket that would break backward-compatability with Ruby 1.9. That is&#8230;a single space. Yes, you heard it correctly.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+        <a class="basic-alignment left" href="/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/" title="Previous Post: How to import millions records via ActiveRecord within minutes not hours">&laquo; How to import millions records via ActiveRecord within minutes not hours</a>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/rails-4-changes-join-table-naming-convention/">Rails 4 Changes Habtm Join Table Naming Convention</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-10-03T18:55:00+10:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2013</time>
-        
-         | <a href="/rails-4-changes-join-table-naming-convention/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>When upgrading my app from Rails 3.2.14 to Rails 4, I bumped into an error in which
-habtm association complains missing DB join table. To my surprise, Rails 4 has changed the default naming convention for join table.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/rails-4-changes-join-table-naming-convention/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/">How to Track Changes of a Model in a `after_callbacks` in Rails 3 or Newer</a></h1>
-    
-    
-      <p class="meta">
-        
+    </p>
+  </footer>
+</article>
 
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-09-23T16:43:00+10:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2013</time>
-        
-         | <a href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>You can track changes to a ActiveRecord model with <code>ActiveRecord::Dirty#changed?</code>. Yet there is one caveat though, the tracking is lost after the model is saved. In this tutorial I&#8217;ll show how to track the changes to a record even the record has been saved, this comes handy when being used with ActiveRecord <code>after</code> callbacks</p>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-write-rails-view-test-with-rspec/">How to Write Rails View Test With RSpec</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-09-16T16:18:00+10:00" pubdate data-updated="true">Sep 16<span>th</span>, 2013</time>
-        
-         | <a href="/how-to-write-rails-view-test-with-rspec/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>In this short tutorial, I will show you how to do a View test with Rspec + capybara</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-write-rails-view-test-with-rspec/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-do-jqueryui-autocomplete-with-capybara-2/">How to Do jQuery UI Autocomplete With Capybara 2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-09-12T14:04:00+10:00" pubdate data-updated="true">Sep 12<span>th</span>, 2013</time>
-        
-         | <a href="/how-to-do-jqueryui-autocomplete-with-capybara-2/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>In this tutorial, I&#8217;ll show you how to do jQuery UI Autocomplete the better way with Capybara 2!
-That is getting rid of <code>sleep</code> that many solutions on the Internet suggested. Furthermore this
-solution works both with selenium and polstergeist driver.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-do-jqueryui-autocomplete-with-capybara-2/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-fill-in-fckeditor-with-capybara-2/">How to Fill in FCKeditor With Capybara 2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-09-12T12:46:00+10:00" pubdate data-updated="true">Sep 12<span>th</span>, 2013</time>
-        
-         | <a href="/how-to-fill-in-fckeditor-with-capybara-2/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>In this short tutorial, I will show you how to fill in FCkeditor text area by using Capybara 2</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-fill-in-fckeditor-with-capybara-2/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/blog/page/2/">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
 <aside class="sidebar">
   
     <section>
@@ -789,7 +430,7 @@ solution works both with selenium and polstergeist driver.</p>
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/joneslee85">@joneslee85</a> on GitHub
@@ -819,7 +460,7 @@ solution works both with selenium and polstergeist driver.</p>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -848,6 +489,7 @@ solution works both with selenium and polstergeist driver.</p>
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -862,7 +504,10 @@ solution works both with selenium and polstergeist driver.</p>
       var disqus_shortname = 'ruby-journal';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ruby-journal.com/digesting-pumactl/';
+        var disqus_url = 'http://ruby-journal.com/digesting-pumactl/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
