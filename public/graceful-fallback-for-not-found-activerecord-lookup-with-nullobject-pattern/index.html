@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>minitest let() is lazy - Ruby Journal</title>
+  <title>Graceful fallback for not found ActiveRecord lookup with NullObject pattern - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Don&#8217;t you know that minitest also have a similar let() helper that does exactly the same job as the one of RSpec. But some people do not fully &hellip;">
+  <meta name="description" content="In my application, I bump to Exception when trying to delegate a method to an unfound ActiveRecord instance. This poses two issues for me: Hard to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/minitest-let-is-lazy/">
+  <link rel="canonical" href="http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">Minitest Let() Is Lazy</h1>
+      <h1 class="entry-title">Graceful Fallback for Not Found ActiveRecord Lookup With NullObject Pattern</h1>
     
     
       <p class="meta">
@@ -94,7 +94,7 @@
   
 
 
-<time datetime="2013-04-13T10:31:00+10:00" pubdate data-updated="true">Apr 13<span>th</span>, 2013</time>
+<time datetime="2013-11-23T23:27:00+11:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -104,133 +104,18 @@
 
 
 <div class="entry-content">
-<p>Don&#8217;t you know that minitest also have a similar <code>let()</code> helper that does exactly the same job as the one of RSpec. But some people do not fully understand the difference between defining object in <code>let()</code> and <code>before()</code> block.</p>
+<p>In my application, I bump to Exception when trying to delegate a method to an unfound ActiveRecord instance. This poses two issues for me:</p>
+
+<ul>
+  <li>Hard to write test for you have to set up fixture/factory correctly</li>
+  <li>Not a good user experience to see error on production</li>
+</ul>
+
+<p>I tackle this with NullObject pattern to provide a graceful fallback.</p>
 
 <!--more-->
 
-<p>So you&#8217;ve been doing TDD, that is writing tests. Tests is like app documentation, it needs attention as much as the main code does. One good way to refactor your test is to use <code>let()</code>.</p>
-
-<p>We have a simple spec below:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">before</span> <span class="k">do</span>
-</span><span class="line">    <span class="vi">@post</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;#publish&#39;</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should publish to the world wide web&#39;</span> <span class="k">do</span>
-</span><span class="line">      <span class="vi">@post</span><span class="o">.</span><span class="n">publish</span>
-</span><span class="line">      <span class="vi">@post</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>that could be refactored to:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">let</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;#publish&#39;</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should publish to the world wide web&#39;</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">post</span><span class="o">.</span><span class="n">publish</span>
-</span><span class="line">      <span class="n">post</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Our test is now easier to read. Some developers naively believes the <code>let()</code> just provides a syntax sugar to the test, in fact it is totally different from the block way. It&#8217;s lazy loaded. See the code below:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">let</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
-</span><span class="line">
-</span><span class="line"><span class="no">Post</span><span class="o">.</span><span class="n">count</span>
-</span><span class="line"><span class="c1"># 0</span>
-</span><span class="line">
-</span><span class="line"><span class="n">post</span>
-</span><span class="line">
-</span><span class="line"><span class="no">Post</span><span class="o">.</span><span class="n">count</span>
-</span><span class="line"><span class="c1"># 1</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>the <code>post</code> is not created until it is invoked. This definitely helps improve the speed of test in which object is initialized upon being referenced. Yet a caveat for tests on collection of objects that does not reference the object directly in the test. For example:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">let</span><span class="p">(</span><span class="ss">:post1</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
-</span><span class="line">  <span class="n">let</span><span class="p">(</span><span class="ss">:post2</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;.bulk_publish&#39;</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should bulk publish to the world wide web&#39;</span> <span class="k">do</span>
-</span><span class="line">      <span class="no">Post</span><span class="o">.</span><span class="n">bulk_publish</span>
-</span><span class="line">      <span class="n">post1</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">      <span class="n">post2</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>To some people surprise, the test will fail because we do not invoke <code>post1</code> and <code>post2</code> in the test, thus 2 posts are not created before <code>Post.bulk_publish</code> is invoked. You tap those 2 objects before the test with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="s1">&#39;.bulk_publish&#39;</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">before</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">post1</span>
-</span><span class="line">    <span class="n">post2</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Which I find very ugly. In such cases, it&#8217;d be best interest to use the block way to define objects.</p>
+<p>Firstly, let me show you my code:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -246,23 +131,159 @@
 <span class="line-number">12</span>
 <span class="line-number">13</span>
 <span class="line-number">14</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;.bulk_publish&#39;</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">before</span> <span class="k">do</span>
-</span><span class="line">      <span class="vi">@post1</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span>
-</span><span class="line">      <span class="vi">@post2</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span>
-</span><span class="line">    <span class="k">end</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="c1"># in schema, each employee has a unique email column as :string type</span>
 </span><span class="line">
-</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should bulk publish to the world wide web&#39;</span> <span class="k">do</span>
-</span><span class="line">      <span class="no">Post</span><span class="o">.</span><span class="n">bulk_publish</span>
-</span><span class="line">      <span class="vi">@post1</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">      <span class="vi">@post2</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">employee_of_the_month?</span>
+</span><span class="line">    <span class="c1"># yeah, code to determine</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">EmployeeLookupService</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find_employee_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+</span><span class="line">    <span class="no">Employee</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">email</span><span class="p">:</span> <span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">ReportService</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">generate_for_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+</span><span class="line">    <span class="n">employee</span> <span class="o">=</span> <span class="no">EmployeeLookupService</span><span class="o">.</span><span class="n">find_employee_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">if</span> <span class="n">employee</span><span class="o">.</span><span class="n">employee_of_the_month?</span>
+</span><span class="line">      <span class="c1"># do something</span>
 </span><span class="line">    <span class="k">end</span>
 </span><span class="line">  <span class="k">end</span>
+</span><span class="line">
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>So now you know the behaviour of <code>let()</code>, I highly recommend you go through your test and apply what you have learned. See you guys in the next tutorial.</p>
+<p>I have a Report which generates report for an employee with matching email. As you can in the above
+code, if the employee could be be found by email, <code>EmployeeLookupService.find_employee_by_email</code> would yield a <code>nil</code> and calling <code>employee_of_the_month?</code> on <code>nil</code> would raise exception. So how could we make sure that our code could handle this exception gracefully?</p>
+
+<h2 id="bad-way">Bad way</h2>
+
+<p>Well, there is one quick bad way, that is to add a addtional presence check for employee, so:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ReportService</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">generate_for_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+</span><span class="line">    <span class="n">employee</span> <span class="o">=</span> <span class="no">EmployeeLookupService</span><span class="o">.</span><span class="n">find_employee_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">if</span> <span class="n">employee</span> <span class="o">&amp;&amp;</span> <span class="n">employee</span><span class="o">.</span><span class="n">employee_of_the_month?</span>
+</span><span class="line">      <span class="c1"># do something</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see, I add <code>if employee</code> clause to ensure the presence of employee. What&#8217;s wrong with this way? I find many Rails developers code this way, but to me it is not good enough. In term of OO design, I expect <code>EmployeeLookupService.find_employee_by_email</code> returns me an object which responds to <code>employee_of_the_month?</code> consistently instead of returning me a <code>nil</code>. Furthermore, it is not the responsibiltiy of <code>ReportService</code> to do presence checkup.</p>
+
+<h2 id="good-way">Good way</h2>
+
+<p>Here is how I refactor the code, I use NullObject pattern to create a new class, called <code>NullEmployee</code> and ensure that this class has the same interface as <code>Employee</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">NullEmployee</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+</span><span class="line">    <span class="vi">@email</span> <span class="o">=</span> <span class="n">email</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">employee_of_the_month?</span>
+</span><span class="line">    <span class="kp">nil</span>
+</span><span class="line">  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and I also refactor my lookup code:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">EmployeeLookupService</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find_employee_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+</span><span class="line">    <span class="no">Employee</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">email</span><span class="p">:</span> <span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span> <span class="o">||</span> <span class="no">NullEmployee</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Let&#8217;s digest what I did above, I make <code>EmployeeLookupService.find_employee_by_email</code> to create a new instance of <code>NullEmployee</code> class if not found and this <code>NullEmployee#employee_of_the_month?</code> always return <code>nil</code>. Now we do have a consistency in returned employee object. And testing it would be much more pleasant, we do not have to care about setting up this employee fixture correctly, we could simply stub <code>employee_of_the_month?</code> which makes testing faster and reduces coupling.</p>
+
+<p>Now, there is one caveat with this NullObject patter and ActiveRecord, what if we call an ActiveRecord API on this NullEmployee instance. Well, we could add all ActiveRecord API into our class and return nil, right? No, I must be kidding in saying that. There are hundreds of them, our class would look messy. The elegant solution is provide graceful fallback for missing methods by implement <code>method_missing</code> call. Here is the code:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">NullEmployee</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1"># whatever there before</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class="line">    <span class="kp">nil</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now calling a missing method won&#8217;t yield any exception.</p>
+
+<p>That&#8217;s it folks. I hope you enjoy it and please never keep learning and remembering these thumb rules:</p>
+
+<ul>
+  <li>Single Reponsibility</li>
+  <li>Interface Consistency</li>
+  <li>Never mix persisence layer with business logic layer</li>
+  <li>If hard to write test, your code might be wrong</li>
+</ul>
+
+<p>See you in the next article. Peace!</p>
 </div>
 
 
@@ -285,7 +306,7 @@
   
 
 
-<time datetime="2013-04-13T10:31:00+10:00" pubdate data-updated="true">Apr 13<span>th</span>, 2013</time>
+<time datetime="2013-11-23T23:27:00+11:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2013</time>
       
 
 
@@ -293,7 +314,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/minitest-let-is-lazy/" data-via="joneslee85" data-counturl="http://ruby-journal.com/minitest-let-is-lazy/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/" data-via="joneslee85" data-counturl="http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -306,10 +327,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/" title="Previous Post: How to install Ruby 2.0 on OSX 10.7 or newer">&laquo; How to install Ruby 2.0 on OSX 10.7 or newer</a>
+        <a class="basic-alignment left" href="/avoid-unless-method-in-a-chain-of-conditions-statement/" title="Previous Post: Avoid unless syntax in a chain of conditions statement">&laquo; Avoid unless syntax in a chain of conditions statement</a>
       
-      
-        <a class="basic-alignment right" href="/learn-to-know-myself-better/" title="Next Post: Learn to know myself better">Learn to know myself better &raquo;</a>
       
     </p>
   </footer>
@@ -437,8 +456,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/minitest-let-is-lazy/';
-        var disqus_url = 'http://ruby-journal.com/minitest-let-is-lazy/';
+        var disqus_identifier = 'http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/';
+        var disqus_url = 'http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/';
         var disqus_script = 'embed.js';
       
     (function () {

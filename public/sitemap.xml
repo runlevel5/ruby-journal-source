@@ -109,11 +109,17 @@
         <lastmod>2013-11-23T23:17:27+11:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/
+        </loc>
+        <lastmod>2013-11-24T00:26:40+11:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2013-11-23T23:17:27+11:00</lastmod>
+        <lastmod>2013-11-24T00:26:40+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2013-11-23T23:17:27+11:00</lastmod>
+        <lastmod>2013-11-24T00:26:40+11:00</lastmod>
     </url>
 </urlset>
