@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: rails - Ruby Journal</title>
+  <title>Avoid unless syntax in a chain of conditions statement - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Category: rails">
+  <meta name="description" content="Ruby gives us a nice human friendly unless which is equivalent to negation of if. Yet if we abuse using this method in a long complex statements, it &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.comblog/categories/rails/">
+  <link rel="canonical" href="http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -74,50 +74,118 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Rails</h1>
+    
+      <h1 class="entry-title">Avoid Unless Syntax in a Chain of Conditions Statement</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-23T23:11:00+11:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content">
+<p>Ruby gives us a nice human friendly <code>unless</code> which is equivalent to negation of <code>if</code>. Yet if we abuse using this method in a long complex statements, it could add more confusion for normal readers. In this article, I&#8217;ll give you one example to prove that you should not use <code>unless</code> in a chain of conditions statement.</p>
 
-  
-  <h2>2012</h2>
+<!--more-->
 
-<article>
-  
-<h1><a href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">Exposing ActiveRecord model attributes to Liquid dynamically</a></h1>
-<time datetime="2012-03-12T12:52:00+11:00" pubdate><span class='month'>Mar</span> <span class='day'>12</span> <span class='year'>2012</span></time>
+<p>I have been using <code>unless</code> for a long time and to my surprise using this method in a chain of conditions is confusing for human brain as many of my colleagues misinterpret the code all the time. Here is one example:</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/rails/'>rails</a></span>
-</footer>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">unless</span> <span class="vi">@employee</span><span class="o">.</span><span class="n">on_annual_leave?</span> <span class="o">||</span> <span class="vi">@employee</span><span class="o">.</span><span class="n">on_parental_leave?</span>
+</span><span class="line">  <span class="nb">puts</span> <span class="s2">&quot;You have no leave yet!&quot;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<p>Majority of normal human would read it as &#8220;if employee is not on annual leave or employee is on parental leave&#8221;. Which is completely wrong, this ambiguous code is supposed to read &#8220;if employee is <em>not</em> annual leave and employee is <em>not</em> on parental leave&#8221;. And for a complex piece of code, misreading this condition could yield detrimental issues. So I&#8217;d suggest not to use <code>unless</code> and instead to use <code>if !condition</code>. Let&#8217;s refactor our code:</p>
 
-</article>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">if</span> <span class="o">!</span><span class="vi">@employee</span><span class="o">.</span><span class="n">on_annual_leave?</span> <span class="o">||</span> <span class="o">!</span><span class="vi">@employee</span><span class="o">.</span><span class="n">on_parental_leave?</span>
+</span><span class="line">  <span class="nb">puts</span> <span class="s2">&quot;You have no leave yet!&quot;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<p>This code would always read as &#8220;if employee is not on annual leave or employee is not on parental leave&#8221;, which is precise to the context. So be wise before using <code>unless</code>, in cases negation with <code>if</code> is much more concise.</p>
 
-
-<article>
-  
-<h1><a href="/rails/define-fixtures-with-polymorphic-association/">Define Fixtures with Polymorphic Association</a></h1>
-<time datetime="2012-03-09T15:16:00+11:00" pubdate><span class='month'>Mar</span> <span class='day'>09</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/rails/'>rails</a></span>
-</footer>
-
-
-</article>
-
+<p>I hope you enjoy this short article, and please leave comments if you like it.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Trung Lê</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-23T23:11:00+11:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/" data-via="joneslee85" data-counturl="http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/digesting-pumactl/" title="Previous Post: Digesting pumactl">&laquo; Digesting pumactl</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -234,7 +302,10 @@
       var disqus_shortname = 'ruby-journal';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/';
+        var disqus_url = 'http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

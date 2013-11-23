@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-11-22T17:38:41+11:00</updated>
+  <updated>2013-11-23T23:18:56+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,42 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Avoid unless syntax in a chain of conditions statement]]></title>
+    <link href="http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/"/>
+    <updated>2013-11-23T23:11:00+11:00</updated>
+    <id>http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement</id>
+    <content type="html"><![CDATA[
+<p>Ruby gives us a nice human friendly <code>unless</code> which is equivalent to negation of <code>if</code>. Yet if we abuse using this method in a long complex statements, it could add more confusion for normal readers. In this article, I&#8217;ll give you one example to prove that you should not use <code>unless</code> in a chain of conditions statement.</p>
+
+<!--more-->
+
+<p>I have been using <code>unless</code> for a long time and to my surprise using this method in a chain of conditions is confusing for human brain as many of my colleagues misinterpret the code all the time. Here is one example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">unless</span> <span class="vi">@employee</span><span class="o">.</span><span class="n">on_annual_leave?</span> <span class="o">||</span> <span class="vi">@employee</span><span class="o">.</span><span class="n">on_parental_leave?</span>
+</span><span class="line">  <span class="nb">puts</span> <span class="s2">&quot;You have no leave yet!&quot;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Majority of normal human would read it as &#8220;if employee is not on annual leave or employee is on parental leave&#8221;. Which is completely wrong, this ambiguous code is supposed to read &#8220;if employee is <em>not</em> annual leave and employee is <em>not</em> on parental leave&#8221;. And for a complex piece of code, misreading this condition could yield detrimental issues. So I&#8217;d suggest not to use <code>unless</code> and instead to use <code>if !condition</code>. Let&#8217;s refactor our code:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">if</span> <span class="o">!</span><span class="vi">@employee</span><span class="o">.</span><span class="n">on_annual_leave?</span> <span class="o">||</span> <span class="o">!</span><span class="vi">@employee</span><span class="o">.</span><span class="n">on_parental_leave?</span>
+</span><span class="line">  <span class="nb">puts</span> <span class="s2">&quot;You have no leave yet!&quot;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This code would always read as &#8220;if employee is not on annual leave or employee is not on parental leave&#8221;, which is precise to the context. So be wise before using <code>unless</code>, in cases negation with <code>if</code> is much more concise.</p>
+
+<p>I hope you enjoy this short article, and please leave comments if you like it.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Digesting pumactl]]></title>
@@ -3037,69 +3073,6 @@ the error:</p>
 
 <p>Again, I’d extend to the core team to deliver another robust release.</p>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Install Ghostscript on Heroku Cedar]]></title>
-    <link href="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/"/>
-    <updated>2012-03-12T16:57:00+11:00</updated>
-    <id>http://ruby-journal.com/heroku/install-ghostscript-on-heroku</id>
-    <content type="html"><![CDATA[
-<p>In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
-As you might have known that Heroku virtual machine does come with a system-wide
-ghostscript version which is located at <code>/usr/bin/gs</code>. You can find out the
-location of this version:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
-</span><span class="line">$ /usr/bin/gs --version
-</span><span class="line">8.71</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>However, explicit dependencies is not recommended, you could read 12 Factor Approach
-on dependencies at <a href="http://www.12factor.net/dependencies">http://www.12factor.net/dependencies</a>. Credit to <a href="https://github.com/rwdaigle">Ryan Daigle</a> who pointed it out for me and I agree with him.</p>
-
-<p>To install ghostscript, we fetch the source under heroku console, fetch the source,
-configure and compile the software:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
-</span><span class="line">$ curl -O http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz
-</span><span class="line">$ tar xzvf ghostscript-9.05.tar.gz
-</span><span class="line">$ cd ghostscript-9.05
-</span><span class="line">$ ./configure --disable-cups --disable-gtk --with-drivers=FILES
-</span><span class="line">$ make
-</span><span class="line">$ cp bin/gs ~/bin</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>You might notice that I only specify configuration parameters <code>--with-drivers=FILES</code>.
-It is because I don&#8217;t need printer drivers for my app which only does think like
-images and PDF manipulation.</p>
-
-<p>Once the compilation is completed, copy the binary <code>ghostscript-9.05/bin/gs</code> to <code>~/bin</code>.
-All binaries in <code>~/bin</code> will be available for your Heroku app now. You can verify
-if the binary works by:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gs --version
-</span><span class="line">9.05</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And please do not forget to clean up:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ cd ~
-</span><span class="line">$ rm -rf ghostscript-9.05*</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>If you feel lazy, you could download my Ruby-wrapper of gs at <a href="https://github.com/joneslee85/ruby-ghostscript">https://github.com/joneslee85/ruby-ghostscript</a>.</p>
 ]]></content>
   </entry>
   
