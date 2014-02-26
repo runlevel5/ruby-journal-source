@@ -115,11 +115,17 @@
         <lastmod>2013-11-24T00:26:40+11:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/
+        </loc>
+        <lastmod>2014-02-26T18:32:34+11:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2013-11-24T00:26:40+11:00</lastmod>
+        <lastmod>2014-02-26T18:32:34+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2013-11-24T00:26:40+11:00</lastmod>
+        <lastmod>2014-02-26T18:32:34+11:00</lastmod>
     </url>
 </urlset>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Ruby Journal]]></title>
   <link href="http://ruby-journal.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2013-11-24T00:27:20+11:00</updated>
+  <updated>2014-02-26T18:32:37+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,59 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to update attributes with validations and callbacks skipped]]></title>
+    <link href="http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/"/>
+    <updated>2014-02-26T18:20:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped</id>
+    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+
+<p>In this short tutorial, I’ll show you how to update attributes for ActiveRecord model with:</p>
+
+<ul>
+  <li>Validations are skipped.</li>
+  <li>Callbacks are skipped.</li>
+  <li><code>updated_at</code>/<code>updated_on</code> are not updated.</li>
+</ul>
+
+<p>Solutions for both Rails 3 and 4 are provided.</p>
+
+<!--more-->
+
+<h2 id="rails-4">Rails 4</h2>
+
+<p>Rails 4 comes with method <code>update_columns</code> which takes in a hash parameter.</p>
+
+<p>Here is one example how to use it:</p>
+
+<p><code>ruby
+user.update_columns(last_request_at: Time.current. name: 'Trung Le')
+</code></p>
+
+<p>At the background, one SQL UPDATE is run and will update both two attributes.</p>
+
+<h2 id="rails-3">Rails 3</h2>
+
+<p>Rails 3 does not have <code>update_columns</code> method, however there is <code>update_column</code> method, so we could loop through the parameters like below:</p>
+
+<p><code>ruby
+{ last_request_at: Time.current. name: 'Trung Le' }.each do |k, v|
+  user.update_column(k, v)
+end
+</code></p>
+
+<p>However this solution sucks because there are 2 SQL UPDATE queries involved!</p>
+
+<p>There is a work-around by using <code>update_all</code></p>
+
+<p><code>ruby
+User.where(id: user.id).update_all(params)
+</code></p>
+
+<p>Which only generate only 1 SQL UPDATE query.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Exposing ActiveRecord model attributes to Liquid dynamically]]></title>

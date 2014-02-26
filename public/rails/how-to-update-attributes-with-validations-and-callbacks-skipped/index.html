@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>How to uninstall all Ruby gems - Ruby Journal</title>
+  <title>How to update attributes with validations and callbacks skipped - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="In order to uninstall all gems, you have to loop through all entries in gem list with bash scripting. This method is very inconveninent. Thanks to &hellip;">
+  <meta name="description" content="In this short tutorial, I&#8217;ll show you how to update attributes for ActiveRecord model with: Validations are skipped. Callbacks are skipped. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/how-to-uninstall-all-ruby-gems/">
+  <link rel="canonical" href="http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">How to Uninstall All Ruby Gems</h1>
+      <h1 class="entry-title">How to Update Attributes With Validations and Callbacks Skipped</h1>
     
     
       <p class="meta">
@@ -94,7 +94,7 @@
   
 
 
-<time datetime="2013-10-11T12:01:00+11:00" pubdate data-updated="true">Oct 11<span>th</span>, 2013</time>
+<time datetime="2014-02-26T18:20:00+11:00" pubdate data-updated="true">Feb 26<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -104,27 +104,53 @@
 
 
 <div class="entry-content">
-<p>In order to uninstall all gems, you have to loop through all entries in <code>gem list</code> with bash scripting. This method is very inconveninent. Thanks to Rubygems 2.1.0, you now could do it with one command.</p>
+<p>In this short tutorial, I&#8217;ll show you how to update attributes for ActiveRecord model with:</p>
+
+<ul>
+  <li>Validations are skipped.</li>
+  <li>Callbacks are skipped.</li>
+  <li><code>updated_at</code>/<code>updated_on</code> are not updated.</li>
+</ul>
+
+<p>Solutions for both Rails 3 and 4 are provided.</p>
+
+<p><br /></p>
 
 <!--more-->
 
-<p>Firstly, please make sure you upgrade your Rubygems to 2.1.0 or newer:</p>
+<h2 id="rails-4">Rails 4</h2>
+
+<p>Rails 4 comes with method <code>update_columns</code> which takes in a hash parameter.</p>
+
+<p>Here is one example how to use it:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">user</span><span class="o">.</span><span class="n">update_columns</span><span class="p">(</span><span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="o">.</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>At the background, one SQL UPDATE is run and will update both two attributes.</p>
+
+<h2 id="rails-3">Rails 3</h2>
+
+<p>Rails 3 does not have <code>update_columns</code> method, however there is <code>update_column</code> method, so we could loop through the parameters like below:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">gem</span> <span class="n">update</span> <span class="o">--</span><span class="nb">system</span>
-</span><span class="line"><span class="n">gem</span> <span class="o">--</span><span class="n">version</span>
-</span><span class="line"><span class="c1"># 2.1.8</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="p">{</span> <span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="o">.</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span> <span class="p">}</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">|</span>
+</span><span class="line">  <span class="n">user</span><span class="o">.</span><span class="n">update_column</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+</span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>and in order to uninstall all gems:</p>
+<p>However this solution sucks because there are 2 SQL UPDATE queries involved!</p>
+
+<p>There is a work-around by using <code>update_all</code></p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">gem</span> <span class="n">uninstall</span> <span class="o">--</span><span class="n">all</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">User</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>That&#8217;s it folks!</p>
+<p>Which only generate only 1 SQL UPDATE query.</p>
 </div>
 
 
@@ -147,15 +173,21 @@
   
 
 
-<time datetime="2013-10-11T12:01:00+11:00" pubdate data-updated="true">Oct 11<span>th</span>, 2013</time>
+<time datetime="2014-02-26T18:20:00+11:00" pubdate data-updated="true">Feb 26<span>th</span>, 2014</time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/rails/'>rails</a>
+  
+</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-uninstall-all-ruby-gems/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-uninstall-all-ruby-gems/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/" data-via="joneslee85" data-counturl="http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -168,10 +200,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/" title="Previous Post: Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0">&laquo; Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0</a>
+        <a class="basic-alignment left" href="/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/" title="Previous Post: Graceful fallback for not found ActiveRecord lookup with NullObject pattern">&laquo; Graceful fallback for not found ActiveRecord lookup with NullObject pattern</a>
       
-      
-        <a class="basic-alignment right" href="/faster-travisci-test/" title="Next Post: Faster TravisCI test">Faster TravisCI test &raquo;</a>
       
     </p>
   </footer>
@@ -299,8 +329,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/how-to-uninstall-all-ruby-gems/';
-        var disqus_url = 'http://ruby-journal.com/how-to-uninstall-all-ruby-gems/';
+        var disqus_identifier = 'http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/';
+        var disqus_url = 'http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/';
         var disqus_script = 'embed.js';
       
     (function () {
