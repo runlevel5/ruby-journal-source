@@ -114,8 +114,6 @@
 
 <p>Solutions for both Rails 3 and 4 are provided.</p>
 
-<p><br /></p>
-
 <!--more-->
 
 <h2 id="rails-4">Rails 4</h2>
@@ -125,7 +123,7 @@
 <p>Here is one example how to use it:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">user</span><span class="o">.</span><span class="n">update_columns</span><span class="p">(</span><span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="o">.</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span><span class="p">)</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">user</span><span class="o">.</span><span class="n">update_columns</span><span class="p">(</span><span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>At the background, one SQL UPDATE is run and will update both two attributes.</p>
@@ -137,7 +135,7 @@
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="p">{</span> <span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="o">.</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span> <span class="p">}</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">|</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="p">{</span> <span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span> <span class="p">}</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">|</span>
 </span><span class="line">  <span class="n">user</span><span class="o">.</span><span class="n">update_column</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
@@ -147,7 +145,7 @@
 <p>There is a work-around by using <code>update_all</code></p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">User</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">User</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Which only generate only 1 SQL UPDATE query.</p>
