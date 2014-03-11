@@ -9,7 +9,8 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="In this short tutorial, I&#8217;ll show you how to update attributes for ActiveRecord model with: Validations are skipped. Callbacks are skipped. &hellip;">
+  <meta name="description" content="Restore a DB dump with pg_restore is always a time-consuming process. However if
+you are using Postgres 8.4 or newer, you could speed it up easily &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +76,52 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/speed-up-your-postgresql-dump-restore/">Speed Up Your PostgreSQL Dump Restore</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-11T16:20:00+11:00" pubdate data-updated="true">Mar 11<span>th</span>, 2014</time>
+        
+         | <a href="/speed-up-your-postgresql-dump-restore/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>Restore a DB dump with pg_restore is always a time-consuming process. However if
+you are using Postgres 8.4 or newer, you could speed it up easily by having
+multiple concurrent process do it for you.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/speed-up-your-postgresql-dump-restore/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -495,50 +542,6 @@ habtm association complains missing DB join table. To my surprise, Rails 4 has c
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/">How to Track Changes of a Model in a `after_callbacks` in Rails 3 or Newer</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-09-23T16:43:00+10:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2013</time>
-        
-         | <a href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>You can track changes to a ActiveRecord model with <code>ActiveRecord::Dirty#changed?</code>. Yet there is one caveat though, the tracking is lost after the model is saved. In this tutorial I&#8217;ll show how to track the changes to a record even the record has been saved, this comes handy when being used with ActiveRecord <code>after</code> callbacks</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -561,6 +564,10 @@ habtm association complains missing DB join table. To my surprise, Rails 4 has c
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/speed-up-your-postgresql-dump-restore/">Speed up your PostgreSQL dump restore</a>
+      </li>
+    
+      <li class="post">
         <a href="/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/">How to update attributes with validations and callbacks skipped</a>
       </li>
     
@@ -574,10 +581,6 @@ habtm association complains missing DB join table. To my surprise, Rails 4 has c
     
       <li class="post">
         <a href="/digesting-pumactl/">Digesting pumactl</a>
-      </li>
-    
-      <li class="post">
-        <a href="/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/">How to import millions records via ActiveRecord within minutes not hours</a>
       </li>
     
   </ul>
