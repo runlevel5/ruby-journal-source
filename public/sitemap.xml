@@ -125,11 +125,17 @@
         <lastmod>2014-03-11T16:29:31+11:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://ruby-journal.com/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test/
+        </loc>
+        <lastmod>2014-03-14T09:56:04+11:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2014-03-11T16:29:31+11:00</lastmod>
+        <lastmod>2014-03-14T09:56:04+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2014-03-11T16:29:31+11:00</lastmod>
+        <lastmod>2014-03-14T09:56:04+11:00</lastmod>
     </url>
 </urlset>
