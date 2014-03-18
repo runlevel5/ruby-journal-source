@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "How to switch between selenium and poltergeist in capybara for Rails integration RSped test"
+title: "How to switch between selenium and poltergeist in capybara for Rails integration RSpec test"
 date: 2014-03-14 09:20
 comments: true
 tags: ruby
