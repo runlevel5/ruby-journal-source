@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>How to block old IE version with Rails - Ruby Journal</title>
+  <title>Genereate gems dependency graph with Bundler - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="There are many ways to detect browser agent, it could be front-end side with Javascript or backend.
-In this short tutorial, I&#8217;ll walk you &hellip;">
+  <meta name="description" content="One of the features I like about RubyMine is the gems dependency graph.
+This graps shows you all explicit/implicit dependencies of gems defined in &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ In this short tutorial, I&#8217;ll walk you &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/">
+  <link rel="canonical" href="http://ruby-journal.com/genereate-gems-dependency-graph-with-bundler/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +79,7 @@ In this short tutorial, I&#8217;ll walk you &hellip;">
   
   <header>
     
-      <h1 class="entry-title">How to Block Old IE Version With Rails</h1>
+      <h1 class="entry-title">Genereate Gems Dependency Graph With Bundler</h1>
     
     
       <p class="meta">
@@ -95,7 +95,7 @@ In this short tutorial, I&#8217;ll walk you &hellip;">
   
 
 
-<time datetime="2013-03-16T17:56:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
+<time datetime="2014-03-18T13:34:00+11:00" pubdate data-updated="true">Mar 18<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,89 +105,37 @@ In this short tutorial, I&#8217;ll walk you &hellip;">
 
 
 <div class="entry-content">
-<p>There are many ways to detect browser agent, it could be front-end side with Javascript or backend.
-In this short tutorial, I&#8217;ll walk you through on how to detect browser version with Ruby On Rails</p>
-
-<p>This applies for Rails &gt; 2.x</p>
+<p>One of the features I like about RubyMine is the gems dependency graph.
+This graps shows you all explicit/implicit dependencies of gems defined in
+your Gemfile. In this short tutorial, I&#8217;ll show how to generate this graph
+with Bundler.</p>
 
 <!--more-->
 
-<h2 id="how-does-thing-work">How does thing work?</h2>
-
-<p>When you surf the site, your browser name and versions are stored in <code>HTTP_USER_AGENT</code> in the request. We need to process this string to work out the browser version and name to decide to greet viewers with warning text or not.</p>
-
-<h2 id="implementation">Implementation</h2>
-
-<p>We will use <code>ActionDispatch</code>&#8217;s <code>request.user_agent</code> to grab the <code>HTTP_USER_AGENT</code> string. An example of user agent string:</p>
+<p>You&#8217;ll need graphviz installed first. On my Mac, I install it with Homebrew:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">brew install graphviz</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>With a bit of text processing, we could work out the browser version, OS platform. Sound simple, isn&#8217;t it? A bit of regex magic and you could write your own detect method. However, we will not do reinvent the wheel in this tutorial, instead we will use the <code>useragent</code> gem for the sake of convenience.</p>
+<p>You could find packages for your flavor on the Internet if you are on Linux.</p>
 
-<p>Install <code>useragent</code> gem by appending to <code>Gemfile</code>:</p>
+<p>In order to generate graph, you need to change directory to the app folder
+where the Gemfile file resides then use command:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem 'useragent'</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>then <code>bundle install</code></p>
-
-<p>Now we will inject a filter in <code>ApplicationController</code> to detect user agent. Below is the source code:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="ss">ActionController</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">before_filter</span> <span class="ss">:check_browser</span>
-</span><span class="line">
-</span><span class="line">  <span class="kp">private</span>
-</span><span class="line">
-</span><span class="line">    <span class="no">Browser</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:browser</span><span class="p">,</span> <span class="ss">:version</span><span class="p">)</span>
-</span><span class="line">
-</span><span class="line">    <span class="no">SupportedBrowsers</span> <span class="o">=</span> <span class="o">[</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Safari&#39;</span><span class="p">,</span> <span class="s1">&#39;6.0.2&#39;</span><span class="p">),</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Firefox&#39;</span><span class="p">,</span> <span class="s1">&#39;19.0.2&#39;</span><span class="p">),</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Internet Explorer&#39;</span><span class="p">,</span> <span class="s1">&#39;9.0&#39;</span><span class="p">),</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Chrome&#39;</span><span class="p">,</span> <span class="s1">&#39;25.0.1364.160&#39;</span><span class="p">)</span>
-</span><span class="line">    <span class="o">]</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">def</span> <span class="nf">check_browser</span>
-</span><span class="line">      <span class="n">user_agent</span> <span class="o">=</span> <span class="no">UserAgent</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user_agent</span><span class="p">)</span>
-</span><span class="line">      <span class="k">unless</span> <span class="no">SupportedBrowsers</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">browser</span><span class="o">|</span> <span class="n">user_agent</span> <span class="o">&gt;=</span> <span class="n">browser</span> <span class="p">}</span>
-</span><span class="line">        <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Your browser is not supported!&#39;</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle viz
+</span><span class="line"># Resolving dependencies...
+</span><span class="line"># /app_path/gem_graph.png</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Let&#8217;s digest what&#8217;s happening the code above.</p>
+<p>If there is no errors, you should see the image file path in the output.</p>
 
-<p><code>Browsers</code> is a <code>Struct</code> object with two attributes <code>:browser</code> and <code>:version</code>. This models after the way <code>UserAgent</code> create browser object. Pay attention to <code>SupportedBrowsers</code> closely, this array defines a stack of supported browsers.</p>
+<p>Open it up and you&#8217;ll see something like this for a stock Rails 4 app:</p>
 
-<p><code>check_browser</code> will get called before any action, this method compare your current user agent with <code>SupportedBrowsers</code>. If the condition is not met, we render a simple text to warn the user. You could extend it to use HTML template if you like.</p>
+<p><img class="left" src="/images/2014-03-18-genereate-gems-dependency-graph-with-bundler/gem_graph.png" /></p>
 
-<p>Please be noted that I assume all your controllers are subclass of <code>ApplicationController</code>. Please adapt the source code accordingly should your controllers extends different parent controller class.</p>
-
+<p>That&#8217;s it for today folks! Keep on learning!</p>
 </div>
 
 
@@ -210,7 +158,7 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
   
 
 
-<time datetime="2013-03-16T17:56:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
+<time datetime="2014-03-18T13:34:00+11:00" pubdate data-updated="true">Mar 18<span>th</span>, 2014</time>
       
 
 
@@ -218,7 +166,7 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/genereate-gems-dependency-graph-with-bundler/" data-via="joneslee85" data-counturl="http://ruby-journal.com/genereate-gems-dependency-graph-with-bundler/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -231,10 +179,8 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/how-to-setup-rails-app-with-puma-and-nginx/" title="Previous Post: How to setup Rails app with puma and NGINX">&laquo; How to setup Rails app with puma and NGINX</a>
+        <a class="basic-alignment left" href="/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test/" title="Previous Post: How to switch between selenium and poltergeist in capybara for Rails integration RSped test">&laquo; How to switch between selenium and poltergeist in capybara for Rails integration RSped test</a>
       
-      
-        <a class="basic-alignment right" href="/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/" title="Next Post: How to install Ruby 2.0 on OSX 10.7 or newer">How to install Ruby 2.0 on OSX 10.7 or newer &raquo;</a>
       
     </p>
   </footer>
@@ -362,8 +308,8 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/how-to-block-old-ie-version-with-rails/';
-        var disqus_url = 'http://ruby-journal.com/how-to-block-old-ie-version-with-rails/';
+        var disqus_identifier = 'http://ruby-journal.com/genereate-gems-dependency-graph-with-bundler/';
+        var disqus_url = 'http://ruby-journal.com/genereate-gems-dependency-graph-with-bundler/';
         var disqus_script = 'embed.js';
       
     (function () {
