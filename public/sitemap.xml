@@ -128,18 +128,22 @@
         <loc>
             http://ruby-journal.com/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test/
         </loc>
-        <lastmod>2014-03-14T09:56:04+11:00</lastmod>
+        <lastmod>2014-03-18T13:44:53+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/genereate-gems-dependency-graph-with-bundler/</loc>
         <lastmod>2014-03-18T13:43:28+11:00</lastmod>
     </url>
     <url>
+        <loc>http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails/</loc>
+        <lastmod>2014-03-24T09:33:40+11:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2014-03-18T13:43:28+11:00</lastmod>
+        <lastmod>2014-03-24T09:33:40+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2014-03-18T13:43:28+11:00</lastmod>
+        <lastmod>2014-03-24T09:33:40+11:00</lastmod>
     </url>
 </urlset>

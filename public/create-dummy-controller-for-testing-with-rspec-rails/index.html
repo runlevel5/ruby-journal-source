@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0 - Ruby Journal</title>
+  <title>Create dummy controller for testing with rspec-rails - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Majority of Ruby 2.0 syntaxes are backward-compatible with Ruby 1.9. Yet there is one tiny change in the way that Ruby 2.0 does lambda rocket that &hellip;">
+  <meta name="description" content="Today I learned a nitfy trick from Jon Rowe on how to to create anonymous controller
+with rspec-rails for controller spec. This would aid testing &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/">
+  <link rel="canonical" href="http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -78,7 +79,7 @@
   
   <header>
     
-      <h1 class="entry-title">Becareful With Space in Lambda Rocket Syntax Between Ruby 1.9 and 2.0</h1>
+      <h1 class="entry-title">Create Dummy Controller for Testing With Rspec-rails</h1>
     
     
       <p class="meta">
@@ -94,7 +95,7 @@
   
 
 
-<time datetime="2013-10-03T19:45:00+10:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2013</time>
+<time datetime="2014-03-24T09:21:00+11:00" pubdate data-updated="true">Mar 24<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -104,17 +105,30 @@
 
 
 <div class="entry-content">
-<p>Majority of Ruby 2.0 syntaxes are backward-compatible with Ruby 1.9. Yet there is one tiny change in the way that Ruby 2.0 does lambda rocket that would break backward-compatability with Ruby 1.9. That is&#8230;a single space. Yes, you heard it correctly.</p>
+<p>Today I learned a nitfy trick from Jon Rowe on how to to create anonymous controller
+with rspec-rails for controller spec. This would aid testing action callbacks testing
+in controller.</p>
 
 <!--more-->
 
-<p>So, in Ruby 2.0, you could declare shorthand <code>lambda</code> with <code>-&gt;</code>. Here is example:</p>
+<p>Say you are testing <code>before_action :authenticate!</code> in your ApplicationController.</p>
+
+<p>Here is my <code>ApplicationController</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="ss">ActionController</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">before_action</span> <span class="ss">:authenticate!</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>The above code runs fine under 2.0 yet failed spectacularly with 1.9:</p>
+<p>Now, I want to test this callback. There are many ways to tackle this, I could create
+a dummy controller like below:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -123,22 +137,90 @@
 <span class="line-number">5</span>
 <span class="line-number">6</span>
 <span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">SyntaxError</span><span class="p">:</span> <span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">1</span><span class="p">:</span> <span class="n">syntax</span> <span class="n">error</span><span class="p">,</span> <span class="n">unexpected</span> <span class="n">tLPAREN_ARG</span><span class="p">,</span> <span class="n">expecting</span> <span class="n">keyword_do_LAMBDA</span> <span class="ow">or</span> <span class="n">tLAMBEG</span>
-</span><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
-</span><span class="line">                  <span class="o">^</span>
-</span><span class="line"><span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">1</span><span class="p">:</span> <span class="n">syntax</span> <span class="n">error</span><span class="p">,</span> <span class="n">unexpected</span> <span class="n">tLAMBEG</span><span class="p">,</span> <span class="n">expecting</span> <span class="vg">$end</span>
-</span><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
-</span><span class="line">                            <span class="o">^</span>
-</span><span class="line">  <span class="n">from</span> <span class="sr">/Users/</span><span class="n">trung_le</span><span class="o">/.</span><span class="n">rubies</span><span class="o">/</span><span class="n">ruby</span><span class="o">-</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">3</span><span class="o">-</span><span class="n">p448</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="ss">irb</span><span class="p">:</span><span class="mi">12</span><span class="ss">:in</span> <span class="sb">`&lt;main&gt;&#39;</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">DummyController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">dummy</span>
+</span><span class="line">    <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Hello World&#39;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># adding dummy routing dynamically - prepare for the hacky hacky!</span>
+</span><span class="line"><span class="k">begin</span>
+</span><span class="line">  <span class="n">_routes</span> <span class="o">=</span> <span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">routes</span>
+</span><span class="line">  <span class="n">_routes</span><span class="o">.</span><span class="n">disable_clear_and_finalize</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class="line">  <span class="n">_routes</span><span class="o">.</span><span class="n">clear!</span>
+</span><span class="line">  <span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">routes_reloader</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">path</span><span class="o">|</span> <span class="nb">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="p">}</span>
+</span><span class="line">  <span class="n">_routes</span><span class="o">.</span><span class="n">draw</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">get</span> <span class="s1">&#39;/dummy&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;dummy#dummy&#39;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">  <span class="no">ActiveSupport</span><span class="o">.</span><span class="n">on_load</span><span class="p">(</span><span class="ss">:action_controller</span><span class="p">)</span> <span class="p">{</span> <span class="n">_routes</span><span class="o">.</span><span class="n">finalize!</span> <span class="p">}</span>
+</span><span class="line"><span class="k">ensure</span>
+</span><span class="line">  <span class="n">_routes</span><span class="o">.</span><span class="n">disable_clear_and_finalize</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="n">describe</span> <span class="no">ApplicationController</span> <span class="k">do</span>
+</span><span class="line">  <span class="c1"># your test</span>
+</span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>In order to fix this issue, we have to rid of the space between <code>-&gt;</code> and <code>(message)</code>:</p>
+<p>Oh gosh, that&#8217;s surely ugly! We could refactor all above with:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">ApplicationController</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">controller</span> <span class="k">do</span>
+</span><span class="line">    <span class="k">def</span> <span class="nf">dummy</span>
+</span><span class="line">      <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Hello world&#39;</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;authenticate! action callback&#39;</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;does redirect if user not sign in&#39;</span> <span class="k">do</span>
+</span><span class="line">      <span class="c1"># ...</span>
+</span><span class="line">      <span class="n">get</span> <span class="ss">:dummy</span>
+</span><span class="line">
+</span><span class="line">      <span class="c1"># ...</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Weird, isn&#8217;t it? At least you are aware of this discrepancy now.</p>
+<p>Thanks to rspec-rails, we have the <code>controller</code> helper which creates
+an anonymous controller (that inherits from ApplicationController).
+It saves you many hacky lines and plus you don&#8217;t need to care about
+routing.</p>
+
+<p>See? You know know a powerful trick! So go on, try it! Keep on learning!</p>
+
 </div>
 
 
@@ -161,7 +243,7 @@
   
 
 
-<time datetime="2013-10-03T19:45:00+10:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2013</time>
+<time datetime="2014-03-24T09:21:00+11:00" pubdate data-updated="true">Mar 24<span>th</span>, 2014</time>
       
 
 
@@ -169,7 +251,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/" data-via="joneslee85" data-counturl="http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails/" data-via="joneslee85" data-counturl="http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -182,10 +264,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/rails-4-changes-join-table-naming-convention/" title="Previous Post: Rails 4 changes habtm join table naming convention">&laquo; Rails 4 changes habtm join table naming convention</a>
+        <a class="basic-alignment left" href="/genereate-gems-dependency-graph-with-bundler/" title="Previous Post: Genereate gems dependency graph with Bundler">&laquo; Genereate gems dependency graph with Bundler</a>
       
-      
-        <a class="basic-alignment right" href="/how-to-uninstall-all-ruby-gems/" title="Next Post: How to uninstall all Ruby gems">How to uninstall all Ruby gems &raquo;</a>
       
     </p>
   </footer>
@@ -313,8 +393,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/';
-        var disqus_url = 'http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/';
+        var disqus_identifier = 'http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails/';
+        var disqus_url = 'http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails/';
         var disqus_script = 'embed.js';
       
     (function () {

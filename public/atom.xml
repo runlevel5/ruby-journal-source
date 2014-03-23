@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-03-18T13:44:03+11:00</updated>
+  <updated>2014-03-24T09:34:52+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,131 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Create dummy controller for testing with rspec-rails]]></title>
+    <link href="http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails/"/>
+    <updated>2014-03-24T09:21:00+11:00</updated>
+    <id>http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails</id>
+    <content type="html"><![CDATA[
+<p>Today I learned a nitfy trick from Jon Rowe on how to to create anonymous controller
+with rspec-rails for controller spec. This would aid testing action callbacks testing
+in controller.</p>
+
+<!--more-->
+
+<p>Say you are testing <code>before_action :authenticate!</code> in your ApplicationController.</p>
+
+<p>Here is my <code>ApplicationController</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="ss">ActionController</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">before_action</span> <span class="ss">:authenticate!</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now, I want to test this callback. There are many ways to tackle this, I could create
+a dummy controller like below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">DummyController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">dummy</span>
+</span><span class="line">    <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Hello World&#39;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># adding dummy routing dynamically - prepare for the hacky hacky!</span>
+</span><span class="line"><span class="k">begin</span>
+</span><span class="line">  <span class="n">_routes</span> <span class="o">=</span> <span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">routes</span>
+</span><span class="line">  <span class="n">_routes</span><span class="o">.</span><span class="n">disable_clear_and_finalize</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class="line">  <span class="n">_routes</span><span class="o">.</span><span class="n">clear!</span>
+</span><span class="line">  <span class="no">Rails</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">routes_reloader</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">path</span><span class="o">|</span> <span class="nb">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="p">}</span>
+</span><span class="line">  <span class="n">_routes</span><span class="o">.</span><span class="n">draw</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">get</span> <span class="s1">&#39;/dummy&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;dummy#dummy&#39;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">  <span class="no">ActiveSupport</span><span class="o">.</span><span class="n">on_load</span><span class="p">(</span><span class="ss">:action_controller</span><span class="p">)</span> <span class="p">{</span> <span class="n">_routes</span><span class="o">.</span><span class="n">finalize!</span> <span class="p">}</span>
+</span><span class="line"><span class="k">ensure</span>
+</span><span class="line">  <span class="n">_routes</span><span class="o">.</span><span class="n">disable_clear_and_finalize</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="n">describe</span> <span class="no">ApplicationController</span> <span class="k">do</span>
+</span><span class="line">  <span class="c1"># your test</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Oh gosh, that&#8217;s surely ugly! We could refactor all above with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">ApplicationController</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">controller</span> <span class="k">do</span>
+</span><span class="line">    <span class="k">def</span> <span class="nf">dummy</span>
+</span><span class="line">      <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Hello world&#39;</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;authenticate! action callback&#39;</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;does redirect if user not sign in&#39;</span> <span class="k">do</span>
+</span><span class="line">      <span class="c1"># ...</span>
+</span><span class="line">      <span class="n">get</span> <span class="ss">:dummy</span>
+</span><span class="line">
+</span><span class="line">      <span class="c1"># ...</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Thanks to rspec-rails, we have the <code>controller</code> helper which creates
+an anonymous controller (that inherits from ApplicationController).
+It saves you many hacky lines and plus you don&#8217;t need to care about
+routing.</p>
+
+<p>See? You know know a powerful trick! So go on, try it! Keep on learning!</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Genereate gems dependency graph with Bundler]]></title>
@@ -54,7 +179,7 @@ where the Gemfile file resides then use command:</p>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[How to switch between selenium and poltergeist in capybara for Rails integration RSped test]]></title>
+    <title type="html"><![CDATA[How to switch between selenium and poltergeist in capybara for Rails integration RSpec test]]></title>
     <link href="http://ruby-journal.com/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test/"/>
     <updated>2014-03-14T09:20:00+11:00</updated>
     <id>http://ruby-journal.com/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test</id>
@@ -1741,98 +1866,6 @@ fix is to use latest version</p>
 </pre></td><td class="code"><pre><code class=""><span class="line">brew update
 </span><span class="line">brew install readline openssl
 </span><span class="line">env CONFIGURE_OPTS=--with-readline-dir=`brew --prefix readline` rbenv install 2.0.0-p0</span></code></pre></td></tr></table></div></figure></notextile></div>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to block old IE version with Rails]]></title>
-    <link href="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/"/>
-    <updated>2013-03-16T17:56:00+11:00</updated>
-    <id>http://ruby-journal.com/how-to-block-old-ie-version-with-rails</id>
-    <content type="html"><![CDATA[
-<p>There are many ways to detect browser agent, it could be front-end side with Javascript or backend.
-In this short tutorial, I&#8217;ll walk you through on how to detect browser version with Ruby On Rails</p>
-
-<p>This applies for Rails &gt; 2.x</p>
-
-<!--more-->
-
-<h2 id="how-does-thing-work">How does thing work?</h2>
-
-<p>When you surf the site, your browser name and versions are stored in <code>HTTP_USER_AGENT</code> in the request. We need to process this string to work out the browser version and name to decide to greet viewers with warning text or not.</p>
-
-<h2 id="implementation">Implementation</h2>
-
-<p>We will use <code>ActionDispatch</code>&#8217;s <code>request.user_agent</code> to grab the <code>HTTP_USER_AGENT</code> string. An example of user agent string:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>With a bit of text processing, we could work out the browser version, OS platform. Sound simple, isn&#8217;t it? A bit of regex magic and you could write your own detect method. However, we will not do reinvent the wheel in this tutorial, instead we will use the <code>useragent</code> gem for the sake of convenience.</p>
-
-<p>Install <code>useragent</code> gem by appending to <code>Gemfile</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem 'useragent'</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>then <code>bundle install</code></p>
-
-<p>Now we will inject a filter in <code>ApplicationController</code> to detect user agent. Below is the source code:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="ss">ActionController</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">before_filter</span> <span class="ss">:check_browser</span>
-</span><span class="line">
-</span><span class="line">  <span class="kp">private</span>
-</span><span class="line">
-</span><span class="line">    <span class="no">Browser</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:browser</span><span class="p">,</span> <span class="ss">:version</span><span class="p">)</span>
-</span><span class="line">
-</span><span class="line">    <span class="no">SupportedBrowsers</span> <span class="o">=</span> <span class="o">[</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Safari&#39;</span><span class="p">,</span> <span class="s1">&#39;6.0.2&#39;</span><span class="p">),</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Firefox&#39;</span><span class="p">,</span> <span class="s1">&#39;19.0.2&#39;</span><span class="p">),</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Internet Explorer&#39;</span><span class="p">,</span> <span class="s1">&#39;9.0&#39;</span><span class="p">),</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Chrome&#39;</span><span class="p">,</span> <span class="s1">&#39;25.0.1364.160&#39;</span><span class="p">)</span>
-</span><span class="line">    <span class="o">]</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">def</span> <span class="nf">check_browser</span>
-</span><span class="line">      <span class="n">user_agent</span> <span class="o">=</span> <span class="no">UserAgent</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user_agent</span><span class="p">)</span>
-</span><span class="line">      <span class="k">unless</span> <span class="no">SupportedBrowsers</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">browser</span><span class="o">|</span> <span class="n">user_agent</span> <span class="o">&gt;=</span> <span class="n">browser</span> <span class="p">}</span>
-</span><span class="line">        <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Your browser is not supported!&#39;</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Let&#8217;s digest what&#8217;s happening the code above.</p>
-
-<p><code>Browsers</code> is a <code>Struct</code> object with two attributes <code>:browser</code> and <code>:version</code>. This models after the way <code>UserAgent</code> create browser object. Pay attention to <code>SupportedBrowsers</code> closely, this array defines a stack of supported browsers.</p>
-
-<p><code>check_browser</code> will get called before any action, this method compare your current user agent with <code>SupportedBrowsers</code>. If the condition is not met, we render a simple text to warn the user. You could extend it to use HTML template if you like.</p>
-
-<p>Please be noted that I assume all your controllers are subclass of <code>ApplicationController</code>. Please adapt the source code accordingly should your controllers extends different parent controller class.</p>
-
 ]]></content>
   </entry>
   
