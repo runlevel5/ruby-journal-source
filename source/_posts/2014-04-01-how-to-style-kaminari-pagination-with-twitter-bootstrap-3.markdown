@@ -15,7 +15,18 @@ In this tutorial, I'll show you how to make Kaminari play well with Bootstrap v3
 
 <!--more-->
 
-First thing, we need to tell bootstrap to generate template files:
+First thing, assume we have `app/views/products/index.html.haml`, place the
+Kaminari's `paginate` call in this template:
+
+```haml
+...
+= paginate @products
+```
+
+By default, Kaminari will generate a list of `nav` wrapped under a div, which is
+totally different to the `ul li` structures of Bootstrap pagination.
+
+No problemo! we could tweak this. Now we need to tell bootstrap to generate template files:
 
 ```
 rails generate kaminari:views bootstrap

@@ -111,10 +111,23 @@ In this tutorial, I&#8217;ll show you how to make Kaminari play well with Bootst
 
 <!--more-->
 
-<p>First thing, we need to tell bootstrap to generate template files:</p>
+<p>First thing, assume we have <code>app/views/products/index.html.haml</code>, place the
+Kaminari&#8217;s <code>paginate</code> call in this template:</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rails generate kaminari:views bootstrap</span></code></pre></td></tr></table></div></figure></notextile></div>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="haml"><span class="line">...
+</span><span class="line"><span class="p">=</span> <span class="n">paginate</span> <span class="vi">@products</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>By default, Kaminari will generate a list of <code>nav</code> wrapped under a div, which is
+totally different to the <code>ul li</code> structures of Bootstrap pagination.</p>
+
+<p>No problemo! we could tweak this. Now we need to tell bootstrap to generate template files:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="haml"><span class="line">rails generate kaminari:views bootstrap
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>which create various fields under <code>app/views/kaminari</code>.</p>
 
