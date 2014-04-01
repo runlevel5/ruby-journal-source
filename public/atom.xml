@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-03-24T09:34:52+11:00</updated>
+  <updated>2014-04-01T19:12:25+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,61 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to style kaminari pagination with Twitter Bootstrap 3]]></title>
+    <link href="http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/"/>
+    <updated>2014-04-01T19:04:00+11:00</updated>
+    <id>http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3</id>
+    <content type="html"><![CDATA[
+<p>Kamiari is an awesome that would do all heavy-lifting work if you want to do pagination.
+Yet Kaminari&#8217;s default layout does not fit well with Twitter Bootstrap pagination styling.
+In this tutorial, I&#8217;ll show you how to make Kaminari play well with Bootstrap v3.</p>
+
+<!--more-->
+
+<p>First thing, we need to tell bootstrap to generate template files:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rails generate kaminari:views bootstrap</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which create various fields under <code>app/views/kaminari</code>.</p>
+
+<p>Next, we need to edit <code>app/views/kaminari/_paginator.html.haml</code> and replace the
+content with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="haml"><span class="line"><span class="p">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">render</span> <span class="k">do</span>
+</span><span class="line">  <span class="nt">%ul</span><span class="nc">.pagination.pagination-lg</span>
+</span><span class="line">    <span class="p">=</span> <span class="n">first_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">first?</span>
+</span><span class="line">    <span class="p">=</span> <span class="n">prev_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">first?</span>
+</span><span class="line">    <span class="p">-</span> <span class="n">each_page</span> <span class="k">do</span> <span class="o">|</span><span class="n">page</span><span class="o">|</span>
+</span><span class="line">      <span class="p">-</span> <span class="k">if</span> <span class="n">page</span><span class="o">.</span><span class="n">left_outer?</span> <span class="o">||</span> <span class="n">page</span><span class="o">.</span><span class="n">right_outer?</span> <span class="o">||</span> <span class="n">page</span><span class="o">.</span><span class="n">inside_window?</span>
+</span><span class="line">        <span class="p">=</span> <span class="n">page_tag</span> <span class="n">page</span>
+</span><span class="line">      <span class="p">-</span> <span class="k">elsif</span> <span class="o">!</span><span class="n">page</span><span class="o">.</span><span class="n">was_truncated?</span>
+</span><span class="line">        <span class="p">=</span> <span class="n">gap_tag</span>
+</span><span class="line">    <span class="p">=</span> <span class="n">next_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">last?</span>
+</span><span class="line">    <span class="p">=</span> <span class="n">last_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">last?</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>What we did above is getting rid of <code>div.pagination</code> and adding class
+<code>pagination</code> to <code>ul</code> tag</p>
+
+<p>That&#8217;s it, now you have Twitter Bootstrap 3 pagination powered by Kaminari!</p>
+
+<p>Keep on learning guys!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Create dummy controller for testing with rspec-rails]]></title>
@@ -1815,57 +1870,6 @@ drivers. If you get stuck, fallback to the primitive way. Feedbacks are greatly 
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>So now you know the behaviour of <code>let()</code>, I highly recommend you go through your test and apply what you have learned. See you guys in the next tutorial.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to install Ruby 2.0 on OSX 10.7 or newer]]></title>
-    <link href="http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/"/>
-    <updated>2013-03-16T17:58:00+11:00</updated>
-    <id>http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer</id>
-    <content type="html"><![CDATA[
-<p>This short tutorial, I will show you how to install Ruby 2.0.0 on OSX 10.7+ or newer</p>
-
-<!--more-->
-
-<h2 id="rvm">RVM:</h2>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rvm get stable &amp;&amp; rvm reload</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Firstly, the OpenSSL comes with your OSX 10.7+ is outdated, you need to get latest version</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rvm pkg install openssl</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Secondly, the readline library on OSX 10.7+ suffers UTF-8 issue in which method in UTF-8 is converted to characters under <code>irb</code>, the
-fix is to use latest version</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rvm pkg install readline</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And you can install Ruby 2.0.0-p0 with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rvm reinstall 2.0.0 --with-readline-dir=$rvm_path/usr --with-openssl-dir=$rvm_path/usr</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Please note that <code>clang-425.0.24</code> that comes with Xcode successfully compile the source, should you bump into any compilation issue, you could try compiling it with <code>gcc-422</code></p>
-
-<h2 id="rbenv">rbenv</h2>
-
-<p>Make sure your <code>ruby-build</code> is up-to-date:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">cd ~/.rbenv/plugins/ruby-build &amp;&amp; git pull</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>rbenv does not fetch fixed readline lib, thus you are required to install them manually with <code>brew</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">brew update
-</span><span class="line">brew install readline openssl
-</span><span class="line">env CONFIGURE_OPTS=--with-readline-dir=`brew --prefix readline` rbenv install 2.0.0-p0</span></code></pre></td></tr></table></div></figure></notextile></div>
 ]]></content>
   </entry>
   

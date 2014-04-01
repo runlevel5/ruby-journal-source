@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Install Postgres.app on OSX 10.7+ - Ruby Journal</title>
+  <title>How to style kaminari pagination with Twitter Bootstrap 3 - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Traditionally, pogstgresql is installed manually with MacPort or Homebrew on Mac OSX 10.7+. I used
-to have lots of problem with the setup for the &hellip;">
+  <meta name="description" content="Kamiari is an awesome that would do all heavy-lifting work if you want to do pagination.
+Yet Kaminari&#8217;s default layout does not fit well with &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ to have lots of problem with the setup for the &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/">
+  <link rel="canonical" href="http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +79,7 @@ to have lots of problem with the setup for the &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Install Postgres.app on OSX 10.7+</h1>
+      <h1 class="entry-title">How to Style Kaminari Pagination With Twitter Bootstrap 3</h1>
     
     
       <p class="meta">
@@ -95,7 +95,7 @@ to have lots of problem with the setup for the &hellip;">
   
 
 
-<time datetime="2012-08-23T16:21:00+10:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2012</time>
+<time datetime="2014-04-01T19:04:00+11:00" pubdate data-updated="true">Apr 1<span>st</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -104,67 +104,53 @@ to have lots of problem with the setup for the &hellip;">
   </header>
 
 
-<div class="entry-content"><p><img class="left" src="/images/netsuke.png" /></p>
+<div class="entry-content">
+<p>Kamiari is an awesome that would do all heavy-lifting work if you want to do pagination.
+Yet Kaminari&#8217;s default layout does not fit well with Twitter Bootstrap pagination styling.
+In this tutorial, I&#8217;ll show you how to make Kaminari play well with Bootstrap v3.</p>
 
-<p>Traditionally, pogstgresql is installed manually with MacPort or Homebrew on Mac OSX 10.7+. I used
-to have lots of problem with the setup for the installation as it requires Xcode, this libs and that libs, etc.
-In summary, it is not convenient enough and I want something as simple as dragging an OS app to my /Application.
-Thanks to Heroku, they took the heed and create Postgres.app. A wrapper bundled with binary postgresql server.
-It is not only easy to install but also easy to setup config file if you are using Rails.</p>
+<!--more-->
 
-<p><br />
-<br />
-<br />
-<!--more--></p>
-
-<h2 id="installation">Installation</h2>
-
-<p>If you have installed postgres using Homebrew or Macport, please make sure you uninstall it first.</p>
-
-<p>Head to <a href="http://postgresapp.com/">http://postgresapp.com/</a> and download DMG into your localbox. Mount the DMG and drag the Postgres.app
-icon into your Applications folder.</p>
-
-<h2 id="configuration">Configuration</h2>
-
-<p>No configuration at all! Simply click on Postgres.app to start it and the app will reside in your top bar tray (elephant icon).
-You can set it to start on start up by click on Elephant Icon on top bar tray and click Automatically Start on Login. That’s it, dead simple compare to
-setting up plist launcher file.</p>
-
-<p>PostgreSQL ships with a constellation of useful binaries, like <code>pg_dump</code> or <code>pg_restore</code>, that you will likely want to use.
-Go ahead and add the <code>/bin</code> directory that ships with Postgres.app to your <code>PATH</code>. Add this to your <code>.bash_profile</code>:</p>
+<p>First thing, we need to tell bootstrap to generate template files:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">PATH="/Applications/Postgres.app/Contents/MacOS/bin:$PATH"</span></code></pre></td></tr></table></div></figure></notextile></div>
+</pre></td><td class="code"><pre><code class=""><span class="line">rails generate kaminari:views bootstrap</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Once setup, you could refresh your terminal session with:</p>
+<p>which create various fields under <code>app/views/kaminari</code>.</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ source .bash_profile</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>Next, we need to edit <code>app/views/kaminari/_paginator.html.haml</code> and replace the
+content with:</p>
 
-<p>And try to run <code>psql</code> without a host, if everything is correct, you should be able to get into the the postgres console</p>
-
-<h2 id="configure-rails-database-connection">Configure Rails database connection</h2>
-
-<p>Use following settings in <code>config/database.yml</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 <span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">development:
-</span><span class="line">  adapter: postgresql
-</span><span class="line">  database: [YOUR_DATABASE_NAME]
-</span><span class="line">  host: localhost</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="haml"><span class="line"><span class="p">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">render</span> <span class="k">do</span>
+</span><span class="line">  <span class="nt">%ul</span><span class="nc">.pagination.pagination-lg</span>
+</span><span class="line">    <span class="p">=</span> <span class="n">first_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">first?</span>
+</span><span class="line">    <span class="p">=</span> <span class="n">prev_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">first?</span>
+</span><span class="line">    <span class="p">-</span> <span class="n">each_page</span> <span class="k">do</span> <span class="o">|</span><span class="n">page</span><span class="o">|</span>
+</span><span class="line">      <span class="p">-</span> <span class="k">if</span> <span class="n">page</span><span class="o">.</span><span class="n">left_outer?</span> <span class="o">||</span> <span class="n">page</span><span class="o">.</span><span class="n">right_outer?</span> <span class="o">||</span> <span class="n">page</span><span class="o">.</span><span class="n">inside_window?</span>
+</span><span class="line">        <span class="p">=</span> <span class="n">page_tag</span> <span class="n">page</span>
+</span><span class="line">      <span class="p">-</span> <span class="k">elsif</span> <span class="o">!</span><span class="n">page</span><span class="o">.</span><span class="n">was_truncated?</span>
+</span><span class="line">        <span class="p">=</span> <span class="n">gap_tag</span>
+</span><span class="line">    <span class="p">=</span> <span class="n">next_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">last?</span>
+</span><span class="line">    <span class="p">=</span> <span class="n">last_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">last?</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<h2 id="install-pg-gem">Install pg gem</h2>
+<p>What we did above is getting rid of <code>div.pagination</code> and adding class
+<code>pagination</code> to <code>ul</code> tag</p>
 
-<p>In order to install <code>pg</code> gem, we need to uninstall <code>pg</code> first and re-installed with:</p>
+<p>That&#8217;s it, now you have Twitter Bootstrap 3 pagination powered by Kaminari!</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ gem uninstall pg
-</span><span class="line">$ gem install pg -- --with-pg-lib=/Applications/Postgres.app/Contents/MacOS/lib</span></code></pre></td></tr></table></div></figure></notextile></div>
-
+<p>Keep on learning guys!</p>
 </div>
 
 
@@ -187,7 +173,7 @@ Go ahead and add the <code>/bin</code> directory that ships with Postgres.app to
   
 
 
-<time datetime="2012-08-23T16:21:00+10:00" pubdate data-updated="true">Aug 23<span>rd</span>, 2012</time>
+<time datetime="2014-04-01T19:04:00+11:00" pubdate data-updated="true">Apr 1<span>st</span>, 2014</time>
       
 
 
@@ -195,7 +181,7 @@ Go ahead and add the <code>/bin</code> directory that ships with Postgres.app to
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/" data-via="joneslee85" data-counturl="http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -208,10 +194,8 @@ Go ahead and add the <code>/bin</code> directory that ships with Postgres.app to
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/spree-1-1-stable-deployment-on-heroku/" title="Previous Post: Spree 1.1 deployment on Heroku">&laquo; Spree 1.1 deployment on Heroku</a>
+        <a class="basic-alignment left" href="/create-dummy-controller-for-testing-with-rspec-rails/" title="Previous Post: Create dummy controller for testing with rspec-rails">&laquo; Create dummy controller for testing with rspec-rails</a>
       
-      
-        <a class="basic-alignment right" href="/debug-your-failed-test-in-travis-ci/" title="Next Post: Debug your failed test in Travis CI">Debug your failed test in Travis CI &raquo;</a>
       
     </p>
   </footer>
@@ -339,8 +323,8 @@ Go ahead and add the <code>/bin</code> directory that ships with Postgres.app to
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/';
-        var disqus_url = 'http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/';
+        var disqus_identifier = 'http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/';
+        var disqus_url = 'http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/';
         var disqus_script = 'embed.js';
       
     (function () {

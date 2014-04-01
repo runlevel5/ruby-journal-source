@@ -139,11 +139,17 @@
         <lastmod>2014-03-24T09:33:40+11:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/
+        </loc>
+        <lastmod>2014-04-01T19:12:11+11:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2014-03-24T09:33:40+11:00</lastmod>
+        <lastmod>2014-04-01T19:12:11+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2014-03-24T09:33:40+11:00</lastmod>
+        <lastmod>2014-04-01T19:12:11+11:00</lastmod>
     </url>
 </urlset>

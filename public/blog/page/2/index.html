@@ -9,7 +9,7 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="In order to uninstall all gems, you have to loop through all entries in gem list with bash scripting. This method is very inconveninent. Thanks to &hellip;">
+  <meta name="description" content="Running test suite is time consuming. There are various techniques to optimize the runtime performance of the CI by stub/mock, parallel_test, etc. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,50 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/faster-travisci-test/">Faster TravisCI Test</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-11T12:37:00+11:00" pubdate data-updated="true">Oct 11<span>th</span>, 2013</time>
+        
+         | <a href="/faster-travisci-test/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>Running test suite is time consuming. There are various techniques to optimize the runtime performance of the CI by stub/mock, parallel_test, etc. In this short tutorial, I&#8217;ll show you how to optimize your TravisCI test suite by splitting your test suit into concurrent jobs, which drastically improve the build time.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/faster-travisci-test/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -475,50 +519,6 @@ solution works both with selenium and polstergeist driver.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/">How to Install Ruby 2.0 on OSX 10.7 or Newer</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-03-16T17:58:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
-        
-         | <a href="/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>This short tutorial, I will show you how to install Ruby 2.0.0 on OSX 10.7+ or newer</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -543,6 +543,10 @@ solution works both with selenium and polstergeist driver.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/">How to style kaminari pagination with Twitter Bootstrap 3</a>
+      </li>
+    
+      <li class="post">
         <a href="/create-dummy-controller-for-testing-with-rspec-rails/">Create dummy controller for testing with rspec-rails</a>
       </li>
     
@@ -556,10 +560,6 @@ solution works both with selenium and polstergeist driver.</p>
     
       <li class="post">
         <a href="/speed-up-your-postgresql-dump-restore/">Speed up your PostgreSQL dump restore</a>
-      </li>
-    
-      <li class="post">
-        <a href="/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/">How to update attributes with validations and callbacks skipped</a>
       </li>
     
   </ul>
