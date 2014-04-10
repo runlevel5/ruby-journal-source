@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-04-01T19:15:40+11:00</updated>
+  <updated>2014-04-10T18:21:41+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,548 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Liquid template in Ruby done right]]></title>
+    <link href="http://ruby-journal.com/liquid-template-in-ruby-done-right/"/>
+    <updated>2014-04-10T16:48:00+10:00</updated>
+    <id>http://ruby-journal.com/liquid-template-in-ruby-done-right</id>
+    <content type="html"><![CDATA[
+<p>Liquid Templating Engine is an awesome technology and with the power of gem &#8216;liquid&#8217;,
+everybody can start using without much hassles. I saw many projects used this gem
+but sadly most of them are quite bad. In this tutorial, I&#8217;ll go through a bad example
+and show you how to refactor it.</p>
+
+<!--more-->
+
+<h2 id="the-smell">The smell</h2>
+
+<p>Below code is for a report generation function for a car dealer Rails app.</p>
+
+<p>Let&#8217;s see the codes:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+<span class="line-number">70</span>
+<span class="line-number">71</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># app/models/car_issue.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">CarIssue</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">belongs_to</span> <span class="ss">:car</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">liquid_methods</span> <span class="ss">:description</span><span class="p">,</span> <span class="ss">:reference_number</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># app/models/car.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Car</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">has_many</span> <span class="ss">:car_issues</span>
+</span><span class="line">  <span class="n">belongs_to</span> <span class="ss">:customer</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">liquid_methods</span> <span class="ss">:car_make</span><span class="p">,</span> <span class="ss">:owner</span><span class="p">,</span> <span class="ss">:dealer_contact_details</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">owner</span>
+</span><span class="line">    <span class="n">customer</span><span class="o">.</span><span class="n">full_name</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">car_make</span>
+</span><span class="line">    <span class="s2">&quot;</span><span class="si">#{</span><span class="n">brand</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">model</span><span class="si">}</span><span class="s2"> MY </span><span class="si">#{</span><span class="n">manufacturer_year</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">dealer_contact_details</span>
+</span><span class="line"><span class="o">&lt;&lt;-</span><span class="no">CONTACT</span>
+</span><span class="line"><span class="sh">  Uber Dealer</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  9 Sesame St</span>
+</span><span class="line"><span class="sh">  Emo Town</span>
+</span><span class="line"><span class="no">CONTACT</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># app/models/customer.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Customer</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">liquid_methods</span> <span class="ss">:full_name</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">full_name</span>
+</span><span class="line">    <span class="s2">&quot;</span><span class="si">#{</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">last_name</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># app/services/car_report_generation.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">CarReportGeneration</span> <span class="k">do</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">car</span><span class="p">)</span>
+</span><span class="line">    <span class="vi">@car</span> <span class="o">=</span> <span class="n">car</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">template</span>
+</span><span class="line"><span class="o">&lt;&lt;-</span><span class="no">TEMPLATE</span>
+</span><span class="line"><span class="sh">  Dear {{ car.owner }},</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  We&#39;ve performed inspection on your {{ car.car_make }} and found following issues:</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  {% for issue in car.issues %}</span>
+</span><span class="line"><span class="sh">    * {{ issue.reference_number }} - {{ issue.description }}</span>
+</span><span class="line"><span class="sh">  {% endfor %}</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  Please call us back for quotes</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  Sincerely yours</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  {{ car.dealer_contact_details }}</span>
+</span><span class="line"><span class="no">TEMPLATE</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">generate_report</span>
+</span><span class="line">    <span class="ss">Liquid</span><span class="p">:</span><span class="ss">:Template</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">template</span><span class="p">)</span><span class="o">.</span><span class="n">render</span> <span class="s1">&#39;car&#39;</span> <span class="o">=&gt;</span> <span class="vi">@car</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see above, the main logic is <code>CarReportGeneration#generate_report</code> which
+render the report template using Liquid to populate fields.</p>
+
+<p>What&#8217;s so stink about the above code? In fact, I think it&#8217;s perfectly fine. However should
+the report requires more details, user will create more methods within Car model to serve
+as report details getter and this could get very ugly quickly as the coupling emerges more
+clearly.</p>
+
+<h2 id="refactoring">Refactoring</h2>
+
+<p>We will take many little steps.</p>
+
+<p>The first step is to reduce the coupling between our models and Liquid. As you can see
+above that the code exposes methods to Liquid with method <code>liquid_methods</code>. This method
+meta-programmingly create for you a class which is a subclass of Liquid::Drop then create
+instance methods that matches the parsed method names.</p>
+
+<p>So our Car&#8217;s <code>liquid_methods :car_make, :owner, :dealer_contact_details</code> would do following implicit things:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Car</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">to_liquid</span>
+</span><span class="line">    <span class="ss">Car</span><span class="p">:</span><span class="ss">:LiquidDropClass</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">Car</span><span class="o">::</span><span class="no">LiquidDropClass</span> <span class="o">&lt;</span> <span class="ss">Liquid</span><span class="p">:</span><span class="ss">:Drop</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">initalize</span><span class="p">(</span><span class="n">object</span><span class="p">)</span>
+</span><span class="line">    <span class="vi">@object</span> <span class="o">=</span> <span class="n">object</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">owner</span>
+</span><span class="line">    <span class="vi">@object</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">full_name</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">car_make</span>
+</span><span class="line">    <span class="vi">@object</span><span class="o">.</span><span class="n">car_make</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">dealer_contact_details</span>
+</span><span class="line">    <span class="vi">@object</span><span class="o">.</span><span class="n">dealer_contact_details</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>We see that the magic lies in method <code>to_liquid</code> which point to a <code>Liquid::Drop</code> class.
+This special object is what Liquid template takes in to render the template.</p>
+
+<p>Now we could replicate the logic easily. See the code below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># app/models/car.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Car</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">has_many</span> <span class="ss">:car_issues</span>
+</span><span class="line">  <span class="n">belongs_to</span> <span class="ss">:customer</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">to_liquid</span>
+</span><span class="line">    <span class="no">CarMergeField</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">self</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># app/merge_fields/car_merge_field.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">CarMergeField</span> <span class="o">&lt;</span> <span class="ss">Liquid</span><span class="p">:</span><span class="ss">:Drop</span>
+</span><span class="line">  <span class="kp">attr_reader</span> <span class="ss">:car</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">initalize</span><span class="p">(</span><span class="n">car</span><span class="p">)</span>
+</span><span class="line">    <span class="vi">@car</span> <span class="o">=</span> <span class="n">car</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">owner</span>
+</span><span class="line">    <span class="n">car</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">full_name</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">car_make</span>
+</span><span class="line">    <span class="s2">&quot;</span><span class="si">#{</span><span class="n">car</span><span class="o">.</span><span class="n">brand</span><span class="si">}</span><span class="s2"> </span><span class="si">#{</span><span class="n">car</span><span class="o">.</span><span class="n">model</span><span class="si">}</span><span class="s2"> MY </span><span class="si">#{</span><span class="n">car</span><span class="o">.</span><span class="n">manufacturer_year</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">dealer_contact_details</span>
+</span><span class="line"><span class="o">&lt;&lt;-</span><span class="no">CONTACT</span>
+</span><span class="line"><span class="sh">  Uber Dealer</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  9 Sesame St</span>
+</span><span class="line"><span class="sh">  Emo Town</span>
+</span><span class="line"><span class="no">CONTACT</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>By moving all Liquid-related methods to a separate class, we leave Car model
+clean and slim, well with a cost of one function, that is <code>Car#to_liquid</code>, but
+I guess we could live with that for now.</p>
+
+<p>But that&#8217;s the end of refactoring yet, we could see that <code>CarMergeField#dealer_contact_details</code>
+should not belong to Car model and would be shared between many reports in the future.</p>
+
+<p>So we create a new class for that:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">DealerMergeField</span> <span class="o">&lt;</span> <span class="ss">Liquid</span><span class="p">:</span><span class="ss">:Drop</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">contact_details</span>
+</span><span class="line"><span class="o">&lt;&lt;-</span><span class="no">CONTACT</span>
+</span><span class="line"><span class="sh">  Uber Dealer</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  9 Sesame St</span>
+</span><span class="line"><span class="sh">  Emo Town</span>
+</span><span class="line"><span class="no">CONTACT</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and make sure we also remove <code>CarMergeField#dealer_contact_details</code> and update our template:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># app/services/car_report_generation.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">CarReportGeneration</span> <span class="k">do</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1"># ...</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">template</span>
+</span><span class="line"><span class="o">&lt;&lt;-</span><span class="no">TEMPLATE</span>
+</span><span class="line"><span class="sh">  Dear {{ car.owner }},</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  We&#39;ve performed inspection on your {{ car.car_make }} and found following issues:</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  {% for issue in car.issues %}</span>
+</span><span class="line"><span class="sh">    * {{ issue.reference_number }} - {{ issue.description }}</span>
+</span><span class="line"><span class="sh">  {% endfor %}</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  Please call us back for quotes</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  Sincerely yours</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  {{ dealer.contact_details }}</span>
+</span><span class="line"><span class="no">TEMPLATE</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">generate_report</span>
+</span><span class="line">    <span class="n">liquid_drops</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">      <span class="s1">&#39;car&#39;</span> <span class="o">=&gt;</span> <span class="vi">@car</span><span class="p">,</span>
+</span><span class="line">      <span class="s1">&#39;dealer&#39;</span> <span class="o">=&gt;</span> <span class="no">DealerMergeField</span><span class="o">.</span><span class="n">new</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">    <span class="ss">Liquid</span><span class="p">:</span><span class="ss">:Template</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">template</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">liquid_drops</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please pay attention closely to the <code>CarReportGeneration#generate_report</code>, you could
+see that I parse in new liquid drop <code>dealer</code> which is an object of <code>DealerMergeField</code>.
+FYI, the liquid does not have to tie to a model. We now could carry on and apply
+the same technique for model CarIssue.</p>
+
+<p>Yet, I am not satisfied, we could push abit further by extraction common liquid
+rendering logic into its own class and encourage reusability of this class for
+other reports.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># app/services/report_generation.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">ReportGeneration</span>
+</span><span class="line">  <span class="kp">attr_reader</span> <span class="ss">:report</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+</span><span class="line">    <span class="vi">@report</span> <span class="o">=</span> <span class="n">report</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">generate_report</span>
+</span><span class="line">    <span class="ss">Liquid</span><span class="p">:</span><span class="ss">:Template</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">template</span><span class="p">)</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">liquid_drops</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># app/reports/car_report.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">CarReport</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">car</span><span class="p">)</span>
+</span><span class="line">    <span class="vi">@car</span> <span class="o">=</span> <span class="n">car</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">template</span>
+</span><span class="line"><span class="o">&lt;&lt;-</span><span class="no">TEMPLATE</span>
+</span><span class="line"><span class="sh">  Dear {{ car.owner }},</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  We&#39;ve performed inspection on your {{ car.car_make }} and found following issues:</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  {% for issue in car.issues %}</span>
+</span><span class="line"><span class="sh">    * {{ issue.reference_number }} - {{ issue.description }}</span>
+</span><span class="line"><span class="sh">  {% endfor %}</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  Please call us back for quotes</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  Sincerely yours</span>
+</span><span class="line">
+</span><span class="line"><span class="sh">  {{ dealer.contact_details }}</span>
+</span><span class="line"><span class="no">TEMPLATE</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">liquid_drops</span>
+</span><span class="line">    <span class="p">{</span>
+</span><span class="line">      <span class="s1">&#39;car&#39;</span> <span class="o">=&gt;</span> <span class="vi">@car</span><span class="p">,</span>
+</span><span class="line">      <span class="s1">&#39;dealer&#39;</span> <span class="o">=&gt;</span> <span class="no">DealerMergeField</span><span class="o">.</span><span class="n">new</span>
+</span><span class="line">    <span class="p">}</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and to use it we do:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">car_report</span> <span class="o">=</span> <span class="no">CarReport</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="vi">@car</span><span class="p">)</span>
+</span><span class="line"><span class="no">ReportGeneration</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">car_report</span><span class="p">)</span><span class="o">.</span><span class="n">generate_report</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Never let a gem manipulate you. If you see a gem makes you do bad things,
+then you should dig deeper. Even writing new thing your own is not a bad
+solution. If you don&#8217;t have time for that, make sure you write abstract
+method that could help you untangle the coupling later.</p>
+
+<p>I hope this is useful to some. I really welcome feedbacks.</p>
+
+<p>Keep on learning folks!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to style kaminari pagination with Twitter Bootstrap 3]]></title>
@@ -1715,174 +2257,6 @@ drivers. If you get stuck, fallback to the primitive way. Feedbacks are greatly 
 <p>So stop blaming other external factors before you have asserted yourself. Please ignoring all prejudices and expectations. Give yourself space and time to learn more about yourself. It&#8217;ll be a long journey but a rewarding one.</p>
 
 <p>Good luck</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[minitest let() is lazy]]></title>
-    <link href="http://ruby-journal.com/minitest-let-is-lazy/"/>
-    <updated>2013-04-13T10:31:00+10:00</updated>
-    <id>http://ruby-journal.com/minitest-let-is-lazy</id>
-    <content type="html"><![CDATA[
-<p>Don&#8217;t you know that minitest also have a similar <code>let()</code> helper that does exactly the same job as the one of RSpec. But some people do not fully understand the difference between defining object in <code>let()</code> and <code>before()</code> block.</p>
-
-<!--more-->
-
-<p>So you&#8217;ve been doing TDD, that is writing tests. Tests is like app documentation, it needs attention as much as the main code does. One good way to refactor your test is to use <code>let()</code>.</p>
-
-<p>We have a simple spec below:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">before</span> <span class="k">do</span>
-</span><span class="line">    <span class="vi">@post</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;#publish&#39;</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should publish to the world wide web&#39;</span> <span class="k">do</span>
-</span><span class="line">      <span class="vi">@post</span><span class="o">.</span><span class="n">publish</span>
-</span><span class="line">      <span class="vi">@post</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>that could be refactored to:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">let</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;#publish&#39;</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should publish to the world wide web&#39;</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">post</span><span class="o">.</span><span class="n">publish</span>
-</span><span class="line">      <span class="n">post</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Our test is now easier to read. Some developers naively believes the <code>let()</code> just provides a syntax sugar to the test, in fact it is totally different from the block way. It&#8217;s lazy loaded. See the code below:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">let</span><span class="p">(</span><span class="ss">:post</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
-</span><span class="line">
-</span><span class="line"><span class="no">Post</span><span class="o">.</span><span class="n">count</span>
-</span><span class="line"><span class="c1"># 0</span>
-</span><span class="line">
-</span><span class="line"><span class="n">post</span>
-</span><span class="line">
-</span><span class="line"><span class="no">Post</span><span class="o">.</span><span class="n">count</span>
-</span><span class="line"><span class="c1"># 1</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>the <code>post</code> is not created until it is invoked. This definitely helps improve the speed of test in which object is initialized upon being referenced. Yet a caveat for tests on collection of objects that does not reference the object directly in the test. For example:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">let</span><span class="p">(</span><span class="ss">:post1</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
-</span><span class="line">  <span class="n">let</span><span class="p">(</span><span class="ss">:post2</span><span class="p">)</span> <span class="p">{</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span> <span class="p">}</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;.bulk_publish&#39;</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should bulk publish to the world wide web&#39;</span> <span class="k">do</span>
-</span><span class="line">      <span class="no">Post</span><span class="o">.</span><span class="n">bulk_publish</span>
-</span><span class="line">      <span class="n">post1</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">      <span class="n">post2</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>To some people surprise, the test will fail because we do not invoke <code>post1</code> and <code>post2</code> in the test, thus 2 posts are not created before <code>Post.bulk_publish</code> is invoked. You tap those 2 objects before the test with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="s1">&#39;.bulk_publish&#39;</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">before</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">post1</span>
-</span><span class="line">    <span class="n">post2</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Which I find very ugly. In such cases, it&#8217;d be best interest to use the block way to define objects.</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">describe</span> <span class="no">Post</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">describe</span> <span class="s1">&#39;.bulk_publish&#39;</span> <span class="k">do</span>
-</span><span class="line">    <span class="n">before</span> <span class="k">do</span>
-</span><span class="line">      <span class="vi">@post1</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span>
-</span><span class="line">      <span class="vi">@post2</span> <span class="o">=</span> <span class="no">Post</span><span class="o">.</span><span class="n">create!</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Awesome Post&#39;</span><span class="p">)</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">
-</span><span class="line">    <span class="n">it</span> <span class="s1">&#39;should bulk publish to the world wide web&#39;</span> <span class="k">do</span>
-</span><span class="line">      <span class="no">Post</span><span class="o">.</span><span class="n">bulk_publish</span>
-</span><span class="line">      <span class="vi">@post1</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">      <span class="vi">@post2</span><span class="o">.</span><span class="n">published</span><span class="o">.</span><span class="n">must_equal</span> <span class="kp">true</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>So now you know the behaviour of <code>let()</code>, I highly recommend you go through your test and apply what you have learned. See you guys in the next tutorial.</p>
 ]]></content>
   </entry>
   

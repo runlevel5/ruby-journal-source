@@ -9,8 +9,8 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="I’ve been a fan of Indiana Jones and GitHub. So I made a request for
-my brother Huey and guess what he gave me. I just hope this artwork could be &hellip;">
+  <meta name="description" content="It is more than often that you have to write a fixtures for models with polymorphic
+association. In this short tutorial, I will show you how to use &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,108 @@ my brother Huey and guess what he gave me. I just hope this artwork could be &he
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/rails/define-fixtures-with-polymorphic-association/">Define Fixtures With Polymorphic Association</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-09T15:16:00+11:00" pubdate data-updated="true">Mar 9<span>th</span>, 2012</time>
+        
+         | <a href="/rails/define-fixtures-with-polymorphic-association/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>It is more than often that you have to write a fixtures for models with polymorphic
+association. In this short tutorial, I will show you how to use few shortcut trick
+to create fixtures.</p>
+
+<p>Assume we have following code:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Car</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">belongs_to</span> <span class="ss">:borrowable</span><span class="p">,</span> <span class="ss">:polymorphic</span> <span class="o">=&gt;</span> <span class="kp">true</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">Company</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">has_many</span> <span class="ss">:cars</span><span class="p">,</span> <span class="ss">:as</span> <span class="o">=&gt;</span> <span class="ss">:borrowable</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Above is just a very simple code declaring a polymorphic association between
+Company to Car. Next, we will write some fixtures for the sake
+of testing.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># Company fixtures</span>
+</span><span class="line"><span class="ss">google</span><span class="p">:</span>
+</span><span class="line">  <span class="nb">id</span><span class="p">:</span> <span class="mi">1</span>
+</span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">Google</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># car fixtures</span>
+</span><span class="line"><span class="ss">ferrari</span><span class="p">:</span>
+</span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">F430</span>
+</span><span class="line">  <span class="n">borrowable_id</span><span class="p">:</span> <span class="mi">1</span>
+</span><span class="line">  <span class="n">borrowable_type</span><span class="p">:</span> <span class="no">Company</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>We could do better by referencing to Company fixture via named fixture, so
+the above car fixture would be:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">ferrari</span><span class="p">:</span>
+</span><span class="line">  <span class="nb">name</span><span class="p">:</span> <span class="no">F430</span>
+</span><span class="line">  <span class="ss">borrowable</span><span class="p">:</span> <span class="n">google</span> <span class="p">(</span><span class="no">Company</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted that the syntax of line <code>borrowable</code> now has an additonal <code>(Company)</code>
+keyword. This is to tell rails that the <code>borrowable_type</code> is of <code>Company</code> class.
+Without that, the fixtures will set <code>borrowable_type</code> to <code>nil</code>, thus invalid.</p>
+
+<p>Hope you find this tutorial useful. And please avoid using fixures as much as you can. Use factory_girl or machinist. See you in the next tutorial.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -205,6 +307,10 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/liquid-template-in-ruby-done-right/">Liquid template in Ruby done right</a>
+      </li>
+    
+      <li class="post">
         <a href="/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/">How to style kaminari pagination with Twitter Bootstrap 3</a>
       </li>
     
@@ -218,10 +324,6 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
     
       <li class="post">
         <a href="/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test/">How to switch between selenium and poltergeist in capybara for Rails integration RSpec test</a>
-      </li>
-    
-      <li class="post">
-        <a href="/speed-up-your-postgresql-dump-restore/">Speed up your PostgreSQL dump restore</a>
       </li>
     
   </ul>

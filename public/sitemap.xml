@@ -145,11 +145,15 @@
         <lastmod>2014-04-01T19:15:29+11:00</lastmod>
     </url>
     <url>
+        <loc>http://ruby-journal.com/liquid-template-in-ruby-done-right/</loc>
+        <lastmod>2014-04-10T18:20:34+10:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2014-04-01T19:15:29+11:00</lastmod>
+        <lastmod>2014-04-10T18:20:34+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2014-04-01T19:15:29+11:00</lastmod>
+        <lastmod>2014-04-10T18:20:34+10:00</lastmod>
     </url>
 </urlset>
