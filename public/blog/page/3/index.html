@@ -9,7 +9,7 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Don&#8217;t you know that minitest also have a similar let() helper that does exactly the same job as the one of RSpec. But some people do not fully &hellip;">
+  <meta name="description" content="Unlike some of my friends, I occassionally write or blog. Because I don&#8217;t know how to express myself in verbal or writting form. In fact I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,50 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/learn-to-know-myself-better/">Learn to Know Myself Better</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-27T22:59:00+10:00" pubdate data-updated="true">Aug 27<span>th</span>, 2013</time>
+        
+         | <a href="/learn-to-know-myself-better/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>Unlike some of my friends, I <em>occassionally</em> write or blog. Because I don&#8217;t know how to express myself in verbal or writting form. In fact I suck at both. It is not because I hate them, on the contrary I <em>love</em> communication and always get fascinated by charismatic speeches. I have been always avoiding confronting this very own problem of mine. Gradually I refrain to question the problem at all.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/learn-to-know-myself-better/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -540,91 +584,6 @@ if the binary works by:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/">Exposing ActiveRecord Model Attributes to Liquid Dynamically</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-03-12T12:52:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
-        
-         | <a href="/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
-model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
-to tell which attributes / call-able methods of the instance that could be passed
-with the <code>liquid_methods</code> call. In most of cases, people tend to use the latter method
-because they could narrow the exposure scope to liquid.</p>
-
-<p>However, what if your model has so many attributes and typing all them out for
-the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
-creating a module:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
-</span><span class="line">    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
-</span><span class="line">        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And you also need to include the above module in the ActiveRecord classes that
-you want to be exposed to Liquid:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">MyObject</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="nb">require</span> <span class="s1">&#39;attributes_to_liquid_methods_mapper&#39;</span>
-</span><span class="line">  <span class="kp">include</span> <span class="no">AttributesToLiquidMethodsMapper</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -649,6 +608,10 @@ you want to be exposed to Liquid:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/how-to-dry-your-rails-routes/">How to DRY your Rails routes</a>
+      </li>
+    
+      <li class="post">
         <a href="/liquid-template-in-ruby-done-right/">Liquid template in Ruby done right</a>
       </li>
     
@@ -662,10 +625,6 @@ you want to be exposed to Liquid:</p>
     
       <li class="post">
         <a href="/genereate-gems-dependency-graph-with-bundler/">Genereate gems dependency graph with Bundler</a>
-      </li>
-    
-      <li class="post">
-        <a href="/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test/">How to switch between selenium and poltergeist in capybara for Rails integration RSpec test</a>
       </li>
     
   </ul>

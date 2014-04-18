@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-04-10T18:21:41+10:00</updated>
+  <updated>2014-04-18T10:01:27+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,141 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to DRY your Rails routes]]></title>
+    <link href="http://ruby-journal.com/how-to-dry-your-rails-routes/"/>
+    <updated>2014-04-18T09:29:00+10:00</updated>
+    <id>http://ruby-journal.com/how-to-dry-your-rails-routes</id>
+    <content type="html"><![CDATA[
+<p>So you have duplicated routes in your resources? In today tutorial, I&#8217;ll show you how to DRY it up abit.</p>
+
+<!--more-->
+
+<h2 id="sample-code">Sample code</h2>
+
+<p>Just imagine we have following routes:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># config/routes.rb</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:pamphlets</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">member</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:posters</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">member</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">collection</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:bulk_print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As we could see in the code above, we have two resources <code>:pamphlets</code> and <code>:posters</code> that both share same
+<code>post :print</code> route.</p>
+
+<h2 id="dry-with-rails-3">DRY with Rails 3</h2>
+
+<p>In order to DRY it, we could extract the block <code>member { post :print }</code> to a shared proc <code>printable</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">printable</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">member</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:pamphlets</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">printable</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:posters</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">printable</span><span class="o">.</span><span class="n">call</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">collection</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:bulk_print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>resources</code> method take in a block, so for <code>pamphlets</code> we parse the whole <code>printable</code> in as block. It is
+a bit different with <code>posters</code> because this resource already have a block, here what we do is we call
+the proc <code>printable</code> within the block by using <code>call</code>.</p>
+
+<h3 id="dry-with-rails-4">DRY with Rails 4</h3>
+
+<p>With Rails 4, it is much easier by using routing concern. Here&#8217;s how:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">concern</span> <span class="ss">:printable</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">member</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:pamphlets</span><span class="p">,</span> <span class="ss">concerns</span><span class="p">:</span> <span class="ss">:printable</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:posters</span><span class="p">,</span> <span class="ss">concerns</span><span class="p">:</span> <span class="ss">:printable</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">collection</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:bulk_print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>We create a routing concern by using method <code>concern</code> and specify which concern we want to use for each resource
+via argument <code>concerns</code>.</p>
+
+<h3 id="summary">Summary</h3>
+
+<p>Rails routing is very powerful and there are many magic that I want to talk to you in near future. For now, you learn
+how to extract shared routes into concern to DRY your routes. Go on, share it with everyone and keep on learning!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Liquid template in Ruby done right]]></title>
@@ -2235,28 +2370,6 @@ solution left for me is to do it the monkey way, that is Javascript. And below i
 
 <p>Vioala! It works smoothly. The lesson I learned with capybara is that it is still a pain to use the built-in DSL as it doesn’t work across
 drivers. If you get stuck, fallback to the primitive way. Feedbacks are greatly welcomed.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Learn to know myself better]]></title>
-    <link href="http://ruby-journal.com/learn-to-know-myself-better/"/>
-    <updated>2013-08-27T22:59:00+10:00</updated>
-    <id>http://ruby-journal.com/learn-to-know-myself-better</id>
-    <content type="html"><![CDATA[
-<p>Unlike some of my friends, I <em>occassionally</em> write or blog. Because I don&#8217;t know how to express myself in verbal or writting form. In fact I suck at both. It is not because I hate them, on the contrary I <em>love</em> communication and always get fascinated by charismatic speeches. I have been always avoiding confronting this very own problem of mine. Gradually I refrain to question the problem at all.</p>
-
-<!--more-->
-
-<p>However today is special. When everyone&#8217;s busy with hectic life, I am lying here, on the hospital bed waiting for the surgery. I have been admitted to hospital for 3 days, at the beginning the fear of surgery makes me anxious and terrified. The urge to express what are going in my head drove me crazy and hopeless. I could not able to focus until the day three, on which all the anxeties seems gone, I felt very peaceful and calm, as if I truly reach my own point of solitude. I learn to be patient and accept things that I could not control and most importantly I learn to accept myself.</p>
-
-<p>I was born <strong>different</strong>.</p>
-
-<p>I have never been good at talking and writting but I am gifted with different ability. Ability to conceive and interpret things visually, I could remember shapes and pictures and be able to draw them from memory and I could draw many shapes before I know how to write alphabets. My brain is programmed in a very graphical but <strong>organic</strong> way. It&#8217;s like Van Goh or Picasso artworks rather than Gantt or Pie charts. There are no rules to predicate how the artwork should be interpreted, just like a Picasso painting, it could mean a universe to some and a doodle work to some. The strength is that you are able to perceive things in multi-paradigms. However the caveat is that you are drown in the multiple streams of thoughts that you hardly be able to express ideas in a coherent way. And just like arts, it takes skills and time to build up the depth to appreciate.</p>
-
-<p>So stop blaming other external factors before you have asserted yourself. Please ignoring all prejudices and expectations. Give yourself space and time to learn more about yourself. It&#8217;ll be a long journey but a rewarding one.</p>
-
-<p>Good luck</p>
 ]]></content>
   </entry>
   
