@@ -9,9 +9,8 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Liquid is a powerful templating tool especially when
-used with rails. It is quite common that you have to expose ActiveRecord attributes
-to liquid. &hellip;">
+  <meta name="description" content="In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
+As you might have known that Heroku virtual machine does come with a &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +76,98 @@ to liquid. &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/heroku/install-ghostscript-on-heroku/">Install Ghostscript on Heroku Cedar</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-12T16:57:00+11:00" pubdate data-updated="true">Mar 12<span>th</span>, 2012</time>
+        
+         | <a href="/heroku/install-ghostscript-on-heroku/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
+As you might have known that Heroku virtual machine does come with a system-wide
+ghostscript version which is located at <code>/usr/bin/gs</code>. You can find out the
+location of this version:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
+</span><span class="line">$ /usr/bin/gs --version
+</span><span class="line">8.71</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>However, explicit dependencies is not recommended, you could read 12 Factor Approach
+on dependencies at <a href="http://www.12factor.net/dependencies">http://www.12factor.net/dependencies</a>. Credit to <a href="https://github.com/rwdaigle">Ryan Daigle</a> who pointed it out for me and I agree with him.</p>
+
+<p>To install ghostscript, we fetch the source under heroku console, fetch the source,
+configure and compile the software:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run bash
+</span><span class="line">$ curl -O http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz
+</span><span class="line">$ tar xzvf ghostscript-9.05.tar.gz
+</span><span class="line">$ cd ghostscript-9.05
+</span><span class="line">$ ./configure --disable-cups --disable-gtk --with-drivers=FILES
+</span><span class="line">$ make
+</span><span class="line">$ cp bin/gs ~/bin</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You might notice that I only specify configuration parameters <code>--with-drivers=FILES</code>.
+It is because I don&#8217;t need printer drivers for my app which only does think like
+images and PDF manipulation.</p>
+
+<p>Once the compilation is completed, copy the binary <code>ghostscript-9.05/bin/gs</code> to <code>~/bin</code>.
+All binaries in <code>~/bin</code> will be available for your Heroku app now. You can verify
+if the binary works by:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ gs --version
+</span><span class="line">9.05</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And please do not forget to clean up:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ cd ~
+</span><span class="line">$ rm -rf ghostscript-9.05*</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If you feel lazy, you could download my Ruby-wrapper of gs at <a href="https://github.com/joneslee85/ruby-ghostscript">https://github.com/joneslee85/ruby-ghostscript</a>.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -393,6 +484,10 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/how-to-override-default-id-param-for-rails-resource-routing/">How to override :id param for Rails resource routing</a>
+      </li>
+    
+      <li class="post">
         <a href="/how-to-dry-your-rails-routes/">How to DRY your Rails routes</a>
       </li>
     
@@ -406,10 +501,6 @@ believe it applies to other UNIX and Linux systems too (maybe with minor adaptat
     
       <li class="post">
         <a href="/create-dummy-controller-for-testing-with-rspec-rails/">Create dummy controller for testing with rspec-rails</a>
-      </li>
-    
-      <li class="post">
-        <a href="/genereate-gems-dependency-graph-with-bundler/">Genereate gems dependency graph with Bundler</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-04-18T10:01:27+10:00</updated>
+  <updated>2014-04-20T22:30:18+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,113 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to override :id param for Rails resource routing]]></title>
+    <link href="http://ruby-journal.com/how-to-override-default-id-param-for-rails-resource-routing/"/>
+    <updated>2014-04-18T10:28:00+10:00</updated>
+    <id>http://ruby-journal.com/how-to-override-default-id-param-for-rails-resource-routing</id>
+    <content type="html"><![CDATA[
+<p>By default, every resource routing is generated with <code>:id</code> as the identifier param.
+What if you want to change this <code>:id</code> to something? Read on and I&#8217;ll show you how.</p>
+
+<!--more-->
+
+<p>When I was working with Spree, there is a requirement to find Order by its <code>number</code>
+column. The way Spree solved this problem (this is pre-Rails 4 era), is to override
+the <code>Order#to_param</code> like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># app/models/order.rb</span>
+</span><span class="line"><span class="k">def</span> <span class="nf">to_param</span>
+</span><span class="line">  <span class="n">number</span><span class="o">.</span><span class="n">to_s</span><span class="o">.</span><span class="n">to_url</span><span class="o">.</span><span class="n">upcase</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Yet I find the solution more problematic as we now have a unorthodox <code>to_param</code> which
+does not refer to our default integer <code>:id</code> column. Furthermore, our <code>OrdersController</code>
+still find object with <code>params[:id]</code>, which might be confusing for users.</p>
+
+<p>There is a better solution if you are on Rails 4, that is modifying the routing.</p>
+
+<p>We have a routing like below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># config/routes.rb</span>
+</span><span class="line"><span class="n">resources</span> <span class="ss">:orders</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which would generates:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">bundle exec rake routes
+</span><span class="line">            Prefix Verb  URI Pattern                   Controller#Action
+</span><span class="line">           orders GET    /orders(.:format)             orders#index
+</span><span class="line">                  POST   /orders(.:format)             orders#create
+</span><span class="line">        new_order GET    /orders/new(.:format)         orders#new
+</span><span class="line">       edit_order GET    /orders/:id/edit(.:format)    orders#edit
+</span><span class="line">            order GET    /orders/:id(.:format)         orders#show
+</span><span class="line">                  PATCH  /orders/:id(.:format)         orders#update
+</span><span class="line">                  PUT    /orders/:id(.:format)         orders#update
+</span><span class="line">                  DELETE /orders/:id(.:format)         orders#destroy
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now if the business logic is to use <code>:number</code> instead of <code>:id</code>, we could override the
+default routing by using <code>param</code> argument:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># config/routes.rb</span>
+</span><span class="line"><span class="n">resources</span> <span class="ss">:orders</span><span class="p">,</span> <span class="ss">param</span><span class="p">:</span> <span class="ss">:number</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and we double-check with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">bundle exec rake routes
+</span><span class="line">            Prefix Verb  URI Pattern                       Controller#Action
+</span><span class="line">           orders GET    /orders(.:format)                 orders#index
+</span><span class="line">                  POST   /orders(.:format)                 orders#create
+</span><span class="line">        new_order GET    /orders/new(.:format)             orders#new
+</span><span class="line">       edit_order GET    /orders/:number/edit(.:format)    orders#edit
+</span><span class="line">            order GET    /orders/:number(.:format)         orders#show
+</span><span class="line">                  PATCH  /orders/:number(.:format)         orders#update
+</span><span class="line">                  PUT    /orders/:number(.:format)         orders#update
+</span><span class="line">                  DELETE /orders/:number(.:format)         orders#destroy
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted that you need to modify the <code>OrdersController</code> to find Order record
+with <code>params[:number]</code> instead of <code>params[:id]</code>.</p>
+
+<p>For most of the cases, the Rails convention of using <code>:id</code> as primary key does the job
+well. However should you need to use something different, please do not hesistate to
+use custom column for the job. And IMHO, please refrain from overriding the <code>to_param</code>.</p>
+
+<p>That&#8217;s it folks, keep on learning!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to DRY your Rails routes]]></title>
@@ -2276,100 +2383,6 @@ do mouse hover then click.</p>
 <p>Using <code>have_selector</code> is definitely a nicer way to check for JS initialization and I
 encourage you apply this technique as often as possible. You&#8217;ll thank me later for saving
 you from randomly failed test. That&#8217;s all for now. Good day!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to fill in FCKeditor with capybara 2]]></title>
-    <link href="http://ruby-journal.com/how-to-fill-in-fckeditor-with-capybara-2/"/>
-    <updated>2013-09-12T12:46:00+10:00</updated>
-    <id>http://ruby-journal.com/how-to-fill-in-fckeditor-with-capybara-2</id>
-    <content type="html"><![CDATA[
-<p>In this short tutorial, I will show you how to fill in FCkeditor text area by using Capybara 2</p>
-
-<!--more-->
-
-<p>Just imagine you have a textarea:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">&lt;textarea cols=​"40" id=​"letter_content" name=​"letter[content]​" rows=​"20"&gt;​&lt;/textarea&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Once you apply FCKeditor for this textarea, the output yields following new DOM:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">&lt;textarea cols=​"40" id=​"letter_content" name=​"letter[content]​" rows=​"20"&gt;​&lt;/textarea&gt;
-</span><span class="line">&lt;div id="cke_letter_content" class="cke_1 cke cke_reset cke_chrome cke_editor_letter_content cke_ltr cke_browser_webkit" dir="ltr" lang="en" role="application" aria-labelledby="cke_letter_content_arialbl"&gt;
-</span><span class="line">  &lt;iframe src="" frameborder="0" class="cke_wysiwyg_frame cke_reset" style="width: 100%; height: 100%;" title="Rich Text Editor, letter_content" aria-describedby="cke_30" tabindex="0" allowtransparency="true"&gt;
-</span><span class="line">    &lt;body contenteditable="true" class="cke_editable cke_editable_themed cke_contents_ltr cke_show_borders" spellcheck="false"&gt;
-</span><span class="line">    &lt;/body&gt;
-</span><span class="line">  &lt;/iframe&gt;
-</span><span class="line">&lt;/div&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>As you can see in the DOM structure, FCKeditor will create new iframe and within this frame, we have a body tag with HTML5 contenteditable.
-By common sense, in order to fill in this body tag, I’d do following:</p>
-
-<ul>
-  <li>Switch to that editor frame</li>
-  <li>Set the body content</li>
-</ul>
-
-<p>I sit down and give it a try on caypybara + selenium and capybara + polstergeist:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line">  <span class="c1"># WARNNING: not working!!</span>
-</span><span class="line">  <span class="k">def</span> <span class="nf">fckeditor_fill_in</span><span class="p">(</span><span class="n">frame_id</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-</span><span class="line">    <span class="n">within_frame</span><span class="p">(</span><span class="n">frame_id</span><span class="p">)</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">fill_in</span> <span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="ss">with</span><span class="p">:</span> <span class="n">value</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>to use it:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line">  <span class="n">fckeditor_fill_in</span><span class="p">(</span><span class="s1">&#39;#cke_letter_content iframe:nth-of-type(1)&#39;</span><span class="p">,</span> <span class="s1">&#39;Hello world&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>run the test and BOOM!, it failed. Firstly, <code>within_frame</code> does not work with selenium. Secondly, <code>fill_in</code> does not support edit contenteditable tag, there was a PR by Jon Rowe few months ago but not merged yet (as of this writing). It seems to me the only viable
-solution left for me is to do it the monkey way, that is Javascript. And below is the working code:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line">  <span class="k">def</span> <span class="nf">fckeditor_fill_in</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="p">{})</span>
-</span><span class="line">    <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{</span>
-</span><span class="line"><span class="sx">      var ckeditor = CKEDITOR.instances.</span><span class="si">#{</span><span class="nb">id</span><span class="si">}</span><span class="sx"></span>
-</span><span class="line"><span class="sx">      ckeditor.setData(&#39;</span><span class="si">#{</span><span class="n">params</span><span class="o">[</span><span class="ss">:with</span><span class="o">]</span><span class="si">}</span><span class="sx">&#39;)</span>
-</span><span class="line"><span class="sx">      ckeditor.focus()</span>
-</span><span class="line"><span class="sx">      ckeditor.updateElement()</span>
-</span><span class="line"><span class="sx">    }</span>
-</span><span class="line">  <span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>to use it:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line">  <span class="n">fckeditor_fill_in</span><span class="p">(</span><span class="s1">&#39;letter_content&#39;</span><span class="p">,</span> <span class="s1">&#39;Hello world&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Vioala! It works smoothly. The lesson I learned with capybara is that it is still a pain to use the built-in DSL as it doesn’t work across
-drivers. If you get stuck, fallback to the primitive way. Feedbacks are greatly welcomed.</p>
 ]]></content>
   </entry>
   
