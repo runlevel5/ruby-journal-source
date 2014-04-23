@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-04-20T22:30:18+10:00</updated>
+  <updated>2014-04-23T22:18:48+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,175 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to write custom serializer for ActiveRecord#serialize]]></title>
+    <link href="http://ruby-journal.com/how-to-write-custom-serializer-for-activerecord-number-serialize/"/>
+    <updated>2014-04-21T07:49:00+10:00</updated>
+    <id>http://ruby-journal.com/how-to-write-custom-serializer-for-activerecord-number-serialize</id>
+    <content type="html"><![CDATA[
+<p>Rails comes with a powerful and convenient <code>serialize</code> method that would do the serialization/deserializtion
+for a specify column of an ActiveRecord model. In today tutorial, I&#8217;ll walk you through on how to write a
+custom serializer that would encrypt/decrypt your serialized value for extra security.</p>
+
+<!--more-->
+
+<h2 id="the-basic">The Basic</h2>
+
+<p>ActiveRecord model has access to class method <code>serialize</code> which by default would serialize/deserialize the
+specified column value with YAML.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">serialize</span> <span class="ss">:properties</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see in the example above, our <code>Product</code> class has column <code>properties</code> which we will store an
+array of properties hash:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">o</span> <span class="o">=</span> <span class="no">Product</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;The Uber Kubik&#39;</span><span class="p">)</span>
+</span><span class="line"><span class="n">o</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="o">[</span><span class="ss">length</span><span class="p">:</span> <span class="s1">&#39;10cm&#39;</span><span class="p">,</span> <span class="ss">width</span><span class="p">:</span> <span class="s1">&#39;20cm&#39;</span><span class="o">]</span>
+</span><span class="line"><span class="n">o</span><span class="o">.</span><span class="n">save!</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and you might be wondering what sort of magic has happened. Let&#8217;s check the output log:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line"> (0.1ms)  begin transaction
+</span><span class="line">SQL (0.4ms)  INSERT INTO &quot;products&quot; (&quot;name&quot;, &quot;created_at&quot;, &quot;properties&quot;, &quot;updated_at&quot;) VALUES (?, ?, ?)  [[&quot;name&quot;, &quot;The Uber Kubik&quot;], [&quot;created_at&quot;, &quot;2014-04-20 21:59:47.486719&quot;], [&quot;properties&quot;, &quot;---\n- :length: 10cm\n  :width: 20cm\n&quot;], [&quot;updated_at&quot;, &quot;2014-04-20 21:59:47.486719&quot;]]
+</span><span class="line"> (1.2ms)  commit transaction
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>clearly we learn that Rails store a YAML string <code>---\n- :length: 10cm\n  :width: 20cm\n</code> into DB. Again, Rails
+also does the magic to deserialize this YAML string back to object:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">o</span><span class="o">.</span><span class="n">properties</span>
+</span><span class="line"><span class="c1">#=&gt; [length: &#39;10cm&#39;, width: &#39;20cm&#39;]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="alternative-serializer">Alternative serializer</h2>
+
+<p>Rails takes in two arguments for class method <code>serialize</code>, the first is the column name and the second is the <em>coder
+classname</em>. The coder class is the name of the serializer class. Rails comes with two serialzers, YAML and JSON.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">serialize</span> <span class="ss">:properties</span><span class="p">,</span> <span class="no">JSON</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>By specifying <code>JSON</code> as the second argument for <code>serialize</code> we tell Rails to use serialize/deseralize the column
+value with JSON.</p>
+
+<p>Again, you might be wondering how YAML and JSON serializers work? Well, the basically they are class that have two
+class methods, that is <code>load</code> for serialization and <code>dump</code> for deserialization.</p>
+
+<p>Let&#8217;s write a JSON serializer that encrypt/decrypt the value with RSA key.</p>
+
+<p>We create a very naive and primitive cipher that simply un/reverse the string:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># lib/protected_json_serializer.rb</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">ProtectedJsonSerializer</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">load</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span class="line">    <span class="no">JSON</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">decrypt</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">dump</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span class="line">    <span class="n">encrypt</span><span class="p">(</span><span class="no">JSON</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">encrypt</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span class="line">    <span class="n">value</span><span class="o">.</span><span class="n">reverse</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">decrypt</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span class="line">    <span class="n">value</span><span class="o">.</span><span class="n">reverse</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and set the coder to <code>ProtectedJsonSerializer</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="nb">require</span> <span class="s1">&#39;protected_json_serializer&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">serialize</span> <span class="ss">:properties</span><span class="p">,</span> <span class="no">ProtectedJsonSerializer</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and now let&#8217;s see the magic:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">o</span> <span class="o">=</span> <span class="no">Product</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;The Uber Kubik&#39;</span><span class="p">)</span>
+</span><span class="line"><span class="n">o</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="o">[</span><span class="ss">length</span><span class="p">:</span> <span class="s1">&#39;10cm&#39;</span><span class="p">,</span> <span class="ss">width</span><span class="p">:</span> <span class="s1">&#39;20cm&#39;</span><span class="o">]</span>
+</span><span class="line"><span class="n">o</span><span class="o">.</span><span class="n">save!</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>would yield log output:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line"> (0.1ms)  begin transaction
+</span><span class="line">SQL (0.4ms)  INSERT INTO &quot;products&quot; (&quot;name&quot;, &quot;created_at&quot;, &quot;properties&quot;, &quot;updated_at&quot;) VALUES (?, ?, ?)  [[&quot;name&quot;, &quot;The Uber Kubik&quot;], [&quot;created_at&quot;, &quot;2014-04-20 21:59:47.486719&quot;], [&quot;properties&quot;, &quot;]}\&quot;mc02\&quot;:\&quot;htdiw\&quot;,\&quot;mc01\&quot;:\&quot;htgnel\&quot;{[&quot;], [&quot;updated_at&quot;, &quot;2014-04-20 21:59:47.486719&quot;]]
+</span><span class="line"> (1.2ms)  commit transaction
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the output clearly shows that our <code>properties</code> value is encryted <code>["properties", "]}\"mc02\":\"htdiw\",\"mc01\":\"htgnel\"{["]</code></p>
+
+<p>so now we can rest assured that even RSA has access to our DB, they could not read our data (well, you need
+to do a better job with the encryption than my naive implementation).</p>
+
+<h3 id="summary">Summary</h3>
+
+<p>For most of common cases, you probably don&#8217;t have to worry about custom serializer. But the power is there
+if you ever need it. Please remember that <code>serialzie</code> takes the serializer class name as the second argument
+and the serializer must have 2 methods <code>load</code> and <code>dump</code>.</p>
+
+<p>That&#8217;s all folks. Keep on learning!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to override :id param for Rails resource routing]]></title>
@@ -2313,76 +2482,6 @@ and add this line into your <code>spec/spec_helper.rb</code>:</p>
 <p>The <code>#has_selector</code> accept CSS and XPath rule and comes with many userful options, it fills in the gap of ActionDispatch::Assertions::SelectorAssertions.</p>
 
 <p>I hope you like this short tutorial, comments are welcome.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to do jQuery UI Autocomplete with capybara 2]]></title>
-    <link href="http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/"/>
-    <updated>2013-09-12T14:04:00+10:00</updated>
-    <id>http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2</id>
-    <content type="html"><![CDATA[
-<p>In this tutorial, I&#8217;ll show you how to do jQuery UI Autocomplete the better way with Capybara 2!
-That is getting rid of <code>sleep</code> that many solutions on the Internet suggested. Furthermore this
-solution works both with selenium and polstergeist driver.</p>
-
-<!--more-->
-
-<p>If you search on the Internet on how to do autocomplete with capybara, you&#8217;ll normally find
-solutions for Capybara 1.x like below:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">s</span><span class="o">.</span><span class="n">fill_in</span> <span class="s2">&quot;Make&quot;</span><span class="p">,</span> <span class="ss">:with</span> <span class="o">=&gt;</span> <span class="s2">&quot;Make&quot;</span>
-</span><span class="line"><span class="nb">sleep</span> <span class="mi">3</span>
-</span><span class="line"><span class="n">page</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;$(&#39;.ui-menu-item a:contains(</span><span class="se">\&quot;</span><span class="s2">Make Two</span><span class="se">\&quot;</span><span class="s2">)&#39;).trigger(&#39;mouseenter&#39;).click();&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>It was a fine solution however the <code>sleep</code> call is not good. It tells the driver to passively
-sleep while waiting for JS loading up. As of Capybara 2, there is no need to call <code>sleep</code> as
-finder API will actively look for existence of the node and raise error if not found. Here is
-a better solution:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">fill_autocomplete</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="p">{})</span>
-</span><span class="line">  <span class="n">fill_in</span> <span class="n">field</span><span class="p">,</span> <span class="ss">with</span><span class="p">:</span> <span class="n">options</span><span class="o">[</span><span class="ss">:with</span><span class="o">]</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{ $(&#39;#</span><span class="si">#{</span><span class="n">field</span><span class="si">}</span><span class="sx">&#39;).trigger(&#39;focus&#39;) }</span>
-</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{ $(&#39;#</span><span class="si">#{</span><span class="n">field</span><span class="si">}</span><span class="sx">&#39;).trigger(&#39;keydown&#39;) }</span>
-</span><span class="line">  <span class="n">selector</span> <span class="o">=</span> <span class="sx">%Q{ul.ui-autocomplete li.ui-menu-item a:contains(&quot;</span><span class="si">#{</span><span class="n">options</span><span class="o">[</span><span class="ss">:select</span><span class="o">]</span><span class="si">}</span><span class="sx">&quot;)}</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">should</span> <span class="n">have_selector</span><span class="p">(</span><span class="s1">&#39;ul.ui-autocomplete li.ui-menu-item a&#39;</span><span class="p">)</span>
-</span><span class="line">  <span class="n">page</span><span class="o">.</span><span class="n">execute_script</span> <span class="sx">%Q{ $(&#39;</span><span class="si">#{</span><span class="n">selector</span><span class="si">}</span><span class="sx">&#39;).trigger(&#39;mouseenter&#39;).click() }</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>To use it, you call:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">fill_autocomplete</span><span class="p">(</span><span class="s1">&#39;field_id&#39;</span><span class="p">,</span> <span class="ss">with</span><span class="p">:</span> <span class="s1">&#39;term&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Please be noted that <code>field</code> parameter must be the CSS ID, not label nor name.</p>
-
-<p>Let me digest the above code, first, I fill in the text field and I want the autocomplete
-to kick in by trigger focus and keydown event on the field using JS. Then I check
-the existence of <code>li.ui-menu-item a</code> instead of doing <code>sleep</code> to ensure that the JS
-has popped the dropdown correctly. The final step is just to trigger mouseentter event to
-do mouse hover then click.</p>
-
-<p>Using <code>have_selector</code> is definitely a nicer way to check for JS initialization and I
-encourage you apply this technique as often as possible. You&#8217;ll thank me later for saving
-you from randomly failed test. That&#8217;s all for now. Good day!</p>
 ]]></content>
   </entry>
   

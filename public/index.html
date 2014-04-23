@@ -9,8 +9,8 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="By default, every resource routing is generated with :id as the identifier param.
-What if you want to change this :id to something? Read on and I&# &hellip;">
+  <meta name="description" content="Rails comes with a powerful and convenient serialize method that would do the serialization/deserializtion
+for a specify column of an ActiveRecord &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,52 @@ What if you want to change this :id to something? Read on and I&# &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/how-to-write-custom-serializer-for-activerecord-number-serialize/">How to Write Custom Serializer for ActiveRecord#serialize</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-21T07:49:00+10:00" pubdate data-updated="true">Apr 21<span>st</span>, 2014</time>
+        
+         | <a href="/how-to-write-custom-serializer-for-activerecord-number-serialize/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>Rails comes with a powerful and convenient <code>serialize</code> method that would do the serialization/deserializtion
+for a specify column of an ActiveRecord model. In today tutorial, I&#8217;ll walk you through on how to write a
+custom serializer that would encrypt/decrypt your serialized value for extra security.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/how-to-write-custom-serializer-for-activerecord-number-serialize/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -495,57 +541,6 @@ multiple concurrent process do it for you.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/">Graceful Fallback for Not Found ActiveRecord Lookup With NullObject Pattern</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-11-23T23:27:00+11:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2013</time>
-        
-         | <a href="/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>In my application, I bump to Exception when trying to delegate a method to an unfound ActiveRecord instance. This poses two issues for me:</p>
-
-<ul>
-  <li>Hard to write test for you have to set up fixture/factory correctly</li>
-  <li>Not a good user experience to see error on production</li>
-</ul>
-
-<p>I tackle this with NullObject pattern to provide a graceful fallback.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -568,6 +563,10 @@ multiple concurrent process do it for you.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/how-to-write-custom-serializer-for-activerecord-number-serialize/">How to write custom serializer for ActiveRecord#serialize</a>
+      </li>
+    
+      <li class="post">
         <a href="/how-to-override-default-id-param-for-rails-resource-routing/">How to override :id param for Rails resource routing</a>
       </li>
     
@@ -581,10 +580,6 @@ multiple concurrent process do it for you.</p>
     
       <li class="post">
         <a href="/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/">How to style kaminari pagination with Twitter Bootstrap 3</a>
-      </li>
-    
-      <li class="post">
-        <a href="/create-dummy-controller-for-testing-with-rspec-rails/">Create dummy controller for testing with rspec-rails</a>
       </li>
     
   </ul>

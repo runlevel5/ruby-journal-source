@@ -150,7 +150,7 @@
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-dry-your-rails-routes/</loc>
-        <lastmod>2014-04-18T10:00:40+10:00</lastmod>
+        <lastmod>2014-04-21T07:47:58+10:00</lastmod>
     </url>
     <url>
         <loc>
@@ -159,11 +159,17 @@
         <lastmod>2014-04-20T22:28:08+10:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://ruby-journal.com/how-to-write-custom-serializer-for-activerecord-number-serialize/
+        </loc>
+        <lastmod>2014-04-23T22:18:04+10:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2014-04-20T22:28:08+10:00</lastmod>
+        <lastmod>2014-04-23T22:18:04+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2014-04-20T22:28:08+10:00</lastmod>
+        <lastmod>2014-04-23T22:18:04+10:00</lastmod>
     </url>
 </urlset>
