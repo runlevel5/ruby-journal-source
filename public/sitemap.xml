@@ -156,20 +156,24 @@
         <loc>
             http://ruby-journal.com/how-to-override-default-id-param-for-rails-resource-routing/
         </loc>
-        <lastmod>2014-04-20T22:28:08+10:00</lastmod>
+        <lastmod>2014-05-05T12:36:26+10:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/how-to-write-custom-serializer-for-activerecord-number-serialize/
         </loc>
-        <lastmod>2014-04-23T22:18:04+10:00</lastmod>
+        <lastmod>2014-05-05T12:36:18+10:00</lastmod>
+    </url>
+    <url>
+        <loc>http://ruby-journal.com/a-simple-shift-cipher-with-ruby/</loc>
+        <lastmod>2014-04-27T02:25:22+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2014-04-23T22:18:04+10:00</lastmod>
+        <lastmod>2014-05-05T12:36:26+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2014-04-23T22:18:04+10:00</lastmod>
+        <lastmod>2014-05-05T12:36:26+10:00</lastmod>
     </url>
 </urlset>

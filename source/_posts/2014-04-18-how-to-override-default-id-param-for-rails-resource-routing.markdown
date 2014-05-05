@@ -16,45 +16,26 @@ What if you want to change this `:id` to something? Read on and I'll show you ho
 
 When I was working with Spree, there is a requirement to find Order by its `number`
 column. The way Spree solved this problem (this is pre-Rails 4 era), is to override
-the `Order#to_param` like this:
+the `Order#to_param`:
 
 ```ruby
 # app/models/order.rb
 def to_param
-  number.to_s.to_url.upcase
+  number.parameterize
 end
+
+# app/controllers/orders_controller.rb
+
+@order = Order.find(params[:id])
 ```
 
-Yet I find the solution more problematic as we now have a unorthodox `to_param` which
-does not refer to our default integer `:id` column. Furthermore, our `OrdersController`
-still find object with `params[:id]`, which might be confusing for users.
+Now you might question, what is an `id`? Is it a reference to `id` column or a metaphor
+to an entity that acts as record ID? I don't know, as far as I can tell, Rails does
+not want you to use other primary key.
 
-There is a better solution if you are on Rails 4, that is modifying the routing.
+IMHO, I would leave `params[:id]` as is and would use `params[:number]`.
 
-We have a routing like below:
-
-```ruby
-# config/routes.rb
-resources :orders
-```
-
-which would generates:
-
-```text
-bundle exec rake routes
-            Prefix Verb  URI Pattern                   Controller#Action
-           orders GET    /orders(.:format)             orders#index
-                  POST   /orders(.:format)             orders#create
-        new_order GET    /orders/new(.:format)         orders#new
-       edit_order GET    /orders/:id/edit(.:format)    orders#edit
-            order GET    /orders/:id(.:format)         orders#show
-                  PATCH  /orders/:id(.:format)         orders#update
-                  PUT    /orders/:id(.:format)         orders#update
-                  DELETE /orders/:id(.:format)         orders#destroy
-```
-
-Now if the business logic is to use `:number` instead of `:id`, we could override the
-default routing by using `param` argument:
+If you are on Rails 4, we can modify the resource ID param by specifying `param`:
 
 ```ruby
 # config/routes.rb
@@ -79,8 +60,12 @@ bundle exec rake routes
 Please be noted that you need to modify the `OrdersController` to find Order record
 with `params[:number]` instead of `params[:id]`.
 
-For most of the cases, the Rails convention of using `:id` as primary key does the job
-well. However should you need to use something different, please do not hesistate to
-use custom column for the job. And IMHO, please refrain from overriding the `to_param`.
+```ruby
+# app/controllers/orders_controller.rb
+@order = Order.find(params[:number])
+```
 
-That's it folks, keep on learning!
+Please be noted that, we still need to override the `Order#to_param` to ensure that
+it comply to URI.
+
+That's all for today!

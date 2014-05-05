@@ -129,7 +129,9 @@ to do a better job with the encryption than my naive implementation).
 ### Summary
 
 For most of common cases, you probably don't have to worry about custom serializer. But the power is there
-if you ever need it. Please remember that `serialzie` takes the serializer class name as the second argument
+if you ever need it. For example, having custom data type column like Array or Set which comes very handy.
+
+Please remember that `serialzie` takes the serializer class name as the second argument
 and the serializer must have 2 methods `load` and `dump`.
 
 That's all folks. Keep on learning!

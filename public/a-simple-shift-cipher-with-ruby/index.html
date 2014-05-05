@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Rails 4 changes habtm join table naming convention - Ruby Journal</title>
+  <title>A simple shift cipher with Ruby - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="When upgrading my app from Rails 3.2.14 to Rails 4, I bumped into an error in which
-habtm association complains missing DB join table. To my &hellip;">
+  <meta name="description" content="Crytography was born thousands years ago, dating back to early day of the Roman which Ceasar
+used a very simple form of substitution cipher to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ habtm association complains missing DB join table. To my &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/rails-4-changes-join-table-naming-convention/">
+  <link rel="canonical" href="http://ruby-journal.com/a-simple-shift-cipher-with-ruby/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +79,7 @@ habtm association complains missing DB join table. To my &hellip;">
   
   <header>
     
-      <h1 class="entry-title">Rails 4 Changes Habtm Join Table Naming Convention</h1>
+      <h1 class="entry-title">A Simple Shift Cipher With Ruby</h1>
     
     
       <p class="meta">
@@ -95,7 +95,7 @@ habtm association complains missing DB join table. To my &hellip;">
   
 
 
-<time datetime="2013-10-03T18:55:00+10:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2013</time>
+<time datetime="2014-04-27T01:28:00+10:00" pubdate data-updated="true">Apr 27<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,12 +105,63 @@ habtm association complains missing DB join table. To my &hellip;">
 
 
 <div class="entry-content">
-<p>When upgrading my app from Rails 3.2.14 to Rails 4, I bumped into an error in which
-habtm association complains missing DB join table. To my surprise, Rails 4 has changed the default naming convention for join table.</p>
+<p>Crytography was born thousands years ago, dating back to early day of the Roman which Ceasar
+used a very simple form of substitution cipher to encrypt military message. Nowaday cryptography
+is much more complex and virtually not solveable in some cases (well until quantum computing).</p>
+
+<p>Today I am going to show how to implement the <a href="http://en.wikipedia.org/wiki/Caesar_cipher">Caesar&#8217;s Cipher</a>
+with improvements:</p>
+
+<ul>
+  <li>Based on Unicode table</li>
+  <li>Accept case sensitive</li>
+</ul>
+
+<p>Read on you&#8217;ll be surprised how easy it is with Ruby!</p>
 
 <!--more-->
 
-<p>Here is the Rails 3 code:</p>
+<h2 id="concept">Concept</h2>
+
+<p>The concept is pretty much the same with Caesar&#8217;s Cipher in which character is shifted
+by a key to the left to generate encrypted text. You can read more about it on WWW.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>Unicode characters are mapped to Unicode table and are represented with
+number in bytes.</p>
+
+<p>English alphabets are basic Latin which are mapped in range 32 -&gt; 127 on Unicode table.
+See the <a href="http://unicode-table.com/en/#basic-latin">table</a></p>
+
+<p>The trick is to convert the message to digit so we could shift the
+position of each character.</p>
+
+<p>Ruby comes with method <code>String#bytes</code> that yields the bytecode of the string, eg:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="s2">&quot;Super Secret&quot;</span><span class="o">.</span><span class="n">bytes</span>
+</span><span class="line"><span class="c1">#=&gt; [83, 117, 112, 101, 114, 32, 83, 101, 99, 114, 101, 116]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And to get back our original text, we use <code>String#pack</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="o">[</span><span class="mi">83</span><span class="p">,</span> <span class="mi">117</span><span class="p">,</span> <span class="mi">112</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">114</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">114</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">116</span><span class="o">].</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;U*&#39;</span><span class="p">)</span>
+</span><span class="line"><span class="c1">#=&gt; &quot;Super Secret&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The argument &#8216;U*&#8217; means unicode. Google if you want to know other arguments
+for this method.</p>
+
+<p>All the hard work! Ruby has made hard things trivial.</p>
+
+<h3 id="encryption">Encryption</h3>
+
+<p>Now we could implement our encrytion easily by shifting the byte number
+to the right by a <em>key</em>.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -127,44 +178,40 @@ habtm association complains missing DB join table. To my surprise, Rails 4 has c
 <span class="line-number">13</span>
 <span class="line-number">14</span>
 <span class="line-number">15</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ContactPlan</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="n">has_and_belongs_to_many</span> <span class="ss">:contact_types</span>
-</span><span class="line"><span class="k">end</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">ShiftCipher</span>
 </span><span class="line">
+</span><span class="line">  <span class="no">LATIN_RANGE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="o">.</span><span class="n">.</span><span class="mi">127</span><span class="p">)</span>
 </span><span class="line">
-</span><span class="line"><span class="k">class</span> <span class="nc">ContactType</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="n">has_and_belongs_to_many</span> <span class="ss">:contact_plans</span>
-</span><span class="line"><span class="k">end</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">encrypt</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">:</span> <span class="mi">3</span><span class="p">)</span>
+</span><span class="line">    <span class="n">to_string</span><span class="p">(</span><span class="n">shift_bytes</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">))</span>
+</span><span class="line">  <span class="k">end</span>
 </span><span class="line">
-</span><span class="line"><span class="k">class</span> <span class="nc">CreateContactPlansContactTypes</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
-</span><span class="line">  <span class="n">create_table</span> <span class="ss">:contact_plans_contact_types</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
-</span><span class="line">    <span class="n">t</span><span class="o">.</span><span class="n">integer</span> <span class="ss">:contact_plan_id</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
-</span><span class="line">    <span class="n">t</span><span class="o">.</span><span class="n">integer</span> <span class="ss">:contact_type_id</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">shift_bytes</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">)</span>
+</span><span class="line">    <span class="n">bytes</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="n">i</span> <span class="o">+</span> <span class="n">shift_key</span> <span class="p">}</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">seflf</span><span class="o">.</span><span class="nf">shift_byte</span><span class="p">(</span><span class="n">byte</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">to_string</span><span class="p">(</span><span class="n">bytes</span><span class="p">)</span>
+</span><span class="line">    <span class="n">bytes</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;U*&#39;</span><span class="p">)</span>
 </span><span class="line">  <span class="k">end</span>
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>As you can see from above migrarion, my join table naming is <code>contact_plans_contact_types</code>. Yet Rails 4 fails to run the migration and asks for the existence of <code>contact_plans_types</code>. If you are upgrading from Rails 3 app, I highly recommend you avoid renaming this join table. Instead, you should explicitly declare the join table for habtm association:</p>
+<p>33 - 3 -32</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ContactPlan</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="n">has_and_belongs_to_many</span> <span class="ss">:contact_types</span><span class="p">,</span> <span class="n">join_table</span><span class="p">:</span> <span class="ss">:contact_plans_contact_types</span>
-</span><span class="line"><span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">class</span> <span class="nc">ContactType</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="n">has_and_belongs_to_many</span> <span class="ss">:contact_plans</span><span class="p">,</span> <span class="n">join_table</span><span class="p">:</span> <span class="ss">:contact_plans_contact_types</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>This technique mitigates regressions. And you can always go back to renaming if you feel like after stablising the build.</p>
-
-<p>I can see that Rails 4 try to be smart by detecting duplication in model naming. I welcome this sort of change as it would reduce the complexity in the naming. Furthermore, if you bump into this issue, it is very likely that you should rethink your model naming.</p>
+<p>-2</p>
 
 </div>
 
@@ -188,7 +235,7 @@ habtm association complains missing DB join table. To my surprise, Rails 4 has c
   
 
 
-<time datetime="2013-10-03T18:55:00+10:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2013</time>
+<time datetime="2014-04-27T01:28:00+10:00" pubdate data-updated="true">Apr 27<span>th</span>, 2014</time>
       
 
 
@@ -196,7 +243,7 @@ habtm association complains missing DB join table. To my surprise, Rails 4 has c
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/rails-4-changes-join-table-naming-convention/" data-via="joneslee85" data-counturl="http://ruby-journal.com/rails-4-changes-join-table-naming-convention/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/a-simple-shift-cipher-with-ruby/" data-via="joneslee85" data-counturl="http://ruby-journal.com/a-simple-shift-cipher-with-ruby/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -209,10 +256,8 @@ habtm association complains missing DB join table. To my surprise, Rails 4 has c
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/" title="Previous Post: How to track changes of a model in a `after_callbacks` in Rails 3 or newer">&laquo; How to track changes of a model in a `after_callbacks` in Rails 3 or newer</a>
+        <a class="basic-alignment left" href="/how-to-write-custom-serializer-for-activerecord-number-serialize/" title="Previous Post: How to write custom serializer for ActiveRecord#serialize">&laquo; How to write custom serializer for ActiveRecord#serialize</a>
       
-      
-        <a class="basic-alignment right" href="/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/" title="Next Post: Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0">Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0 &raquo;</a>
       
     </p>
   </footer>
@@ -340,8 +385,8 @@ habtm association complains missing DB join table. To my surprise, Rails 4 has c
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/rails-4-changes-join-table-naming-convention/';
-        var disqus_url = 'http://ruby-journal.com/rails-4-changes-join-table-naming-convention/';
+        var disqus_identifier = 'http://ruby-journal.com/a-simple-shift-cipher-with-ruby/';
+        var disqus_url = 'http://ruby-journal.com/a-simple-shift-cipher-with-ruby/';
         var disqus_script = 'embed.js';
       
     (function () {
