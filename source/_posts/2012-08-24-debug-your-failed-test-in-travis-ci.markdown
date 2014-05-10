@@ -18,6 +18,10 @@ Read on as I show you how
 <br/>
 <!--more-->
 
+
+_UPDATE_: The below solution no longer works with current Travis, I've contacted Josh and he advises
+to contact support@travisci.org and Travis would open a VM for you.
+
 In one occassion, I had a failed Ruby test on Travis which infact passed on my local box. So I tried
 to put in `debugger` and see if Travis could let me drop into Irb or not. It turns out Travis hang
 for quite a while until timed out. So debug remotely doesn't work.

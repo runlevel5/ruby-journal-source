@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-05-10T13:25:34+10:00</updated>
+  <updated>2014-05-10T13:54:55+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -18,7 +18,8 @@
     <link href="http://ruby-journal.com/a-simple-shift-cipher-with-ruby/"/>
     <updated>2014-04-27T01:28:00+10:00</updated>
     <id>http://ruby-journal.com/a-simple-shift-cipher-with-ruby</id>
-    <content type="html"><![CDATA[
+    <content type="html"><![CDATA[<p>(WIP)</p>
+
 <p>Crytography was born thousands years ago, dating back to early day of the Roman which Ceasar
 used a very simple form of substitution cipher to encrypt military message. Nowaday cryptography
 is much more complex and virtually not solveable in some cases (well until quantum computing).</p>

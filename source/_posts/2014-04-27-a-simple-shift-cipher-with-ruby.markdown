@@ -7,7 +7,7 @@ tags: ruby, crytography
 author: "Trung Lê"
 ---
 
-{{ post.title }}
+{{ post.title }} (WIP)
 
 Crytography was born thousands years ago, dating back to early day of the Roman which Ceasar
 used a very simple form of substitution cipher to encrypt military message. Nowaday cryptography
