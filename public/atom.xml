@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-05-05T12:36:37+10:00</updated>
+  <updated>2014-05-10T13:25:34+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -99,9 +99,12 @@ to the right by a <em>key</em>.</p>
 <span class="line-number">20</span>
 <span class="line-number">21</span>
 <span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">ShiftCipher</span>
 </span><span class="line">
-</span><span class="line">  <span class="no">LATIN_RANGE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="o">.</span><span class="n">.</span><span class="mi">127</span><span class="p">)</span>
+</span><span class="line">  <span class="no">LATIN_RANGE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="o">.</span><span class="n">.</span><span class="mi">127</span><span class="p">)</span><span class="o">.</span><span class="n">to_a</span><span class="o">.</span><span class="n">freeze</span>
 </span><span class="line">
 </span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">encrypt</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">:</span> <span class="mi">3</span><span class="p">)</span>
 </span><span class="line">    <span class="n">to_string</span><span class="p">(</span><span class="n">shift_bytes</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">))</span>
@@ -114,7 +117,10 @@ to the right by a <em>key</em>.</p>
 </span><span class="line">  <span class="k">end</span>
 </span><span class="line">
 </span><span class="line">  <span class="k">def</span> <span class="nc">seflf</span><span class="o">.</span><span class="nf">shift_byte</span><span class="p">(</span><span class="n">byte</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">)</span>
+</span><span class="line">    <span class="k">while</span> <span class="p">(</span><span class="n">bye</span> <span class="o">+</span> <span class="n">shift_key</span><span class="p">)</span> <span class="o">&gt;</span> <span class="no">LATIN_RANGE</span><span class="o">.</span><span class="n">last</span>
+</span><span class="line">      <span class="n">i</span> <span class="o">=</span> <span class="p">((</span><span class="n">bye</span> <span class="o">+</span> <span class="n">shift_key</span><span class="p">)</span> <span class="o">-</span> <span class="no">LATIN_RANGE</span><span class="o">.</span><span class="n">last</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 </span><span class="line">
+</span><span class="line">    <span class="k">end</span>
 </span><span class="line">  <span class="k">end</span>
 </span><span class="line">
 </span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">to_string</span><span class="p">(</span><span class="n">bytes</span><span class="p">)</span>
@@ -302,19 +308,75 @@ and the serializer must have 2 methods <code>load</code> and <code>dump</code>.<
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[How to override :id param for Rails resource routing]]></title>
-    <link href="http://ruby-journal.com/how-to-override-default-id-param-for-rails-resource-routing/"/>
+    <title type="html"><![CDATA[How to override default primary key id in Rails]]></title>
+    <link href="http://ruby-journal.com/how-to-override-default-primary-key-id-in-rails/"/>
     <updated>2014-04-18T10:28:00+10:00</updated>
-    <id>http://ruby-journal.com/how-to-override-default-id-param-for-rails-resource-routing</id>
+    <id>http://ruby-journal.com/how-to-override-default-primary-key-id-in-rails</id>
     <content type="html"><![CDATA[
-<p>By default, every resource routing is generated with <code>:id</code> as the identifier param.
-What if you want to change this <code>:id</code> to something? Read on and I&#8217;ll show you how.</p>
+<p>Rails is all about Convention over Configuration, this includes the DB primary key,
+which is always set to be <code>id</code> column. What if you want to use different column
+as your primary key? Read on and I&#8217;ll show you how.</p>
 
 <!--more-->
 
-<p>When I was working with Spree, there is a requirement to find Order by its <code>number</code>
-column. The way Spree solved this problem (this is pre-Rails 4 era), is to override
-the <code>Order#to_param</code>:</p>
+<p>NOTE: This article is written for Rails 4.1.1 /w Postgres</p>
+
+<h2 id="usecase">Usecase</h2>
+
+<p>My webstore uses a special string ID, called <code>sku</code>, this ID is unique and queried
+instead of <code>id</code> column. For the sake of simplicty, I use Rails scaffolding:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ rails g scaffold products sku</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="what-is-primary-key">What is primary key?</h2>
+
+<p>A column is called a primay key when it is:</p>
+
+<ul>
+  <li>has not NULL constraint</li>
+  <li>has UNIQUE contraint</li>
+  <li>has index</li>
+</ul>
+
+<p>We could prove this by checking out DB schema:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ rails db
+</span><span class="line">psql (9.3.4)
+</span><span class="line">Type "help" for help.
+</span><span class="line">
+</span><span class="line">webstote_development=# \d products
+</span><span class="line">                                     Table "public.products"
+</span><span class="line">   Column   |            Type             |                       Modifiers
+</span><span class="line">------------+-----------------------------+-------------------------------------------------------
+</span><span class="line"> id         | integer                     | not null default nextval('products_id_seq'::regclass)
+</span><span class="line"> sku        | character varying(255)      |
+</span><span class="line"> created_at | timestamp without time zone |
+</span><span class="line"> updated_at | timestamp without time zone |
+</span><span class="line">Indexes:
+</span><span class="line">    "products_pkey" PRIMARY KEY, btree (id)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The above output clearly indicates that at DB level, is is NOT NULL, is PRIMARY_KEY and indexed.</p>
+
+<p>According to Postgres doc, PRIMARY_KEY constraint is a combination of a unique constraint and a not-null constraint.</p>
+
+<h2 id="migration">Migration</h2>
+
+<p>We have following migration:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -324,31 +386,339 @@ the <code>Order#to_param</code>:</p>
 <span class="line-number">6</span>
 <span class="line-number">7</span>
 <span class="line-number">8</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># app/models/order.rb</span>
-</span><span class="line"><span class="k">def</span> <span class="nf">to_param</span>
-</span><span class="line">  <span class="n">number</span><span class="o">.</span><span class="n">parameterize</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">CreateProducts</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">change</span>
+</span><span class="line">    <span class="n">create_table</span> <span class="ss">:products</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+</span><span class="line">      <span class="n">t</span><span class="o">.</span><span class="n">string</span> <span class="ss">:sku</span>
+</span><span class="line">
+</span><span class="line">      <span class="n">t</span><span class="o">.</span><span class="n">timestamps</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
 </span><span class="line"><span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="c1"># app/controllers/orders_controller.rb</span>
-</span><span class="line">
-</span><span class="line"><span class="vi">@order</span> <span class="o">=</span> <span class="no">Order</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:id</span><span class="o">]</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Now you might question, what is an <code>id</code>? Is it a reference to <code>id</code> column or a metaphor
-to an entity that acts as record ID? I don&#8217;t know, as far as I can tell, Rails does
-not want you to use other primary key.</p>
+<p>and we want to turn the <code>sku</code> column to be our primary key.</p>
 
-<p>IMHO, I would leave <code>params[:id]</code> as is and would use <code>params[:number]</code>.</p>
+<p>By convention, you would not see any code mention about the primary <code>id</code> column.
+This column is automatically created when you call method <code>create_table</code>.</p>
 
-<p>If you are on Rails 4, we can modify the resource ID param by specifying <code>param</code>:</p>
+<p>We can tell Rails not to create column id by parsing <code>id: false</code> options</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class="line">  <span class="n">create_table</span> <span class="ss">:products</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+</span><span class="line">    <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and then we tell Rails to turn <code>sku</code> to be primary key. After doing abit of research,
+I found method <code>ActiveRecord::ConnectionAdapters::TableDefinitiion#primary_key</code> with
+following code:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># File activerecord/lib/active_record/connection_adapters/abstract/schema_definitions.rb, line 68</span>
+</span><span class="line"><span class="k">def</span> <span class="nf">primary_key</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="ss">:primary_key</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="p">{})</span>
+</span><span class="line">  <span class="n">column</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">type</span><span class="p">,</span> <span class="n">options</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="ss">:primary_key</span> <span class="o">=&gt;</span> <span class="kp">true</span><span class="p">))</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Disecting the above shows that by using type <code>primary_key</code>, I could turn my column to primary key.
+I wonder what this type is. Let&#8217;s give it a go:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">create_table</span> <span class="ss">:products</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+</span><span class="line">  <span class="n">t</span><span class="o">.</span><span class="n">primary_key</span> <span class="ss">:sku</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">t</span><span class="o">.</span><span class="n">timestamps</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>after <code>rake db:migrate</code>, I check my DB schema again:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line">                                  <span class="no">Table</span> <span class="s2">&quot;public.products&quot;</span>
+</span><span class="line">   <span class="no">Column</span>   <span class="o">|</span>            <span class="no">Type</span>             <span class="o">|</span>                       <span class="no">Modifiers</span>
+</span><span class="line"><span class="o">------------+-----------------------------+--------------------------------------------------------</span>
+</span><span class="line"> <span class="n">sku</span>        <span class="o">|</span> <span class="n">integer</span>                     <span class="o">|</span> <span class="ow">not</span> <span class="n">null</span> <span class="n">default</span> <span class="n">nextval</span><span class="p">(</span><span class="s1">&#39;products_sku_seq&#39;</span><span class="o">::</span><span class="n">regclass</span><span class="p">)</span>
+</span><span class="line"> <span class="n">created_at</span> <span class="o">|</span> <span class="n">timestamp</span> <span class="n">without</span> <span class="n">time</span> <span class="n">zone</span> <span class="o">|</span>
+</span><span class="line"> <span class="n">updated_at</span> <span class="o">|</span> <span class="n">timestamp</span> <span class="n">without</span> <span class="n">time</span> <span class="n">zone</span> <span class="o">|</span>
+</span><span class="line"><span class="ss">Indexes</span><span class="p">:</span>
+</span><span class="line"><span class="s2">&quot;products_pkey&quot;</span> <span class="no">PRIMARY</span> <span class="no">KEY</span><span class="p">,</span> <span class="n">btree</span> <span class="p">(</span><span class="n">sku</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>sku</code> column is assigned with <code>integer</code> datatype, which is not correct. So <code>primary_key</code> type must be of <code>integer</code> type.</p>
+
+<p>Naively, I try other alternatives:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">create_table</span> <span class="ss">:products</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+</span><span class="line">  <span class="n">t</span><span class="o">.</span><span class="n">string</span> <span class="ss">:sku</span><span class="p">,</span> <span class="ss">primary</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">t</span><span class="o">.</span><span class="n">timestamps</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>OR</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">create_table</span> <span class="ss">:products</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+</span><span class="line">  <span class="n">t</span><span class="o">.</span><span class="n">string</span> <span class="ss">:sku</span><span class="p">,</span> <span class="n">primary_key</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">t</span><span class="o">.</span><span class="n">timestamps</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which doesn&#8217;t do anything. Meh :(</p>
+
+<p>It is okay, if Rails doesn&#8217;t let you do so, because you can still be able to do a workaround:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">CreateProducts</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">change</span>
+</span><span class="line">    <span class="n">create_table</span> <span class="ss">:products</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+</span><span class="line">      <span class="n">t</span><span class="o">.</span><span class="n">string</span> <span class="ss">:sku</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+</span><span class="line">
+</span><span class="line">      <span class="n">t</span><span class="o">.</span><span class="n">timestamps</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">execute</span> <span class="sx">%Q{ ALTER TABLE &quot;products&quot; ADD PRIMARY KEY (&quot;sku&quot;); }</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and bravo, it does the job! Hold on, there is a twist!</p>
+
+<p>our <code>db/schema.rb</code> says nothing about the contraint addition line, which makes
+sense because we are not using SQL format to preserve it.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">config</span><span class="o">.</span><span class="n">active_record</span><span class="o">.</span><span class="n">schema_format</span> <span class="o">=</span> <span class="ss">:sql</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>I don&#8217;t like this solution because I love readability of helper methods than SQL.</p>
+
+<p>I come up with better solution (IMHO), according to Postgres documentation:</p>
+
+<p>&#8220;a primary key constraint is simply a combination of a unique constraint and a not-null constraint&#8221;</p>
+
+<p>Let&#8217;s see how I do it:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">CreateProducts</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Migration</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">change</span>
+</span><span class="line">    <span class="n">create_table</span> <span class="ss">:products</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+</span><span class="line">      <span class="n">t</span><span class="o">.</span><span class="n">string</span> <span class="ss">:sku</span><span class="p">,</span> <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+</span><span class="line">
+</span><span class="line">      <span class="n">t</span><span class="o">.</span><span class="n">timestamps</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">add_index</span> <span class="ss">:products</span><span class="p">,</span> <span class="ss">:sku</span><span class="p">,</span> <span class="ss">unique</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and let&#8217;s check our schema:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line">           <span class="no">Table</span> <span class="s2">&quot;public.products&quot;</span>
+</span><span class="line">   <span class="no">Column</span>   <span class="o">|</span>            <span class="no">Type</span>             <span class="o">|</span> <span class="no">Modifiers</span>
+</span><span class="line"><span class="o">------------+-----------------------------+-----------</span>
+</span><span class="line"> <span class="n">sku</span>        <span class="o">|</span> <span class="n">character</span> <span class="n">varying</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span>      <span class="o">|</span> <span class="ow">not</span> <span class="n">null</span>
+</span><span class="line"> <span class="n">created_at</span> <span class="o">|</span> <span class="n">timestamp</span> <span class="n">without</span> <span class="n">time</span> <span class="n">zone</span> <span class="o">|</span>
+</span><span class="line"> <span class="n">updated_at</span> <span class="o">|</span> <span class="n">timestamp</span> <span class="n">without</span> <span class="n">time</span> <span class="n">zone</span> <span class="o">|</span>
+</span><span class="line"><span class="ss">Indexes</span><span class="p">:</span>
+</span><span class="line"><span class="s2">&quot;index_products_on_sku&quot;</span> <span class="no">UNIQUE</span><span class="p">,</span> <span class="n">btree</span> <span class="p">(</span><span class="n">sku</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Though our sku doesn&#8217;t have PRIMARY_KEY contrsaint, yet it is equivalent.</p>
+
+<p>And look at our <code>db/schema.rb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Schema</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="ss">version</span><span class="p">:</span> <span class="mi">20140510012730</span><span class="p">)</span> <span class="k">do</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1"># These are extensions that must be enabled in order to support this database</span>
+</span><span class="line">  <span class="n">enable_extension</span> <span class="s2">&quot;plpgsql&quot;</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">create_table</span> <span class="s2">&quot;products&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">force</span><span class="p">:</span> <span class="kp">true</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+</span><span class="line">    <span class="n">t</span><span class="o">.</span><span class="n">string</span>   <span class="s2">&quot;sku&quot;</span><span class="p">,</span>        <span class="ss">null</span><span class="p">:</span> <span class="kp">false</span>
+</span><span class="line">    <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="s2">&quot;created_at&quot;</span>
+</span><span class="line">    <span class="n">t</span><span class="o">.</span><span class="n">datetime</span> <span class="s2">&quot;updated_at&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">add_index</span> <span class="s2">&quot;products&quot;</span><span class="p">,</span> <span class="o">[</span><span class="s2">&quot;sku&quot;</span><span class="o">]</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s2">&quot;index_products_on_sku&quot;</span><span class="p">,</span> <span class="ss">unique</span><span class="p">:</span> <span class="kp">true</span><span class="p">,</span> <span class="ss">using</span><span class="p">:</span> <span class="ss">:btree</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>All lovely and readable ;)</p>
+
+<h2 id="model">Model</h2>
+
+<p>We tell our model <code>Product</code> to use <code>sku</code> as primay key:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="nb">self</span><span class="o">.</span><span class="n">primay_key</span> <span class="o">=</span> <span class="s1">&#39;sku&#39;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And you are set to go.</p>
+
+<p>Now I wonder if changing to different primary key, would it cause any side effect
+to method like <code>#find</code>. The answer is not at all, if we look into <code>ActiveRecord::AttributeMethods::PrimaryKey</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># File activerecord/lib/active_record/attribute_methods/primary_key.rb, line 17</span>
+</span><span class="line"><span class="k">def</span> <span class="nf">id</span>
+</span><span class="line">  <span class="n">sync_with_transaction_state</span>
+</span><span class="line">  <span class="n">read_attribute</span><span class="p">(</span><span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">primary_key</span><span class="p">)</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the <code>read_attribute(self.class.primary_key)</code> line tells us that it will reference to
+our <code>Product.primary_key</code>, that is <code>sku</code>. Therefore, we you call:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Product</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;SKU-01&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>it would generate SQL:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="sql"><span class="line"><span class="k">SELECT</span>  <span class="ss">&quot;products&quot;</span><span class="p">.</span><span class="o">*</span> <span class="k">FROM</span> <span class="ss">&quot;products&quot;</span>  <span class="k">WHERE</span> <span class="ss">&quot;products&quot;</span><span class="p">.</span><span class="ss">&quot;sku&quot;</span> <span class="o">=</span> <span class="err">$</span><span class="mi">1</span> <span class="k">LIMIT</span> <span class="mi">1</span>  <span class="p">[[</span><span class="ss">&quot;sku&quot;</span><span class="p">,</span> <span class="s1">&#39;SKU-01&#39;</span><span class="p">]]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and FYI, there is also writer method <code>#id=</code> that is provided by Rails:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="nb">p</span> <span class="o">=</span> <span class="no">Product</span><span class="o">.</span><span class="n">new</span>
+</span><span class="line"><span class="nb">p</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s1">&#39;SKU-02&#39;</span>
+</span><span class="line"><span class="nb">p</span><span class="o">.</span><span class="n">sku</span>
+</span><span class="line"><span class="c1"># SKU-02</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If you don&#8217;t like to use <code>#id</code> and <code>#id=</code>, you could override them in your class:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">id</span>
+</span><span class="line">    <span class="k">raise</span> <span class="no">NoMethodError</span><span class="p">,</span> <span class="s2">&quot;Please call </span><span class="si">#{</span><span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">primay_key</span><span class="si">}</span><span class="s2"> instead.&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">id</span><span class="o">=</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span class="line">    <span class="k">raise</span> <span class="no">NoMethodError</span><span class="p">,</span> <span class="s2">&quot;Please call </span><span class="si">#{</span><span class="nb">self</span><span class="o">.</span><span class="n">class</span><span class="o">.</span><span class="n">primay_key</span><span class="si">}</span><span class="s2">= instead.&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Be aware that <code>Product.find</code> won&#8217;t work anymore, and other Rails helper that relies
+on <code>id</code> will stop functioning. If you really want that, you need to override more
+methods and this seems too much of a pain for me. So I&#8217;d highly recommend you to
+leave <code>#id</code> as is.</p>
+
+<h1 id="routing">Routing</h1>
+
+<p>Our default rails is:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># config/routes.rb</span>
-</span><span class="line"><span class="n">resources</span> <span class="ss">:orders</span><span class="p">,</span> <span class="ss">param</span><span class="p">:</span> <span class="ss">:number</span>
+</span><span class="line"><span class="n">resources</span> <span class="ss">:products</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>and we double-check with:</p>
+<p>which by default will generate routes with reference to <code>:id</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -362,29 +732,108 @@ not want you to use other primary key.</p>
 <span class="line-number">10</span>
 </pre></td><td class="code"><pre><code class="text"><span class="line">bundle exec rake routes
 </span><span class="line">            Prefix Verb  URI Pattern                       Controller#Action
-</span><span class="line">           orders GET    /orders(.:format)                 orders#index
-</span><span class="line">                  POST   /orders(.:format)                 orders#create
-</span><span class="line">        new_order GET    /orders/new(.:format)             orders#new
-</span><span class="line">       edit_order GET    /orders/:number/edit(.:format)    orders#edit
-</span><span class="line">            order GET    /orders/:number(.:format)         orders#show
-</span><span class="line">                  PATCH  /orders/:number(.:format)         orders#update
-</span><span class="line">                  PUT    /orders/:number(.:format)         orders#update
-</span><span class="line">                  DELETE /orders/:number(.:format)         orders#destroy
+</span><span class="line">           products GET   /products(.:format)                 products#index
+</span><span class="line">                   POST   /products(.:format)                 products#create
+</span><span class="line">        new_product GET   /products/new(.:format)             products#new
+</span><span class="line">       edit_product GET   /products/:id/edit(.:format)        products#edit
+</span><span class="line">            product GET   /products/:id(.:format)             products#show
+</span><span class="line">                  PATCH   /products/:id(.:format)             products#update
+</span><span class="line">                    PUT   /products/:id(.:format)             products#update
+</span><span class="line">                 DELETE   /products/:id(.:format)             products#destroy
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Please be noted that you need to modify the <code>OrdersController</code> to find Order record
-with <code>params[:number]</code> instead of <code>params[:id]</code>.</p>
+<p>With Rails 4, you can change <code>:id</code> to <code>:sku</code> with:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># app/controllers/orders_controller.rb</span>
-</span><span class="line"><span class="vi">@order</span> <span class="o">=</span> <span class="no">Order</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:number</span><span class="o">]</span><span class="p">)</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># config/routes.rb</span>
+</span><span class="line"><span class="n">resources</span> <span class="ss">:products</span><span class="p">,</span> <span class="n">param</span> <span class="ss">:sku</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Please be noted that, we still need to override the <code>Order#to_param</code> to ensure that
-it comply to URI.</p>
+<p>our routes would be:</p>
 
-<p>That&#8217;s all for today!</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">bundle exec rake routes
+</span><span class="line">            Prefix Verb  URI Pattern                       Controller#Action
+</span><span class="line">           products GET   /products(.:format)              products#index
+</span><span class="line">                   POST   /products(.:format)              products#create
+</span><span class="line">        new_product GET   /products/new(.:format)          products#new
+</span><span class="line">       edit_product GET   /products/:sku/edit(.:format)    products#edit
+</span><span class="line">            product GET   /products/:sku(.:format)         products#show
+</span><span class="line">                  PATCH   /products/:sku(.:format)         products#update
+</span><span class="line">                    PUT   /products/:sku(.:format)         products#update
+</span><span class="line">                 DELETE   /products/:sku(.:format)         products#destroy
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted that you need to modify the <code>ProductssController</code> to find Order record
+with <code>params[:sku]</code> instead of <code>params[:id]</code>.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># app/controllers/products_controller.rb</span>
+</span><span class="line"><span class="k">def</span> <span class="nf">set_product</span>
+</span><span class="line">  <span class="vi">@product</span> <span class="o">=</span> <span class="no">Product</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:sku</span><span class="o">]</span><span class="p">)</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="uri">URI</h2>
+
+<p>For example if we have a Product with a very non-URI friendly SKU like: &#8216;SKU 001&#8217;,
+when we access our <code>ProductsController#show</code>, we would have following URL:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">http</span><span class="p">:</span><span class="sr">//</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="no">SKU</span><span class="o">%</span><span class="mi">23001</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>to make our primary key URI friendly, we could override <code>#to_param</code> method. By
+convention, Rails would call this method to work out the routing URI:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">to_param</span>
+</span><span class="line">    <span class="n">sku</span><span class="o">.</span><span class="n">parameterize</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and the URI turns to:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">http</span><span class="p">:</span><span class="sr">//</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="o">.</span><span class="mi">0</span><span class="p">:</span><span class="mi">3000</span><span class="o">/</span><span class="n">products</span><span class="o">/</span><span class="no">SKU</span><span class="o">-</span><span class="mo">001</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Rails is all about CoC, for most of the cases, you should stick to it. However you could
+override the convention by:</p>
+
+<ul>
+  <li>Adding NOT NULL and UNIQUE contrainst to column you want to be the primary key</li>
+  <li>Set <code>self.primary_key</code> for the model</li>
+  <li>Set <code>param</code> for your routing</li>
+  <li>Override <code>#to_param</code> for friendly URI</li>
+</ul>
+
+<p>That&#8217;s all for today. Please leave comments if you have any question.</p>
 ]]></content>
   </entry>
   

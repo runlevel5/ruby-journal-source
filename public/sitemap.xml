@@ -153,10 +153,8 @@
         <lastmod>2014-04-21T07:47:58+10:00</lastmod>
     </url>
     <url>
-        <loc>
-            http://ruby-journal.com/how-to-override-default-id-param-for-rails-resource-routing/
-        </loc>
-        <lastmod>2014-05-05T12:36:26+10:00</lastmod>
+        <loc>http://ruby-journal.com/how-to-override-default-primary-key-id-in-rails/</loc>
+        <lastmod>2014-05-10T13:25:25+10:00</lastmod>
     </url>
     <url>
         <loc>
@@ -166,14 +164,14 @@
     </url>
     <url>
         <loc>http://ruby-journal.com/a-simple-shift-cipher-with-ruby/</loc>
-        <lastmod>2014-04-27T02:25:22+10:00</lastmod>
+        <lastmod>2014-05-05T12:44:43+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2014-05-05T12:36:26+10:00</lastmod>
+        <lastmod>2014-05-10T13:25:25+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2014-05-05T12:36:26+10:00</lastmod>
+        <lastmod>2014-05-10T13:25:25+10:00</lastmod>
     </url>
 </urlset>

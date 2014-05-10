@@ -185,9 +185,12 @@ to the right by a <em>key</em>.</p>
 <span class="line-number">20</span>
 <span class="line-number">21</span>
 <span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">ShiftCipher</span>
 </span><span class="line">
-</span><span class="line">  <span class="no">LATIN_RANGE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="o">.</span><span class="n">.</span><span class="mi">127</span><span class="p">)</span>
+</span><span class="line">  <span class="no">LATIN_RANGE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="o">.</span><span class="n">.</span><span class="mi">127</span><span class="p">)</span><span class="o">.</span><span class="n">to_a</span><span class="o">.</span><span class="n">freeze</span>
 </span><span class="line">
 </span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">encrypt</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">:</span> <span class="mi">3</span><span class="p">)</span>
 </span><span class="line">    <span class="n">to_string</span><span class="p">(</span><span class="n">shift_bytes</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">))</span>
@@ -200,7 +203,10 @@ to the right by a <em>key</em>.</p>
 </span><span class="line">  <span class="k">end</span>
 </span><span class="line">
 </span><span class="line">  <span class="k">def</span> <span class="nc">seflf</span><span class="o">.</span><span class="nf">shift_byte</span><span class="p">(</span><span class="n">byte</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">)</span>
+</span><span class="line">    <span class="k">while</span> <span class="p">(</span><span class="n">bye</span> <span class="o">+</span> <span class="n">shift_key</span><span class="p">)</span> <span class="o">&gt;</span> <span class="no">LATIN_RANGE</span><span class="o">.</span><span class="n">last</span>
+</span><span class="line">      <span class="n">i</span> <span class="o">=</span> <span class="p">((</span><span class="n">bye</span> <span class="o">+</span> <span class="n">shift_key</span><span class="p">)</span> <span class="o">-</span> <span class="no">LATIN_RANGE</span><span class="o">.</span><span class="n">last</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 </span><span class="line">
+</span><span class="line">    <span class="k">end</span>
 </span><span class="line">  <span class="k">end</span>
 </span><span class="line">
 </span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">to_string</span><span class="p">(</span><span class="n">bytes</span><span class="p">)</span>
@@ -293,7 +299,7 @@ to the right by a <em>key</em>.</p>
       </li>
     
       <li class="post">
-        <a href="/how-to-override-default-id-param-for-rails-resource-routing/">How to override :id param for Rails resource routing</a>
+        <a href="/how-to-override-default-primary-key-id-in-rails/">How to override default primary key id in Rails</a>
       </li>
     
       <li class="post">
