@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-05-10T13:54:55+10:00</updated>
+  <updated>2014-05-23T14:39:09+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -14,126 +14,34 @@
 
   
   <entry>
-    <title type="html"><![CDATA[A simple shift cipher with Ruby]]></title>
-    <link href="http://ruby-journal.com/a-simple-shift-cipher-with-ruby/"/>
-    <updated>2014-04-27T01:28:00+10:00</updated>
-    <id>http://ruby-journal.com/a-simple-shift-cipher-with-ruby</id>
-    <content type="html"><![CDATA[<p>(WIP)</p>
-
-<p>Crytography was born thousands years ago, dating back to early day of the Roman which Ceasar
-used a very simple form of substitution cipher to encrypt military message. Nowaday cryptography
-is much more complex and virtually not solveable in some cases (well until quantum computing).</p>
-
-<p>Today I am going to show how to implement the <a href="http://en.wikipedia.org/wiki/Caesar_cipher">Caesar&#8217;s Cipher</a>
-with improvements:</p>
-
-<ul>
-  <li>Based on Unicode table</li>
-  <li>Accept case sensitive</li>
-</ul>
-
-<p>Read on you&#8217;ll be surprised how easy it is with Ruby!</p>
+    <title type="html"><![CDATA[Override ordering with ActiveRecord]]></title>
+    <link href="http://ruby-journal.com/override-ordering-with-activerecord/"/>
+    <updated>2014-05-23T14:33:00+10:00</updated>
+    <id>http://ruby-journal.com/override-ordering-with-activerecord</id>
+    <content type="html"><![CDATA[
+<p>If your ActiveRecord models happen to have default ordering scope, you could override
+this ordering scope in queries by using <code>reorder</code> method.</p>
 
 <!--more-->
 
-<h2 id="concept">Concept</h2>
-
-<p>The concept is pretty much the same with Caesar&#8217;s Cipher in which character is shifted
-by a key to the left to generate encrypted text. You can read more about it on WWW.</p>
-
-<h2 id="implementation">Implementation</h2>
-
-<p>Unicode characters are mapped to Unicode table and are represented with
-number in bytes.</p>
-
-<p>English alphabets are basic Latin which are mapped in range 32 -&gt; 127 on Unicode table.
-See the <a href="http://unicode-table.com/en/#basic-latin">table</a></p>
-
-<p>The trick is to convert the message to digit so we could shift the
-position of each character.</p>
-
-<p>Ruby comes with method <code>String#bytes</code> that yields the bytecode of the string, eg:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="s2">&quot;Super Secret&quot;</span><span class="o">.</span><span class="n">bytes</span>
-</span><span class="line"><span class="c1">#=&gt; [83, 117, 112, 101, 114, 32, 83, 101, 99, 114, 101, 116]</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And to get back our original text, we use <code>String#pack</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="o">[</span><span class="mi">83</span><span class="p">,</span> <span class="mi">117</span><span class="p">,</span> <span class="mi">112</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">114</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">114</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">116</span><span class="o">].</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;U*&#39;</span><span class="p">)</span>
-</span><span class="line"><span class="c1">#=&gt; &quot;Super Secret&quot;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The argument &#8216;U*&#8217; means unicode. Google if you want to know other arguments
-for this method.</p>
-
-<p>All the hard work! Ruby has made hard things trivial.</p>
-
-<h3 id="encryption">Encryption</h3>
-
-<p>Now we could implement our encrytion easily by shifting the byte number
-to the right by a <em>key</em>.</p>
+<p>Imagine we have a model like this:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-<span class="line-number">24</span>
-<span class="line-number">25</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">ShiftCipher</span>
-</span><span class="line">
-</span><span class="line">  <span class="no">LATIN_RANGE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="o">.</span><span class="n">.</span><span class="mi">127</span><span class="p">)</span><span class="o">.</span><span class="n">to_a</span><span class="o">.</span><span class="n">freeze</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">encrypt</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">:</span> <span class="mi">3</span><span class="p">)</span>
-</span><span class="line">    <span class="n">to_string</span><span class="p">(</span><span class="n">shift_bytes</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">))</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line">  <span class="kp">private</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">shift_bytes</span><span class="p">(</span><span class="n">bytes</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">)</span>
-</span><span class="line">    <span class="n">bytes</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span> <span class="n">i</span> <span class="o">+</span> <span class="n">shift_key</span> <span class="p">}</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nc">seflf</span><span class="o">.</span><span class="nf">shift_byte</span><span class="p">(</span><span class="n">byte</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">)</span>
-</span><span class="line">    <span class="k">while</span> <span class="p">(</span><span class="n">bye</span> <span class="o">+</span> <span class="n">shift_key</span><span class="p">)</span> <span class="o">&gt;</span> <span class="no">LATIN_RANGE</span><span class="o">.</span><span class="n">last</span>
-</span><span class="line">      <span class="n">i</span> <span class="o">=</span> <span class="p">((</span><span class="n">bye</span> <span class="o">+</span> <span class="n">shift_key</span><span class="p">)</span> <span class="o">-</span> <span class="no">LATIN_RANGE</span><span class="o">.</span><span class="n">last</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">to_string</span><span class="p">(</span><span class="n">bytes</span><span class="p">)</span>
-</span><span class="line">    <span class="n">bytes</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;U*&#39;</span><span class="p">)</span>
-</span><span class="line">  <span class="k">end</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">default_scope</span> <span class="p">{</span> <span class="n">order</span><span class="p">(</span><span class="ss">:updated_at</span><span class="p">)</span> <span class="p">}</span>
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>33 - 3 -32</p>
+<p>All queries would include this scope by default. If you want to override this scope,
+you can apply <code>reorder</code> to the query chain:</p>
 
-<p>-2</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">query_chain</span><span class="o">.</span><span class="n">reorder</span><span class="p">(</span><span class="ss">:order_index</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<p>That&#8217;s it for today folks!</p>
 ]]></content>
   </entry>
   
