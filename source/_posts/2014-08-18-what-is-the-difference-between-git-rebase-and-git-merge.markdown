@@ -134,7 +134,7 @@ want to reflect the true ordering of commits.
 For mosts of cases, I use `git merge` because of following cons of `git rebase`:
 
 * Cannot push to remote feature branch because the history of local and remote is mistmached.
-And the only way to push it to remove branch is to use `git push --force` or being
+And the only way to push it to remote branch is to use `git push --force` or being
 explictily `git push origin <name-of-branch> --force` for the sake of avoiding pushing
 into wrong branch. And this could cause lots of issue if you. (I did, so I know)
 * Recursive pain and pain and pain when resolving conflicts
