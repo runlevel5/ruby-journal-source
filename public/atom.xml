@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-05-23T14:39:09+10:00</updated>
+  <updated>2014-08-18T13:55:06+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,175 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[What is the difference between git rebase and git merge]]></title>
+    <link href="http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge/"/>
+    <updated>2014-08-18T13:52:00+10:00</updated>
+    <id>http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge</id>
+    <content type="html"><![CDATA[
+<p>There are many people who asked me about the differences between <code>git rebase</code> vs <code>git merge</code>.
+Read on if you want to know :-)</p>
+
+<!--more-->
+
+<p>Here is my simple explanation with real examples:</p>
+
+<p>1) Create an empty project:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">mkdir demo
+</span><span class="line">cd demo
+</span><span class="line">git init .</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>2) Create first file</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">touch README.md
+</span><span class="line">git add README.md
+</span><span class="line">git commit -m 'Add README.md'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>3) Create 2 separate branches from master branch, ie 1 for rebase testing and other for merge testing</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout master -b rebase-test
+</span><span class="line">git checkout master -b merge-test</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>double check and you shall see 2 new branches:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout master
+</span><span class="line">git branch
+</span><span class="line">* master
+</span><span class="line">  merge-test
+</span><span class="line">  rebase-test</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>4) Now let&#8217;s make some unique changes in our new branches</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout rebase-test
+</span><span class="line">touch hello.txt
+</span><span class="line">git add hello.txt
+</span><span class="line">git commit -m 'A hello from rebase branch'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout merge-test
+</span><span class="line">touch bye.txt
+</span><span class="line">git add bye.txt
+</span><span class="line">git commit -m 'A goodbye from merge branch'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>5) Okay, now let&#8217;s go back to our master branch and change
+our README.md</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout master
+</span><span class="line">echo "WTF" &gt;&gt; README.md
+</span><span class="line">git add README.md
+</span><span class="line">git commit -m 'WTF README'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>6) Now we have a new changes in master and we need to rebase
+our 2 branches to be up-to-date with changes made in master.
+The wording &#8216;rebase&#8217; here does not mean <code>git rebase</code>, it means
+to sync feature branch with master branch</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout rebase-test
+</span><span class="line">git rebase master
+</span><span class="line">
+</span><span class="line">git checkout merge-test
+</span><span class="line">git merge master
+</span><span class="line"># accept the default new commit message and save</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>7) Let&#8217;s compare the log tree:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout rebase-test
+</span><span class="line">git log --graph --pretty=oneline --abbrev-commit
+</span><span class="line">* 933dae8 A hello from rebase branch
+</span><span class="line">* 8142960 WTF README
+</span><span class="line">* 0497b20 Add README</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout merge-test
+</span><span class="line">git log --graph --pretty=oneline --abbrev-commit
+</span><span class="line">*   1af5ec5 Merge branch 'master' into merge-test
+</span><span class="line">|\
+</span><span class="line">| * 8142960 WTF README
+</span><span class="line">* | 278a115 A goodbye from merge branch
+</span><span class="line">|/
+</span><span class="line">* 0497b20 Add README</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The commit that is at the top of the commit is the latest commit.</p>
+
+<p>Paying close attention to log tree of <code>rebase-test</code>, we could see that
+commit <code>933dae8 A hello from rebase branch</code> is pushed to the top, higher
+than the master (which is created later) <code>8142960 WTF README</code>.</p>
+
+<p>Compared to the log tree of <code>merge-test</code>, we can clearly see that it
+is the other way around, that is the master commit <code>8142960 WTF README</code>
+is placed to the top and higher than the commit <code>278a115 A goodbye from merge branch</code>.
+Plus, an additional commit (or what I called meta-commit) <code>1af5ec5 Merge branch 'master' into merge-test</code>
+is also created.</p>
+
+<p>Okay, now you might ask WTF? Why people come up with 2 different ways
+to do rebase? Isn&#8217;t the world too complicated already? Well, the answer
+lies in how you want to rewrite history (Every crazy men who wants to
+take on the world do). You use <code>git rebase</code> if you want your changes in
+the feature branch to always the latest. And you use <code>git merge</code> if you
+want to reflect the true ordering of commits.</p>
+
+<p>For mosts of cases, I use <code>git merge</code> because of following cons of <code>git rebase</code>:</p>
+
+<ul>
+  <li>Cannot push to remote feature branch because the history of local and remote is mistmached.
+And the only way to push it to remove branch is to use <code>git push --force</code> or being
+explictily <code>git push origin &lt;name-of-branch&gt; --force</code> for the sake of avoiding pushing
+into wrong branch. And this could cause lots of issue if you. (I did, so I know)</li>
+  <li>Recursive pain and pain and pain when resolving conflicts</li>
+</ul>
+
+<p>The only cons that I know about <code>git merge</code> is that you have a long list of many
+commits which could be hard on eyes. However I find it is not really an issue because
+the log tree show the merged trees very clearly.</p>
+
+<p>I guess that&#8217;s it for today folks. See you in another how to for dummies from me!</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Override ordering with ActiveRecord]]></title>
@@ -2713,88 +2882,6 @@ habtm association complains missing DB join table. To my surprise, Rails 4 has c
 <p>This technique mitigates regressions. And you can always go back to renaming if you feel like after stablising the build.</p>
 
 <p>I can see that Rails 4 try to be smart by detecting duplication in model naming. I welcome this sort of change as it would reduce the complexity in the naming. Furthermore, if you bump into this issue, it is very likely that you should rethink your model naming.</p>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to track changes of a model in a `after_callbacks` in Rails 3 or newer]]></title>
-    <link href="http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/"/>
-    <updated>2013-09-23T16:43:00+10:00</updated>
-    <id>http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer</id>
-    <content type="html"><![CDATA[
-<p>You can track changes to a ActiveRecord model with <code>ActiveRecord::Dirty#changed?</code>. Yet there is one caveat though, the tracking is lost after the model is saved. In this tutorial I&#8217;ll show how to track the changes to a record even the record has been saved, this comes handy when being used with ActiveRecord <code>after</code> callbacks</p>
-
-<!--more-->
-
-<p>Imagine that we have a <code>Product</code> model with <code>name</code>, we make change to <code>name</code> with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name</span> <span class="c1"># =&gt; &quot;Diamond&quot;</span>
-</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Ruby&#39;</span>
-</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">changed?</span> <span class="c1"># =&gt; true</span>
-</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name_changed?</span> <span class="c1"># =&gt; true</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>By using ActiveRecord::Dirty, we could tell if the model or attribute <code>name</code> is changed.</p>
-
-<p>If we save our model</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">save</span>
-</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">changed?</span> <span class="c1"># =&gt; false</span>
-</span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name_changed?</span> <span class="c1"># =&gt; false</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The <code>false</code> value indicates that ActiveRecord::Dirty is not persisent after the model is saved. What if now you are being asked to add in a code to notify the inventory system if product name is changed? We can
-simply workaround by using <code>around</code> callback. Here is details:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="n">around_update</span> <span class="ss">:notify_systtem_if_name_is_changed</span>
-</span><span class="line">
-</span><span class="line">  <span class="kp">private</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nf">notify_systtem_if_name_is_changed</span>
-</span><span class="line">    <span class="n">name_changed</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">name_changed?</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">yield</span>
-</span><span class="line">
-</span><span class="line">    <span class="n">notify_system</span> <span class="k">if</span> <span class="n">named_changed</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p><code>around</code> callback is introduced in Rails 3. This callback consists of 3 parts:</p>
-
-<ul>
-  <li>The part before <code>yield</code> is codes prior to the action is called</li>
-  <li>The <code>yield</code> is action that gets called</li>
-  <li>The part after <code>yield</code> is codes after the action is called</li>
-</ul>
-
-<p>In our example above, we store the changing state of attribute <code>name</code> into <code>named_change</code> variable. The <code>yield</code> executes the <code>update</code> action. The changing state then can be referenced afterward and will send out notification if name is truly changed.</p>
-
-<p>The <code>around</code> callbacks are very powerful features of ActiveRecord. I hope that you should take advantage of it more. See you in the next tutorial.</p>
 
 ]]></content>
   </entry>

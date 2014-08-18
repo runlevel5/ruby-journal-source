@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Debug your failed test in Travis CI - Ruby Journal</title>
+  <title>What is the difference between git rebase and git merge - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Ever wondering why some tests passed locally but failed on Travis?
-Ever questioning how could I go about to debug why that failed test on remote &hellip;">
+  <meta name="description" content="There are many people who asked me about the differences between git rebase vs git merge.
+Read on if you want to know :-) Here is my simple &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ Ever questioning how could I go about to debug why that failed test on remote &h
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/">
+  <link rel="canonical" href="http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +79,7 @@ Ever questioning how could I go about to debug why that failed test on remote &h
   
   <header>
     
-      <h1 class="entry-title">Debug Your Failed Test in Travis CI</h1>
+      <h1 class="entry-title">What Is the Difference Between Git Rebase and Git Merge</h1>
     
     
       <p class="meta">
@@ -95,7 +95,7 @@ Ever questioning how could I go about to debug why that failed test on remote &h
   
 
 
-<time datetime="2012-08-24T13:04:00+10:00" pubdate data-updated="true">Aug 24<span>th</span>, 2012</time>
+<time datetime="2014-08-18T13:52:00+10:00" pubdate data-updated="true">Aug 18<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,94 +105,165 @@ Ever questioning how could I go about to debug why that failed test on remote &h
 
 
 <div class="entry-content">
-<p>Ever wondering why some tests passed locally but failed on Travis?
-Ever questioning how could I go about to debug why that failed test on remote Travis?
-Read on as I show you how</p>
+<p>There are many people who asked me about the differences between <code>git rebase</code> vs <code>git merge</code>.
+Read on if you want to know :-)</p>
 
-<p><br />
-<br />
-<br />
-<!--more--></p>
+<!--more-->
 
-<p><em>UPDATE</em>: The below solution no longer works with current Travis, I&#8217;ve contacted Josh and he advises
-to contact support@travisci.org and Travis would open a VM for you.</p>
+<p>Here is my simple explanation with real examples:</p>
 
-<p>In one occassion, I had a failed Ruby test on Travis which infact passed on my local box. So I tried
-to put in <code>debugger</code> and see if Travis could let me drop into Irb or not. It turns out Travis hang
-for quite a while until timed out. So debug remotely doesn&#8217;t work.</p>
-
-<p>Right, plan B then. I spent some time dig into Travis documentation and learned that Travis server
-provisioned new VM image for every test. So if I could get my hand on the VMs, I could replicate the
-same environment that Travis run the test locally. Sound rational, doesn&#8217;t it? Unfortunately, I could
-not find any traces nor URL where to download those VMs. Thanks to Josh at Travis, he sent me the URL
-to VMs.</p>
-
-<h2 id="download-vm">Download VM</h2>
-
-<p>Travis VM are packaged Vagrant box.</p>
-
-<p>You coud download VM here at:</p>
+<p>1) Create an empty project:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">files.travis-ci.org/boxes/provisioned/travis-(box_name).box</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">mkdir demo
+</span><span class="line">cd demo
+</span><span class="line">git init .</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>in which <code>(box_name)</code> is the language you use, <code>ruby</code>, <code>php</code>, etc.</p>
-
-<p>For my case, I was testing a Rails app, so I downloaded the ruby box:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">wget files.travis-ci.org/boxes/provisioned/travis-ruby.box</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Please note that those files are large in size ~&gt; 3GB</p>
-
-<h2 id="install-vagrant">Install Vagrant</h2>
-
-<p>Head to http://vagrantup.com/ and download the package for your OS.</p>
-
-<h2 id="install-virtualbox">Install Virtualbox</h2>
-
-<p>Head to https://www.virtualbox.org/ and download the app for your OS.</p>
-
-<h2 id="import-the-vm-box">Import the VM box</h2>
-
-<p>Once you have downloaded the VM box, the image can be imported to your system. In my case:</p>
+<p>2) Create first file</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant box add travis-ruby travis-ruby.box</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">touch README.md
+</span><span class="line">git add README.md
+</span><span class="line">git commit -m 'Add README.md'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>If imported successfully, you should be able to see <code>travis-ruby</code> in the box list with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant box list</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<h2 id="bootstrap">Bootstrap</h2>
-
-<p>Let&#8217;s get our box up so we could SSH and start playing around with it:</p>
+<p>3) Create 2 separate branches from master branch, ie 1 for rebase testing and other for merge testing</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant init travis-ruby</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout master -b rebase-test
+</span><span class="line">git checkout master -b merge-test</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>A new <code>Vargrantfile</code> will be created for you in the current folder.
-We could bring the box up with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant up</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And now you can SSH into with:</p>
+<p>double check and you shall see 2 new branches:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ vagrant ssh</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout master
+</span><span class="line">git branch
+</span><span class="line">* master
+</span><span class="line">  merge-test
+</span><span class="line">  rebase-test</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Once you are in the box terminal, we run the post-install script:</p>
+<p>4) Now let&#8217;s make some unique changes in our new branches</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ sh ./postinstall.sh</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout rebase-test
+</span><span class="line">touch hello.txt
+</span><span class="line">git add hello.txt
+</span><span class="line">git commit -m 'A hello from rebase branch'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>This script install all essential packages like compilers, libraries.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout merge-test
+</span><span class="line">touch bye.txt
+</span><span class="line">git add bye.txt
+</span><span class="line">git commit -m 'A goodbye from merge branch'</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<h2 id="debug-your-test">Debug your test</h2>
+<p>5) Okay, now let&#8217;s go back to our master branch and change
+our README.md</p>
 
-<p>Copy your application to this VM box via <code>scp</code> or <code>git clone</code> and debug the test like you debug it on your local box.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout master
+</span><span class="line">echo "WTF" &gt;&gt; README.md
+</span><span class="line">git add README.md
+</span><span class="line">git commit -m 'WTF README'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>6) Now we have a new changes in master and we need to rebase
+our 2 branches to be up-to-date with changes made in master.
+The wording &#8216;rebase&#8217; here does not mean <code>git rebase</code>, it means
+to sync feature branch with master branch</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout rebase-test
+</span><span class="line">git rebase master
+</span><span class="line">
+</span><span class="line">git checkout merge-test
+</span><span class="line">git merge master
+</span><span class="line"># accept the default new commit message and save</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>7) Let&#8217;s compare the log tree:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout rebase-test
+</span><span class="line">git log --graph --pretty=oneline --abbrev-commit
+</span><span class="line">* 933dae8 A hello from rebase branch
+</span><span class="line">* 8142960 WTF README
+</span><span class="line">* 0497b20 Add README</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git checkout merge-test
+</span><span class="line">git log --graph --pretty=oneline --abbrev-commit
+</span><span class="line">*   1af5ec5 Merge branch 'master' into merge-test
+</span><span class="line">|\
+</span><span class="line">| * 8142960 WTF README
+</span><span class="line">* | 278a115 A goodbye from merge branch
+</span><span class="line">|/
+</span><span class="line">* 0497b20 Add README</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The commit that is at the top of the commit is the latest commit.</p>
+
+<p>Paying close attention to log tree of <code>rebase-test</code>, we could see that
+commit <code>933dae8 A hello from rebase branch</code> is pushed to the top, higher
+than the master (which is created later) <code>8142960 WTF README</code>.</p>
+
+<p>Compared to the log tree of <code>merge-test</code>, we can clearly see that it
+is the other way around, that is the master commit <code>8142960 WTF README</code>
+is placed to the top and higher than the commit <code>278a115 A goodbye from merge branch</code>.
+Plus, an additional commit (or what I called meta-commit) <code>1af5ec5 Merge branch 'master' into merge-test</code>
+is also created.</p>
+
+<p>Okay, now you might ask WTF? Why people come up with 2 different ways
+to do rebase? Isn&#8217;t the world too complicated already? Well, the answer
+lies in how you want to rewrite history (Every crazy men who wants to
+take on the world do). You use <code>git rebase</code> if you want your changes in
+the feature branch to always the latest. And you use <code>git merge</code> if you
+want to reflect the true ordering of commits.</p>
+
+<p>For mosts of cases, I use <code>git merge</code> because of following cons of <code>git rebase</code>:</p>
+
+<ul>
+  <li>Cannot push to remote feature branch because the history of local and remote is mistmached.
+And the only way to push it to remove branch is to use <code>git push --force</code> or being
+explictily <code>git push origin &lt;name-of-branch&gt; --force</code> for the sake of avoiding pushing
+into wrong branch. And this could cause lots of issue if you. (I did, so I know)</li>
+  <li>Recursive pain and pain and pain when resolving conflicts</li>
+</ul>
+
+<p>The only cons that I know about <code>git merge</code> is that you have a long list of many
+commits which could be hard on eyes. However I find it is not really an issue because
+the log tree show the merged trees very clearly.</p>
+
+<p>I guess that&#8217;s it for today folks. See you in another how to for dummies from me!</p>
 
 </div>
 
@@ -216,7 +287,7 @@ We could bring the box up with:</p>
   
 
 
-<time datetime="2012-08-24T13:04:00+10:00" pubdate data-updated="true">Aug 24<span>th</span>, 2012</time>
+<time datetime="2014-08-18T13:52:00+10:00" pubdate data-updated="true">Aug 18<span>th</span>, 2014</time>
       
 
 
@@ -224,7 +295,7 @@ We could bring the box up with:</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/" data-via="joneslee85" data-counturl="http://ruby-journal.com/debug-your-failed-test-in-travis-ci/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge/" data-via="joneslee85" data-counturl="http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -237,10 +308,8 @@ We could bring the box up with:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/install-postgres-dot-app-on-osx-10-dot-7-plus/" title="Previous Post: Install Postgres.app on OSX 10.7+">&laquo; Install Postgres.app on OSX 10.7+</a>
+        <a class="basic-alignment left" href="/override-ordering-with-activerecord/" title="Previous Post: Override ordering with ActiveRecord">&laquo; Override ordering with ActiveRecord</a>
       
-      
-        <a class="basic-alignment right" href="/install-ubuntu-with-pxe-via-osx/" title="Next Post: Install Ubuntu with PXE via OSX">Install Ubuntu with PXE via OSX &raquo;</a>
       
     </p>
   </footer>
@@ -368,8 +437,8 @@ We could bring the box up with:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/debug-your-failed-test-in-travis-ci/';
-        var disqus_url = 'http://ruby-journal.com/debug-your-failed-test-in-travis-ci/';
+        var disqus_identifier = 'http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge/';
+        var disqus_url = 'http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge/';
         var disqus_script = 'embed.js';
       
     (function () {
