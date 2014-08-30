@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-08-21T18:28:31+10:00</updated>
+  <updated>2014-08-29T22:19:08-04:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[How to solve Silicon Straits Saigon hiring challenge]]></title>
     <link href="http://ruby-journal.com/how-to-solve-sss-hiring-challenge/"/>
-    <updated>2014-08-21T17:04:00+10:00</updated>
+    <updated>2014-08-21T17:04:00-04:00</updated>
     <id>http://ruby-journal.com/how-to-solve-sss-hiring-challenge</id>
     <content type="html"><![CDATA[<p>Hello folks</p>
 
@@ -252,7 +252,7 @@ the interview.</p>
   <entry>
     <title type="html"><![CDATA[What is the difference between git rebase and git merge]]></title>
     <link href="http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge/"/>
-    <updated>2014-08-18T13:52:00+10:00</updated>
+    <updated>2014-08-18T13:52:00-04:00</updated>
     <id>http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge</id>
     <content type="html"><![CDATA[
 <p>There are many people who asked me about the differences between <code>git rebase</code> vs <code>git merge</code>.
@@ -421,7 +421,7 @@ the log tree show the merged trees very clearly.</p>
   <entry>
     <title type="html"><![CDATA[Override ordering with ActiveRecord]]></title>
     <link href="http://ruby-journal.com/override-ordering-with-activerecord/"/>
-    <updated>2014-05-23T14:33:00+10:00</updated>
+    <updated>2014-05-23T14:33:00-04:00</updated>
     <id>http://ruby-journal.com/override-ordering-with-activerecord</id>
     <content type="html"><![CDATA[
 <p>If your ActiveRecord models happen to have default ordering scope, you could override
@@ -453,7 +453,7 @@ you can apply <code>reorder</code> to the query chain:</p>
   <entry>
     <title type="html"><![CDATA[How to write custom serializer for ActiveRecord#serialize]]></title>
     <link href="http://ruby-journal.com/how-to-write-custom-serializer-for-activerecord-number-serialize/"/>
-    <updated>2014-04-21T07:49:00+10:00</updated>
+    <updated>2014-04-21T07:49:00-04:00</updated>
     <id>http://ruby-journal.com/how-to-write-custom-serializer-for-activerecord-number-serialize</id>
     <content type="html"><![CDATA[
 <p>Rails comes with a powerful and convenient <code>serialize</code> method that would do the serialization/deserializtion
@@ -624,7 +624,7 @@ and the serializer must have 2 methods <code>load</code> and <code>dump</code>.<
   <entry>
     <title type="html"><![CDATA[How to override default primary key id in Rails]]></title>
     <link href="http://ruby-journal.com/how-to-override-default-primary-key-id-in-rails/"/>
-    <updated>2014-04-18T10:28:00+10:00</updated>
+    <updated>2014-04-18T10:28:00-04:00</updated>
     <id>http://ruby-journal.com/how-to-override-default-primary-key-id-in-rails</id>
     <content type="html"><![CDATA[
 <p>Rails is all about Convention over Configuration, this includes the DB primary key,
@@ -1154,7 +1154,7 @@ override the convention by:</p>
   <entry>
     <title type="html"><![CDATA[How to DRY your Rails routes]]></title>
     <link href="http://ruby-journal.com/how-to-dry-your-rails-routes/"/>
-    <updated>2014-04-18T09:29:00+10:00</updated>
+    <updated>2014-04-18T09:29:00-04:00</updated>
     <id>http://ruby-journal.com/how-to-dry-your-rails-routes</id>
     <content type="html"><![CDATA[
 <p>So you have duplicated routes in your resources? In today tutorial, I&#8217;ll show you how to DRY it up abit.</p>
@@ -1289,7 +1289,7 @@ how to extract shared routes into concern to DRY your routes. Go on, share it wi
   <entry>
     <title type="html"><![CDATA[Liquid template in Ruby done right]]></title>
     <link href="http://ruby-journal.com/liquid-template-in-ruby-done-right/"/>
-    <updated>2014-04-10T16:48:00+10:00</updated>
+    <updated>2014-04-10T16:48:00-04:00</updated>
     <id>http://ruby-journal.com/liquid-template-in-ruby-done-right</id>
     <content type="html"><![CDATA[
 <p>Liquid Templating Engine is an awesome technology and with the power of gem &#8216;liquid&#8217;,
@@ -1831,7 +1831,7 @@ method that could help you untangle the coupling later.</p>
   <entry>
     <title type="html"><![CDATA[How to style kaminari pagination with Twitter Bootstrap 3]]></title>
     <link href="http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/"/>
-    <updated>2014-04-01T19:04:00+11:00</updated>
+    <updated>2014-04-01T19:04:00-04:00</updated>
     <id>http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3</id>
     <content type="html"><![CDATA[
 <p>Kamiari is an awesome that would do all heavy-lifting work if you want to do pagination.
@@ -1899,7 +1899,7 @@ content with:</p>
   <entry>
     <title type="html"><![CDATA[Create dummy controller for testing with rspec-rails]]></title>
     <link href="http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails/"/>
-    <updated>2014-03-24T09:21:00+11:00</updated>
+    <updated>2014-03-24T09:21:00-04:00</updated>
     <id>http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails</id>
     <content type="html"><![CDATA[
 <p>Today I learned a nitfy trick from Jon Rowe on how to to create anonymous controller
@@ -2024,7 +2024,7 @@ routing.</p>
   <entry>
     <title type="html"><![CDATA[Genereate gems dependency graph with Bundler]]></title>
     <link href="http://ruby-journal.com/genereate-gems-dependency-graph-with-bundler/"/>
-    <updated>2014-03-18T13:34:00+11:00</updated>
+    <updated>2014-03-18T13:34:00-04:00</updated>
     <id>http://ruby-journal.com/genereate-gems-dependency-graph-with-bundler</id>
     <content type="html"><![CDATA[
 <p>One of the features I like about RubyMine is the gems dependency graph.
@@ -2064,7 +2064,7 @@ where the Gemfile file resides then use command:</p>
   <entry>
     <title type="html"><![CDATA[How to switch between selenium and poltergeist in capybara for Rails integration RSpec test]]></title>
     <link href="http://ruby-journal.com/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test/"/>
-    <updated>2014-03-14T09:20:00+11:00</updated>
+    <updated>2014-03-14T09:20:00-04:00</updated>
     <id>http://ruby-journal.com/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test</id>
     <content type="html"><![CDATA[
 <p>Debugging integration is still a pain with headless driver like poltergeist. In this tutorial
@@ -2226,7 +2226,7 @@ that you want and Firefox browser will open up if selenium is used. Eg:</p>
   <entry>
     <title type="html"><![CDATA[Speed up your PostgreSQL dump restore]]></title>
     <link href="http://ruby-journal.com/speed-up-your-postgresql-dump-restore/"/>
-    <updated>2014-03-11T16:20:00+11:00</updated>
+    <updated>2014-03-11T16:20:00-04:00</updated>
     <id>http://ruby-journal.com/speed-up-your-postgresql-dump-restore</id>
     <content type="html"><![CDATA[
 <p>Restore a DB dump with pg_restore is always a time-consuming process. However if
@@ -2265,7 +2265,7 @@ works with custom and directory archive dump.</p>
   <entry>
     <title type="html"><![CDATA[How to update attributes with validations and callbacks skipped]]></title>
     <link href="http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/"/>
-    <updated>2014-02-26T18:20:00+11:00</updated>
+    <updated>2014-02-26T18:20:00-05:00</updated>
     <id>http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped</id>
     <content type="html"><![CDATA[
 <p>In this short tutorial, I&#8217;ll show you how to update attributes for ActiveRecord model with:</p>
@@ -2319,7 +2319,7 @@ works with custom and directory archive dump.</p>
   <entry>
     <title type="html"><![CDATA[Graceful fallback for not found ActiveRecord lookup with NullObject pattern]]></title>
     <link href="http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/"/>
-    <updated>2013-11-23T23:27:00+11:00</updated>
+    <updated>2013-11-23T23:27:00-05:00</updated>
     <id>http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern</id>
     <content type="html"><![CDATA[
 <p>In my application, I bump to Exception when trying to delegate a method to an unfound ActiveRecord instance. This poses two issues for me:</p>
@@ -2508,7 +2508,7 @@ code, if the employee could be be found by email, <code>EmployeeLookupService.fi
   <entry>
     <title type="html"><![CDATA[Avoid unless syntax in a chain of conditions statement]]></title>
     <link href="http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/"/>
-    <updated>2013-11-23T23:11:00+11:00</updated>
+    <updated>2013-11-23T23:11:00-05:00</updated>
     <id>http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement</id>
     <content type="html"><![CDATA[
 <p>Ruby gives us a nice human friendly <code>unless</code> which is equivalent to negation of <code>if</code>. Yet if we abuse using this method in a long complex statements, it could add more confusion for normal readers. In this article, I&#8217;ll give you one example to prove that you should not use <code>unless</code> in a chain of conditions statement.</p>
@@ -2544,7 +2544,7 @@ code, if the employee could be be found by email, <code>EmployeeLookupService.fi
   <entry>
     <title type="html"><![CDATA[Digesting pumactl]]></title>
     <link href="http://ruby-journal.com/digesting-pumactl/"/>
-    <updated>2013-11-22T16:39:00+11:00</updated>
+    <updated>2013-11-22T16:39:00-05:00</updated>
     <id>http://ruby-journal.com/digesting-pumactl</id>
     <content type="html"><![CDATA[
 <p>Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
@@ -2784,7 +2784,7 @@ it with pumactl. See you in the next article.</p>
   <entry>
     <title type="html"><![CDATA[How to import millions records via ActiveRecord within minutes not hours]]></title>
     <link href="http://ruby-journal.com/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/"/>
-    <updated>2013-10-30T17:23:00+11:00</updated>
+    <updated>2013-10-30T17:23:00-04:00</updated>
     <id>http://ruby-journal.com/how-to-import-millions-records-via-activerecord-within-minutes-not-hours</id>
     <content type="html"><![CDATA[
 <p>In today tutorial, I&#8217;ll show you how to optimise a ActiveRecord import script by 300%. My solution is better than other solution as it doesn&#8217;t use any SQL hack, thus you can retain the integrity with the data by running it through ActiveRecord normally.</p>
@@ -2916,7 +2916,7 @@ it with pumactl. See you in the next article.</p>
   <entry>
     <title type="html"><![CDATA[Faster TravisCI test]]></title>
     <link href="http://ruby-journal.com/faster-travisci-test/"/>
-    <updated>2013-10-11T12:37:00+11:00</updated>
+    <updated>2013-10-11T12:37:00-04:00</updated>
     <id>http://ruby-journal.com/faster-travisci-test</id>
     <content type="html"><![CDATA[
 <p>Running test suite is time consuming. There are various techniques to optimize the runtime performance of the CI by stub/mock, parallel_test, etc. In this short tutorial, I&#8217;ll show you how to optimize your TravisCI test suite by splitting your test suit into concurrent jobs, which drastically improve the build time.</p>
@@ -2981,7 +2981,7 @@ it with pumactl. See you in the next article.</p>
   <entry>
     <title type="html"><![CDATA[How to uninstall all Ruby gems]]></title>
     <link href="http://ruby-journal.com/how-to-uninstall-all-ruby-gems/"/>
-    <updated>2013-10-11T12:01:00+11:00</updated>
+    <updated>2013-10-11T12:01:00-04:00</updated>
     <id>http://ruby-journal.com/how-to-uninstall-all-ruby-gems</id>
     <content type="html"><![CDATA[
 <p>In order to uninstall all gems, you have to loop through all entries in <code>gem list</code> with bash scripting. This method is very inconveninent. Thanks to Rubygems 2.1.0, you now could do it with one command.</p>
@@ -3011,7 +3011,7 @@ it with pumactl. See you in the next article.</p>
   <entry>
     <title type="html"><![CDATA[Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0]]></title>
     <link href="http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/"/>
-    <updated>2013-10-03T19:45:00+10:00</updated>
+    <updated>2013-10-03T19:45:00-04:00</updated>
     <id>http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0</id>
     <content type="html"><![CDATA[
 <p>Majority of Ruby 2.0 syntaxes are backward-compatible with Ruby 1.9. Yet there is one tiny change in the way that Ruby 2.0 does lambda rocket that would break backward-compatability with Ruby 1.9. That is&#8230;a single space. Yes, you heard it correctly.</p>

@@ -94,7 +94,7 @@
   
 
 
-<time datetime="2013-09-23T16:43:00+10:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2013</time>
+<time datetime="2013-09-23T16:43:00-04:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2013</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -150,11 +150,11 @@ simply workaround by using <code>around</code> callback. Here is details:</p>
 <span class="line-number">13</span>
 <span class="line-number">14</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="n">around_update</span> <span class="ss">:notify_systtem_if_name_is_changed</span>
+</span><span class="line">  <span class="n">around_update</span> <span class="ss">:notify_system_if_name_is_changed</span>
 </span><span class="line">
 </span><span class="line">  <span class="kp">private</span>
 </span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nf">notify_systtem_if_name_is_changed</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">notify_system_if_name_is_changed</span>
 </span><span class="line">    <span class="n">name_changed</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">name_changed?</span>
 </span><span class="line">
 </span><span class="line">    <span class="k">yield</span>
@@ -199,7 +199,7 @@ simply workaround by using <code>around</code> callback. Here is details:</p>
   
 
 
-<time datetime="2013-09-23T16:43:00+10:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2013</time>
+<time datetime="2013-09-23T16:43:00-04:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2013</time>
       
 
 

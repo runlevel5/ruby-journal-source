@@ -37,11 +37,11 @@ simply workaround by using `around` callback. Here is details:
 
 ```ruby
 class Product < ActiveRecord::Base
-  around_update :notify_systtem_if_name_is_changed
+  around_update :notify_system_if_name_is_changed
 
   private
 
-  def notify_systtem_if_name_is_changed
+  def notify_system_if_name_is_changed
     name_changed = self.name_changed?
 
     yield
