@@ -325,7 +325,7 @@ With Rails 4, you can change `:id` to `:sku` with:
 
 ```ruby
 # config/routes.rb
-resources :products, param :sku
+resources :products, param: :sku
 ```
 
 our routes would be:
