@@ -19,6 +19,7 @@ am going to guide you through how to integrate Sidekiq with ActiveJob, and you w
 * Advanced usage of multiple queues
 * ActiveJob callback
 * ActiveJob exception catch
+* ActiveJob mailer API
 
 <!--more-->
 
@@ -170,7 +171,8 @@ in the sidekiq config file. In the above example, I tell Rails to delegate this 
 specifying the queue name using `queue_as` API.
 
 The `perform` method is the logic of job handler, what you want to do with the job. Please be noted that
-you could customize the params to be whatever you like, in our case, the param is the CSV file path.
+the arguments for this method must be a legal JSON types such as String, Integer, Flat, nil, True/False, Hash, Array
+or GlobalID instances. The latter one is very interesting, please read more about it in the latter section.
 
 ## The art of enqueuing
 
@@ -255,7 +257,8 @@ end
 
 the code in the block will be evaluated under the context of the job. I guess I don't have to explain much
 about the code above, it's just a simple condition. But you might be puzzled about the usage of `self.arguments`.
-This method returns an array of parameters that are parsed into `#perform`.
+This method returns an array of parameters that are parsed into `#perform_later` during queuing. The arguments
+get passed into `#perform` happens during job processing.
 
 Let's give our code a trial:
 
@@ -289,8 +292,7 @@ callbacks:
 
 Those callbacks hook into the enqueuing and performing steps of the job.
 
-We can use callbacks to do job logging and notification. Saying that we want to notify our manager once the job is finished, we could
-code do:
+We can use callbacks to do job logging and notification. Below is the code to notify manager once the job is finished:
 
 ```ruby
 class CsvImportJob < ActiveJob::Base
@@ -315,7 +317,8 @@ The above code tells ActiveJob to execute `#notify_manager` after the CsvImporte
 
 FYI, I use method `NotificationMailer#deliver_later`, this would tell ActiveJob to deliver email in the background too.
 
-Furthermore, you could tell AJ to delay the deliver of mailer by specifying `wait` option:
+Furthermore, the same options of `ActiveJob.set` also apply for mailer class, which provides
+a consistent API for background mailer jobs, thus you could use `wait` option, for eg:
 
 ```ruby
 def notify_manager
@@ -354,9 +357,50 @@ end
 The above code tells ActiveJob to listen to job execution's exception and then catch and
 notify the manager.
 
+## You can parse live object! OMG
+
+As I have stated above that valid arguments for `perform` method must be legal JSON type
+or GlobalID instances.
+
+What is GlobalID instance? The class of those instance must have `ActiveModel::GlobalIdentification` mixin.
+
+Let me give you one example, assume that we have an AR class:
+
+```ruby
+class Report < ActiveRecord::Base
+end
+```
+
+`ActiveRecord` does include `ActiveModel::GlobalIdentification`, so instead of parsing a pair ID integer or Class string:
+
+```ruby
+def perform(klass_name, id)
+  klass = klass_name.constantize
+  our_object = klass.find(id)
+end
+
+SomeJob.perform_later('Report', id)
+```
+
+we could parse in the object
+
+```ruby
+def perform(our_object)
+end
+
+report = Report.find(id)
+SomeJob.perform_later(report)
+```
+
 ## Conclusion
 
 ActiveJob is surely a nice addition to Rails stack, it makes scheduling background jobs easier and more intuitive.
-It is also a great abstraction for your app, you don't have to worry about the under layer.
+It is also a great abstraction for your app, you don't have to worry about the under layer adapter so you can easily
+swap from one adapter to other.
+
+Overall, IMHO I really like working with the consistent API though I think Rails abuses inherentance too much. It'd
+be much better if we could mixin ActiveJob into classes via composition.
 
 Again, good luck and keep on learning folks!
+
+PS: Thanks to Tao Guo for proof-reading

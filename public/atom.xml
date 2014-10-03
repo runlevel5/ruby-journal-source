@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-10-03T16:06:06+10:00</updated>
+  <updated>2014-10-04T07:56:51+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -267,6 +267,7 @@ am going to guide you through how to integrate Sidekiq with ActiveJob, and you w
   <li>Advanced usage of multiple queues</li>
   <li>ActiveJob callback</li>
   <li>ActiveJob exception catch</li>
+  <li>ActiveJob mailer API</li>
 </ul>
 
 <!--more-->
@@ -455,7 +456,8 @@ in the sidekiq config file. In the above example, I tell Rails to delegate this 
 specifying the queue name using <code>queue_as</code> API.</p>
 
 <p>The <code>perform</code> method is the logic of job handler, what you want to do with the job. Please be noted that
-you could customize the params to be whatever you like, in our case, the param is the CSV file path.</p>
+the arguments for this method must be a legal JSON types such as String, Integer, Flat, nil, True/False, Hash, Array
+or GlobalID instances. The latter one is very interesting, please read more about it in the latter section.</p>
 
 <h2 id="the-art-of-enqueuing">The art of enqueuing</h2>
 
@@ -561,7 +563,8 @@ case, we configure:</p>
 
 <p>the code in the block will be evaluated under the context of the job. I guess I don&#8217;t have to explain much
 about the code above, it&#8217;s just a simple condition. But you might be puzzled about the usage of <code>self.arguments</code>.
-This method returns an array of parameters that are parsed into <code>#perform</code>.</p>
+This method returns an array of parameters that are parsed into <code>#perform_later</code> during queuing. The arguments
+get passed into <code>#perform</code> happens during job processing.</p>
 
 <p>Let&#8217;s give our code a trial:</p>
 
@@ -597,8 +600,7 @@ callbacks:</p>
 
 <p>Those callbacks hook into the enqueuing and performing steps of the job.</p>
 
-<p>We can use callbacks to do job logging and notification. Saying that we want to notify our manager once the job is finished, we could
-code do:</p>
+<p>We can use callbacks to do job logging and notification. Below is the code to notify manager once the job is finished:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -638,7 +640,8 @@ code do:</p>
 
 <p>FYI, I use method <code>NotificationMailer#deliver_later</code>, this would tell ActiveJob to deliver email in the background too.</p>
 
-<p>Furthermore, you could tell AJ to delay the deliver of mailer by specifying <code>wait</code> option:</p>
+<p>Furthermore, the same options of <code>ActiveJob.set</code> also apply for mailer class, which provides
+a consistent API for background mailer jobs, thus you could use <code>wait</code> option, for eg:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -696,12 +699,63 @@ the import job fails too! How can we do that? Introducing the <code>#rescue_from
 <p>The above code tells ActiveJob to listen to job execution&#8217;s exception and then catch and
 notify the manager.</p>
 
+<h2 id="you-can-parse-live-object-omg">You can parse live object! OMG</h2>
+
+<p>As I have stated above that valid arguments for <code>perform</code> method must be legal JSON type
+or GlobalID instances.</p>
+
+<p>What is GlobalID instance? The class of those instance must have <code>ActiveModel::GlobalIdentification</code> mixin.</p>
+
+<p>Let me give you one example, assume that we have an AR class:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Report</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>ActiveRecord</code> does include <code>ActiveModel::GlobalIdentification</code>, so instead of parsing a pair ID integer or Class string:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">klass_name</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+</span><span class="line">  <span class="n">klass</span> <span class="o">=</span> <span class="n">klass_name</span><span class="o">.</span><span class="n">constantize</span>
+</span><span class="line">  <span class="n">our_object</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="no">SomeJob</span><span class="o">.</span><span class="n">perform_later</span><span class="p">(</span><span class="s1">&#39;Report&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>we could parse in the object</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">our_object</span><span class="p">)</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="n">report</span> <span class="o">=</span> <span class="no">Report</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+</span><span class="line"><span class="no">SomeJob</span><span class="o">.</span><span class="n">perform_later</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
 <h2 id="conclusion">Conclusion</h2>
 
 <p>ActiveJob is surely a nice addition to Rails stack, it makes scheduling background jobs easier and more intuitive.
-It is also a great abstraction for your app, you don&#8217;t have to worry about the under layer.</p>
+It is also a great abstraction for your app, you don&#8217;t have to worry about the under layer adapter so you can easily
+swap from one adapter to other.</p>
+
+<p>Overall, IMHO I really like working with the consistent API though I think Rails abuses inherentance too much. It&#8217;d
+be much better if we could mixin ActiveJob into classes via composition.</p>
 
 <p>Again, good luck and keep on learning folks!</p>
+
+<p>PS: Thanks to Tao Guo for proof-reading</p>
 ]]></content>
   </entry>
   
