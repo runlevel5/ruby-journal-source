@@ -354,7 +354,7 @@ end
 The above code tells ActiveJob to listen to job execution's exception and then catch and
 notify the manager.
 
-## Conclustion
+## Conclusion
 
 ActiveJob is surely a nice addition to Rails stack, it makes scheduling background jobs easier and more intuitive.
 It is also a great abstraction for your app, you don't have to worry about the under layer.
