@@ -12,6 +12,8 @@ author: "Trung Lê"
 
 So you search for how to moneykey-patch a class in Ruby? Read on, I'll show you how.
 
+<!--more-->
+
 ## Note
 
 Ruby is very powerful and flexible. Before I show you how to override a class, I want to

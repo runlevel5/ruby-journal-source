@@ -14,7 +14,7 @@ By default, SQL `ADD COLUMN` would add new column to the tail of columns. What i
 want to add a new column and append this new column after an existing column? Read on
 and I'll show you how to do that with Rails in MySQL
 
----
+<!--more-->
 
 ## Add new column after existing column in SQL
 

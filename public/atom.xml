@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-10-09T15:34:37+11:00</updated>
+  <updated>2014-10-03T13:39:31+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -23,7 +23,7 @@
 want to add a new column and append this new column after an existing column? Read on
 and I&#8217;ll show you how to do that with Rails in MySQL</p>
 
-<hr />
+<!--more-->
 
 <h2 id="add-new-column-after-existing-column-in-sql">Add new column after existing column in SQL</h2>
 
@@ -63,6 +63,8 @@ a new migration with content:</p>
     <id>http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby</id>
     <content type="html"><![CDATA[
 <p>So you search for how to moneykey-patch a class in Ruby? Read on, I&#8217;ll show you how.</p>
+
+<!--more-->
 
 <h2 id="note">Note</h2>
 
@@ -246,6 +248,460 @@ no differences if accessing using String or Symbol key. Introducing ActiveSuppor
 <h2 id="application-in-rails">Application in Rails</h2>
 
 <p>You can find traces of HashWithIndifferentAccess in Rails controller, the magical <code>params</code> method.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to integrate Sidekiq with ActiveJob]]></title>
+    <link href="http://ruby-journal.com/how-to-integrate-sidekiq-with-activejob/"/>
+    <updated>2014-10-03T08:39:00+10:00</updated>
+    <id>http://ruby-journal.com/how-to-integrate-sidekiq-with-activejob</id>
+    <content type="html"><![CDATA[
+<p>One of the hot thing in Rails 4.2 is the brand new ActiveJob gem, this gem consolidate
+the API for background job gems on the market such as DelayedJob, Resque, etc. Today I
+am going to guide you through how to integrate Sidekiq with ActiveJob, and you will learn:</p>
+
+<ul>
+  <li>Set up Sidekiq adapter for ActiveJob</li>
+  <li>Basic of ActiveJob class</li>
+  <li>Advanced usage of multiple queues</li>
+  <li>ActiveJob callback</li>
+  <li>ActiveJob exception catch</li>
+</ul>
+
+<!--more-->
+
+<h2 id="the-concept">The concept</h2>
+
+<p>Before we move into details on implementation, I want to clarify that ActiveJob is not
+Sidekiq but Sidekiq can act like ActiveJob. Because ActiveJob does not care how a job
+is processed (that is forking processes for eg), it only does job queuing and delegate
+job crunching to adapter, that is Sidekiq. However Sidekiq does both, it could act
+as job queuer and job processor at same time.</p>
+
+<p>So what&#8217;s so good about ActiveJob then? ActiveJob standardises the API interface for
+job queuer. This helps changing from one job backend to the other much easily.</p>
+
+<h2 id="install-rails-42">Install Rails 4.2</h2>
+
+<p>ActiveJob is only available in Rails 4.2 and you need to install the latest version of
+4.2 (at the time of the writing is 4.2.0-beta2).</p>
+
+<p>And in your Gemfile of your app, change the version to</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'rails', '4.2.0.beta2'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And do the <code>bundle install</code></p>
+
+<h2 id="install-sidekiq">Install Sidekiq</h2>
+
+<p>It is just as simple as append this line to your Gemfile</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'sidekiq', '3.2.5'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and fire away <code>bundle install</code></p>
+
+<p>Then we create new config file <code>config/sidekiq.yml</code> for our sidekiq</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">---
+</span><span class="line">:concurrency: 25
+</span><span class="line">:pidfile: ./tmp/pids/sidekiq.pid
+</span><span class="line">:logfile: ./log/sidekiq.log
+</span><span class="line">:queues:
+</span><span class="line">  - default
+</span><span class="line">  - [high_priority, 2]</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The above config file tell Sidekiq where to store PID and log file.
+Plus I also configure Sidekiq to create 2 queues, default and high priority queue.
+FYI, the number 2 in high_priority line is the weight of 2, it means
+that it will be check twice as often. I&#8217;ll demonstrate how can we delegate our job to
+right queue later.</p>
+
+<p>You are free to configure Sidekiq in whatever way you see fit your app.</p>
+
+<p>We can start our sidekiq daemon:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sidekiq -C config/sidekiq.yml</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>if nothing goes wrong, you should see similar output:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">2014-10-03T01:23:24.775Z 13918 TID-oxapc5ias INFO: Running in ruby 2.1.3p242 (2014-09-19 revision 47630) [x86_64-darwin14.0]
+</span><span class="line">2014-10-03T01:23:24.775Z 13918 TID-oxapc5ias INFO: See LICENSE and the LGPL-3.0 for licensing details.
+</span><span class="line">2014-10-03T01:23:24.776Z 13918 TID-oxapc5ias INFO: Upgrade to Sidekiq Pro for more features and support: http://sidekiq.org/pro
+</span><span class="line">2014-10-03T01:23:24.776Z 13918 TID-oxapc5ias INFO: Starting processing, hit Ctrl-C to stop
+</span><span class="line">2014-10-03T01:23:24.777Z 13918 TID-oxaphajos DEBUG: {:queues=&gt;["default", "high_priority", "high_priority"], :labels=&gt;[], :concurrency=&gt;25, :require=&gt;".", :environment=&gt;nil, :timeout=&gt;8, :error_handlers=&gt;[#&lt;Sidekiq::ExceptionHandler::Logger:0x007fe76b1cfcc8&gt;], :lifecycle_events=&gt;{:startup=&gt;[], :quiet=&gt;[], :shutdown=&gt;[]}, :verbose=&gt;true, :daemon=&gt;false, :pidfile=&gt;"./tmp/pids/sidekiq.pid", :logfile=&gt;"./log/sidekiq.log", :strict=&gt;false, :config_file=&gt;"config/sidekiq.yml", :tag=&gt;"demo_app"}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That&#8217;s a good, quit out the sidekiq by Ctrl-C and we could run sidekiq in daemon mode by
+modifying our <code>config/sidekiq.yml</code> by appending so our file is:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">---
+</span><span class="line">:concurrency: 25
+</span><span class="line">:pidfile: ./tmp/pids/sidekiq.pid
+</span><span class="line">:logfile: ./log/sidekiq.log
+</span><span class="line">:queues:
+</span><span class="line">  - default
+</span><span class="line">  - [high_priority, 2]
+</span><span class="line">:daemon: true</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Let&#8217;s run out sidekiq again:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sidekiq -C config/sidekiq.yml
+</span><span class="line">
+</span><span class="line"># we then can check if it's started correctly
+</span><span class="line">$ ps aux | grep sidekiq
+</span><span class="line">trung_le        13534  22.6  0.7  2667148 118288   ??  S    10:31am   0:02.62 sidekiq 3.2.5 demo_app [0 of 25 busy]</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="set-up-our-job">Set up our Job</h2>
+
+<p>Let&#8217;s imagine that our job is to run a CSV Importer in background, here is our CSVImporter class:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">CsvImporter</span>
+</span><span class="line">  <span class="kp">attr_reader</span> <span class="ss">:filepath</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</span><span class="line">    <span class="vi">@filepath</span> <span class="o">=</span> <span class="n">filepath</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">run</span>
+</span><span class="line">    <span class="nb">puts</span> <span class="s2">&quot;Prepare to import </span><span class="si">#{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> ...&quot;</span>
+</span><span class="line">    <span class="c1"># some crunching code</span>
+</span><span class="line">    <span class="nb">puts</span> <span class="s2">&quot;Import </span><span class="si">#{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> completed&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now we have our gems installed, we&#8217;ll need to configure ActiveJob to use sidekiq as backend by creating following initializer:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1">#config/initializers/active_job.rb</span>
+</span><span class="line">
+</span><span class="line"><span class="ss">ActiveJob</span><span class="p">:</span><span class="ss">:Base</span><span class="o">.</span><span class="n">queue_adapter</span> <span class="o">=</span> <span class="ss">:sidekiq</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>By convention, we place our Job class under <code>app/jobs</code></p>
+
+<p>Here is our uber-cool CSV importing job (I try to make the most boring thing on Earth&#8230;interesting)</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># app/jobs/csv_import_job.rb</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">CsvImportJob</span> <span class="o">&lt;</span> <span class="ss">ActiveJob</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">queue_as</span> <span class="ss">:default</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1"># we assume that we have a class CsvImporter to handle the import</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</span><span class="line">    <span class="no">CsvImporter</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">run</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see above, we have <code>queue_as</code> and <code>perform</code>, these two methods are required by convention
+when creating ActiveJob class.</p>
+
+<p>As you might have known that sidekiq supports multiple queues, which we configure with <code>queues</code> option
+in the sidekiq config file. In the above example, I tell Rails to delegate this CSV job to default queue by
+specifying the queue name using <code>queue_as</code> API.</p>
+
+<p>The <code>perform</code> method is the logic of job handler, what you want to do with the job. Please be noted that
+you could customize the params to be whatever you like, in our case, the param is the CSV file path.</p>
+
+<h2 id="the-art-of-enqueuing">The art of enqueuing</h2>
+
+<p>We could tell Rails to queue a job and run it as soon as the queue is free with <code>#perform_later</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">CsvImportJob</span><span class="o">.</span><span class="n">perform_later</span><span class="p">(</span><span class="s1">&#39;/tmp/my_file.csv&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and if you peek into <code>log/development.log</code> you should see:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="o">[</span><span class="no">ActiveJob</span><span class="o">]</span> <span class="no">Enqueued</span> <span class="no">CsvImportJob</span> <span class="p">(</span><span class="no">Job</span> <span class="ss">ID</span><span class="p">:</span> <span class="mi">525</span><span class="n">b3f7b</span><span class="o">-</span><span class="n">adab</span><span class="o">-</span><span class="mi">41</span><span class="n">de</span><span class="o">-</span><span class="n">afe7</span><span class="o">-</span><span class="n">bee229188501</span><span class="p">)</span> <span class="n">to</span> <span class="no">Sidekiq</span><span class="p">(</span><span class="n">csv</span><span class="p">)</span> <span class="n">with</span> <span class="ss">arguments</span><span class="p">:</span> <span class="s2">&quot;/tmp/my_file.csv&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the output indicates that our job has been successfully queued and processed</p>
+
+<h2 id="run-the-queue-in-the-future">Run the queue in the future!</h2>
+
+<p>What&#8217;s cool about ActiveJob is that it allows you to schedule the time to run enequeued jobs.</p>
+
+<p>we could delay the running till tomorrow noon by using <code>#set</code> method with <code>wait_until</code> option:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">CsvImportJob</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">wait_until</span><span class="p">:</span> <span class="no">Date</span><span class="o">.</span><span class="n">tomorrow</span><span class="o">.</span><span class="n">noon</span><span class="p">)</span><span class="o">.</span><span class="n">perform_later</span><span class="p">(</span><span class="s1">&#39;/tmp/my_file.csv&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which generates log line:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="o">[</span><span class="no">ActiveJob</span><span class="o">]</span> <span class="no">Enqueued</span> <span class="no">CsvImportJob</span> <span class="p">(</span><span class="no">Job</span> <span class="ss">ID</span><span class="p">:</span> <span class="mi">08</span><span class="n">f113f4</span><span class="o">-</span><span class="n">d12c</span><span class="o">-</span><span class="mi">4401</span><span class="o">-</span><span class="n">a84e</span><span class="o">-</span><span class="mi">1</span><span class="n">b0e55f194d6</span><span class="p">)</span> <span class="n">to</span> <span class="no">Sidekiq</span><span class="p">(</span><span class="n">csv</span><span class="p">)</span> <span class="n">at</span> <span class="mi">2014</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mo">04</span> <span class="mi">12</span><span class="p">:</span><span class="mo">00</span><span class="p">:</span><span class="mo">00</span> <span class="no">UTC</span> <span class="n">with</span> <span class="ss">arguments</span><span class="p">:</span> <span class="s2">&quot;/tmp/my_file.csv&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the above output clearly point out that the job is scheduled to run on 2014-10-04 12:00:00 UTC. Cool, isn&#8217;t it?</p>
+
+<p>Furthermore, the option <code>wait</code> is also very cool too, it takes in human idomatic syntax from now on:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">CsvImportJob</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="ss">wait</span><span class="p">:</span> <span class="mi">2</span><span class="o">.</span><span class="n">week</span><span class="p">)</span><span class="o">.</span><span class="n">perform_later</span><span class="p">(</span><span class="s1">&#39;/tmp/my_file.csv&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the above code will tell the worker to run the job after 2 weeks from now.</p>
+
+<h2 id="prioritise-with-multi-queues">Prioritise with multi-queues</h2>
+
+<p>Let&#8217;s assume that the business people want file that are located in folder <code>/tmp/urgent</code> to be processed first.
+How could we go about tackling this? Introducing multi-queues, by specifying queues with higher weight, in our
+case, we configure:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">:queues</span><span class="p">:</span>
+</span><span class="line">  <span class="o">-</span> <span class="n">default</span>
+</span><span class="line">  <span class="o">-</span> <span class="o">[</span><span class="n">high_priority</span><span class="p">,</span> <span class="mi">2</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the <code>high_priority</code> queue will have higher precedence than default queue, thus it&#8217;ll be run first.</p>
+
+<p>To tell ActiveJob to use this high priority queue on condition, we could parse in a block into our <code>queue_as</code> line.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">CsvImportJob</span> <span class="o">&lt;</span> <span class="ss">ActiveJob</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">queue_as</span> <span class="k">do</span>
+</span><span class="line">    <span class="k">if</span> <span class="n">urgent_job?</span>
+</span><span class="line">      <span class="ss">:high_priority</span>
+</span><span class="line">    <span class="k">else</span>
+</span><span class="line">      <span class="ss">:default</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1"># we assume that we have a class CsvImporter to handle the import</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</span><span class="line">    <span class="no">CsvImporter</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">run</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">urgent_job?</span>
+</span><span class="line">    <span class="nb">self</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">first</span> <span class="o">=~</span> <span class="sr">/\/urgent\//</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the code in the block will be evaluated under the context of the job. I guess I don&#8217;t have to explain much
+about the code above, it&#8217;s just a simple condition. But you might be puzzled about the usage of <code>self.arguments</code>.
+This method returns an array of parameters that are parsed into <code>#perform</code>.</p>
+
+<p>Let&#8217;s give our code a trial:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">CsvImportJob</span><span class="o">.</span><span class="n">perform_later</span><span class="p">(</span><span class="s1">&#39;/tmp/urgent/my_file.csv&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and pay close attention to out log output:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="o">[</span><span class="no">ActiveJob</span><span class="o">]</span> <span class="o">[</span><span class="no">CsvImportJob</span><span class="o">]</span> <span class="o">[</span><span class="mi">30488</span><span class="n">ea0</span><span class="o">-</span><span class="mi">108</span><span class="n">c</span><span class="o">-</span><span class="mi">484</span><span class="n">f</span><span class="o">-</span><span class="n">bf12</span><span class="o">-</span><span class="mi">8341</span><span class="n">da38e76b</span><span class="o">]</span> <span class="no">Performed</span> <span class="no">CsvImportJob</span> <span class="n">from</span> <span class="no">Sidekiq</span><span class="p">(</span><span class="n">high_priority</span><span class="p">)</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mi">2</span><span class="n">ms</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>you could see that ActiveJob tells Sidekiq to run the job from <code>Sidekiq(high_priority)</code>.</p>
+
+<p>However, should you want to run non-urgent file in high priority queue, you could override with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">CsvImportJob</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="ss">queue</span><span class="p">:</span> <span class="ss">:high_priority</span><span class="p">)</span><span class="o">.</span><span class="n">perform_later</span><span class="p">(</span><span class="s1">&#39;/tmp/my_file.csv&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="the-powerful-callbacks">The powerful callbacks!</h2>
+
+<p>I love ActiveRecord callbacks, it is one of the best pattern ever in Rails!!! (I will kill you if you use it in your app!)</p>
+
+<p>So just like ActiveRecord and ActionController, Rails also offers callbacks for ActiveJob. Below is the list of available
+callbacks:</p>
+
+<ul>
+  <li>before/after/around_enqueue</li>
+  <li>before/after/around_perform</li>
+</ul>
+
+<p>Those callbacks hook into the enqueuing and performing steps of the job.</p>
+
+<p>We can use callbacks to do job logging and notification. Saying that we want to notify our manager once the job is finished, we could
+code do:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">CsvImportJob</span> <span class="o">&lt;</span> <span class="ss">ActiveJob</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">queue_as</span> <span class="ss">:default</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">after_perform</span> <span class="ss">:notify_manager</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1"># we assume that we have a class CsvImporter to handle the import</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</span><span class="line">    <span class="no">CsvImporter</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">run</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">notify_manager</span>
+</span><span class="line">    <span class="no">NotificationMailer</span><span class="o">.</span><span class="n">job_done</span><span class="p">(</span><span class="no">User</span><span class="o">.</span><span class="n">find_manager</span><span class="p">)</span><span class="o">.</span><span class="n">deliver_later</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The above code tells ActiveJob to execute <code>#notify_manager</code> after the CsvImporter has finished.</p>
+
+<p>FYI, I use method <code>NotificationMailer#deliver_later</code>, this would tell ActiveJob to deliver email in the background too.</p>
+
+<p>Furthermore, you could tell AJ to delay the deliver of mailer by specifying <code>wait</code> option:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">notify_manager</span>
+</span><span class="line">  <span class="no">NotificationMailer</span><span class="o">.</span><span class="n">job_done</span><span class="p">(</span><span class="no">User</span><span class="o">.</span><span class="n">find_manager</span><span class="p">)</span><span class="o">.</span><span class="n">deliver_later</span><span class="p">(</span><span class="ss">wait</span><span class="p">:</span> <span class="mi">2</span><span class="o">.</span><span class="n">minutes</span><span class="p">)</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>How cool is that!</p>
+
+<h2 id="catching-the-exceptions">Catching the Exceptions!</h2>
+
+<p>There is no guarantee that our CsvImporter won&#8217;t run into error, thus we should notify our manager should
+the import job fails too! How can we do that? Introducing the <code>#rescue_from</code> method.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">CsvImportJob</span> <span class="o">&lt;</span> <span class="ss">ActiveJob</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">queue_as</span> <span class="ss">:default</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">rescue_from</span><span class="p">(</span><span class="no">StandardErrors</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">exception</span><span class="o">|</span>
+</span><span class="line">    <span class="n">notify_failed_job_to_manager</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="c1"># we assume that we have a class CsvImporter to handle the import</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">perform</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+</span><span class="line">    <span class="no">CsvImporter</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">run</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">notify_failed_job_to_manager</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span>
+</span><span class="line">    <span class="no">NotificationMailer</span><span class="o">.</span><span class="n">job_failed</span><span class="p">(</span><span class="no">User</span><span class="o">.</span><span class="n">find_manager</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span><span class="o">.</span><span class="n">deliver_later</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The above code tells ActiveJob to listen to job execution&#8217;s exception and then catch and
+notify the manager.</p>
+
+<h2 id="conclustion">Conclustion</h2>
+
+<p>ActiveJob is surely a nice addition to Rails stack, it makes scheduling background jobs easier and more intuitive.
+It is also a great abstraction for your app, you don&#8217;t have to worry about the under layer.</p>
+
+<p>Again, good luck and keep on learning folks!</p>
 ]]></content>
   </entry>
   
@@ -3014,138 +3470,6 @@ our pid file is updated with 3001:</p>
 <p>That&#8217;s it folk. Now you know how to use pumactl, why don&#8217;t you delete your custom script and replace
 it with pumactl. See you in the next article.</p>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to import millions records via ActiveRecord within minutes not hours]]></title>
-    <link href="http://ruby-journal.com/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/"/>
-    <updated>2013-10-30T17:23:00+11:00</updated>
-    <id>http://ruby-journal.com/how-to-import-millions-records-via-activerecord-within-minutes-not-hours</id>
-    <content type="html"><![CDATA[
-<p>In today tutorial, I&#8217;ll show you how to optimise a ActiveRecord import script by 300%. My solution is better than other solution as it doesn&#8217;t use any SQL hack, thus you can retain the integrity with the data by running it through ActiveRecord normally.</p>
-
-<!--more-->
-
-<p>At work, I am assigned a task to import millions rows of records from a 300MB CSV file into Rails app. The rake task takes in FILE and process it with ActiveRecord.</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">FILE=/tmp/big_file.csv rake data:import</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And the rake task would call my <code>ProductsImporter.run</code> method, summarised below:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ProductsImporter</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">run</span>
-</span><span class="line">    <span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class="line">    <span class="c1"># read the CSV files and assigns rows to variable rows</span>
-</span><span class="line">
-</span><span class="line">    <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span><span class="o">.</span><span class="n">transaction</span> <span class="k">do</span>
-</span><span class="line">      <span class="n">rows</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">row</span><span class="o">|</span>
-</span><span class="line">        <span class="nb">p</span> <span class="o">=</span> <span class="no">Product</span><span class="o">.</span><span class="n">find_or_initialize_by_product_id</span><span class="p">(</span><span class="n">row</span><span class="o">[</span><span class="ss">:product_id</span><span class="o">]</span><span class="p">)</span>
-</span><span class="line">        <span class="nb">p</span><span class="o">.</span><span class="n">assign_attributes</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
-</span><span class="line">        <span class="nb">p</span><span class="o">.</span><span class="n">save!</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And soon I bumped into performance issue because ActiveRecord::Transaction could not release garbage effectively. The script tooks <em>~2hrs</em> to complete. This is unacceptable to my standard.</p>
-
-<p>There are various workarounds on the net such as using <code>ar_import</code> gem which uses SQL INSERT. However I do not like these SQL solutions as there are so many callbacks with my models and data integrity is very important. So I come up with an alternative solution:</p>
-
-<ul>
-  <li>Split the big_file.csv into smaller files</li>
-  <li>Loop through these smaller chunks and recursively run rake task on each</li>
-</ul>
-
-<p>So now you wonder how the above solution works better. It is because now we run many small processes in which Rails won&#8217;t have to deal much with big GC. Once a process is completed, memory will be instantly released. Now, let&#8217;s code this up using shell script, I chose bash as example (please adapt to fit your purpose):</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-<span class="line-number">24</span>
-<span class="line-number">25</span>
-<span class="line-number">26</span>
-<span class="line-number">27</span>
-<span class="line-number">28</span>
-<span class="line-number">29</span>
-<span class="line-number">30</span>
-</pre></td><td class="code"><pre><code class="bash"><span class="line"><span class="c">#! /bin/bash</span>
-</span><span class="line">
-</span><span class="line"><span class="nv">NUMBER_OF_SPLIT_LINES</span><span class="o">=</span>50000
-</span><span class="line"><span class="nv">SPLIT_FILE_PREFIX</span><span class="o">=</span><span class="s1">&#39;small_&#39;</span>
-</span><span class="line"><span class="nv">BIG_FILE_PATH</span><span class="o">=</span>/tmp/big_file.csv
-</span><span class="line"><span class="nv">SPLIT_FILES</span><span class="o">=</span>/tmp/<span class="nv">$SPLIT_FILE_PREFIX</span>*
-</span><span class="line">
-</span><span class="line">temp_home <span class="o">()</span> <span class="o">{</span>
-</span><span class="line">  <span class="nb">cd</span> /tmp
-</span><span class="line"><span class="o">}</span>
-</span><span class="line">
-</span><span class="line">rails_app_home <span class="o">()</span> <span class="o">{</span>
-</span><span class="line">  <span class="nb">cd</span> /your_app
-</span><span class="line"><span class="o">}</span>
-</span><span class="line">
-</span><span class="line">split_big_csv_into_small_chunks <span class="o">()</span> <span class="o">{</span>
-</span><span class="line">  <span class="nb">echo</span> <span class="s2">&quot;Split $BIG_FILE_PATH file into small chunks with size $NUMBER_OF_SPLIT_LINES lines...&quot;</span>
-</span><span class="line">  temp_home <span class="o">&amp;&amp;</span> split -l <span class="nv">$NUMBER_OF_SPLIT_LINES</span> <span class="nv">$BIG_FILE_PATH</span> <span class="nv">$SPLIT_FILE_PREFIX</span>
-</span><span class="line"><span class="o">}</span>
-</span><span class="line">
-</span><span class="line">process_split_files <span class="o">()</span> <span class="o">{</span>
-</span><span class="line">  <span class="k">for </span>f in <span class="nv">$SPLIT_FILES</span>
-</span><span class="line">  <span class="k">do</span>
-</span><span class="line"><span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;Processing $f file...&quot;</span>
-</span><span class="line">    rails_app_home <span class="o">&amp;&amp;</span> <span class="nv">FILE</span><span class="o">=</span><span class="nv">$f</span> nohup rake data:import &amp;
-</span><span class="line">  <span class="k">done</span>
-</span><span class="line"><span class="o">}</span>
-</span><span class="line">
-</span><span class="line">split_big_csv_into_small_chunks
-</span><span class="line">process_split_files
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Let&#8217;s go through the above script. I use <code>split</code> UNIX command to split the big file into many smaller files, each with 50000 lines. Then I loop through these small files and parse it to rake task to run. I utilise <code>nohup</code> to make sure my script is not killed by SIGHUP (in my case, I run this script on remote host via SSH). Be noted that, I run each process in the background.</p>
-
-<p>If you want a better performant version of <code>split</code>, I highly recommend you give <code>csv_split</code> a try, please download it at https://github.com/PerformanceHorizonGroup/csv-split.</p>
-
-<p>Now, how many minutes you think our bash script would take to finish? It is <em>3 mintutes</em> - no kidding! This is a massive gain compared to 2hrs.</p>
-
-<p>Ruby/Rails are not the best for dealing with huge chunk of memory. So before deciding to try some SQL way, you can be pragmatic and abuse UNIX by spawning as many processes as your computer can handle and you&#8217;ll be surprised on how much gain you would achieve. Good luck!</p>
 ]]></content>
   </entry>
   

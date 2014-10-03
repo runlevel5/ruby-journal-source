@@ -112,38 +112,12 @@ want to add a new column and append this new column after an &hellip;">
 want to add a new column and append this new column after an existing column? Read on
 and I&#8217;ll show you how to do that with Rails in MySQL</p>
 
-<hr />
-
-<h2 id="add-new-column-after-existing-column-in-sql">Add new column after existing column in SQL</h2>
-
-<p>MySQL provides <code>AFTER</code> contrainst for <code>ADD COLUMN</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="sql"><span class="line"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">mytable</span>
-</span><span class="line"><span class="k">ADD</span> <span class="k">COLUMN</span>  <span class="n">new_column</span> <span class="o">&lt;</span><span class="k">type</span><span class="o">&gt;</span>
-</span><span class="line"><span class="k">AFTER</span>       <span class="n">existing_column</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The example above tell MySQL to create new <code>new_column</code> after <code>existing_column</code>.</p>
-
-<h2 id="doing-it-with-rails-migration">Doing it with Rails migration</h2>
-
-<p>With Rails, we could use ActiveRecord::Migration helper for the job. Let&#8217;s create
-a new migration with content:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">change</span>
-</span><span class="line">  <span class="n">add_column</span> <span class="ss">:mytable</span><span class="p">,</span> <span class="ss">:new_column</span><span class="p">,</span> <span class="s1">&#39;&lt;type&gt; AFTER existing_column&#39;</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>That&#8217;s all for today folks</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/how-to-add-new-column-after-existing-column-with-mysql-in-rails/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -182,87 +156,12 @@ a new migration with content:</p>
   <div class="entry-content">
 <p>So you search for how to moneykey-patch a class in Ruby? Read on, I&#8217;ll show you how.</p>
 
-<h2 id="note">Note</h2>
-
-<p>Ruby is very powerful and flexible. Before I show you how to override a class, I want to
-ensure that you understand that monkey-patching is not considered a good practice. It might
-be the source of hard to trace bugs.</p>
-
-<h2 id="open-existing-class-by-re-defining-class">Open existing class by re-defining class</h2>
-
-<p>Imagine we have following class:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
-</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
-</span><span class="line">    <span class="s2">&quot;hello world&quot;</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>You can open your existing class easily by re-declaring the class and its methods:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
-</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
-</span><span class="line">    <span class="s2">&quot;hello Uncle!&quot;</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The <code>Greeter#hello</code> would be overriden with new message <em>if</em> class <code>Greeter</code> does exist.</p>
-
-<p>If class <code>Greeter</code> has not been defined, then our above code would define a new Greeter class. And
-that could lead to side effect if we are not careful.</p>
-
-<h2 id="open-existing-class-with-classeval">Open existing class with class_eval</h2>
-
-<p>Alternatively, Ruby provide <code>class_eval</code> method which would check for the existence of the to-be overriden
-class. If the class does exist, the block of code that is parsed to <code>class_eval</code> would be evaluated and
-replace the existing methods. So our example above will be:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Greeter</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
-</span><span class="line">    <span class="s2">&quot;hello WORLD!&quot;</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>If class does not exist, an NameError exeception will be raised:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">NonExistingGreeter</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
-</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
-</span><span class="line">    <span class="s2">&quot;hello WORLD!&quot;</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span><span class="line"><span class="c1">#=&gt; NameError: uninitialized constant NonExistingGreeter</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>Be aware of your action before you override a class and I highly recommend you to use <code>class_eval</code> because
-it does gives you extra class existence check.</p>
 </div>
   
+  
+    <footer>
+      <a rel="full-article" href="/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/">Read on &rarr;</a>
+    </footer>
   
 
 
@@ -317,6 +216,60 @@ no differences if accessing using String or Symbol key. Introducing ActiveSuppor
   
     <footer>
       <a rel="full-article" href="/quick-guide-to-activesupport-hashwithindifferentaccess/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/how-to-integrate-sidekiq-with-activejob/">How to Integrate Sidekiq With ActiveJob</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-10-03T08:39:00+10:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2014</time>
+        
+         | <a href="/how-to-integrate-sidekiq-with-activejob/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>One of the hot thing in Rails 4.2 is the brand new ActiveJob gem, this gem consolidate
+the API for background job gems on the market such as DelayedJob, Resque, etc. Today I
+am going to guide you through how to integrate Sidekiq with ActiveJob, and you will learn:</p>
+
+<ul>
+  <li>Set up Sidekiq adapter for ActiveJob</li>
+  <li>Basic of ActiveJob class</li>
+  <li>Advanced usage of multiple queues</li>
+  <li>ActiveJob callback</li>
+  <li>ActiveJob exception catch</li>
+</ul>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/how-to-integrate-sidekiq-with-activejob/">Read on &rarr;</a>
     </footer>
   
 
@@ -606,53 +559,6 @@ as your primary key? Read on and I&#8217;ll show you how.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/liquid-template-in-ruby-done-right/">Liquid Template in Ruby Done Right</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-04-10T16:48:00+10:00" pubdate data-updated="true">Apr 10<span>th</span>, 2014</time>
-        
-         | <a href="/liquid-template-in-ruby-done-right/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>Liquid Templating Engine is an awesome technology and with the power of gem &#8216;liquid&#8217;,
-everybody can start using without much hassles. I saw many projects used this gem
-but sadly most of them are quite bad. In this tutorial, I&#8217;ll go through a bad example
-and show you how to refactor it.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/liquid-template-in-ruby-done-right/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -687,11 +593,11 @@ and show you how to refactor it.</p>
       </li>
     
       <li class="post">
-        <a href="/how-to-solve-sss-hiring-challenge/">How to solve Silicon Straits Saigon hiring challenge</a>
+        <a href="/how-to-integrate-sidekiq-with-activejob/">How to integrate Sidekiq with ActiveJob</a>
       </li>
     
       <li class="post">
-        <a href="/what-is-the-difference-between-git-rebase-and-git-merge/">What is the difference between git rebase and git merge</a>
+        <a href="/how-to-solve-sss-hiring-challenge/">How to solve Silicon Straits Saigon hiring challenge</a>
       </li>
     
   </ul>
