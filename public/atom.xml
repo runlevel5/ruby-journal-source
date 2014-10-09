@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-09-22T16:10:39+10:00</updated>
+  <updated>2014-10-09T11:11:21+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,109 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Quick guide to ActiveSupport::HashWithIndifferentAccess]]></title>
+    <link href="http://ruby-journal.com/quick-guide-to-activesupport-hashwithindifferentaccess/"/>
+    <updated>2014-10-09T10:49:00+11:00</updated>
+    <id>http://ruby-journal.com/quick-guide-to-activesupport-hashwithindifferentaccess</id>
+    <content type="html"><![CDATA[
+<p>Hash is beautiful. It is one of many things why I love Ruby. As you might have known,
+Hash is identified by a key, this key could be either a String or a Symbol. For most
+of cases, people tend to go for symbol because it would take up less memory (though it
+might come with a side effect that is Symbol is not GC-colletable (Ruby 2.2.0 does clean
+it up though)).</p>
+
+<p>There are access usecases that requires our hash key to be interchangable between String and Symbol
+key. For example, web application request parameter processing.</p>
+
+<p>We could typecast the key to either String or Symbol but it would soon emerge an
+annoying pattern. Instead, with the help of ActiveSupport, you can create a hash with
+no differences if accessing using String or Symbol key. Introducing ActiveSupport::HashWithIndifferentAccess.</p>
+
+<!--more-->
+
+<h2 id="basic-hash">Basic Hash</h2>
+
+<p>A String hash is like below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">my_string_hash</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;special_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;the string value&#39;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Or with Symbol:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">my_symbol_hash</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:special_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;the symbol value&#39;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted that the key might looks similar but they are different to each other in concept.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">my_mix_hash</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;special_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;the string value&#39;</span><span class="p">,</span> <span class="ss">:special_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;the symbol value&#39;</span> <span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="s1">&#39;special_key&#39;</span><span class="o">]</span>
+</span><span class="line"><span class="c1">#=&gt; &#39;the string value&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="ss">:special_key</span><span class="o">]</span>
+</span><span class="line"><span class="c1">#=&gt; &#39;the symbol value&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="the-indifferent-access-hash">The Indifferent Access Hash</h2>
+
+<p>If we want to consolidate two type keys into one, ActviveSupport provides a convenient way to do it:</p>
+
+<p>Ensure you install <code>actives_support</code> gem first:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">gem</span> <span class="n">install</span> <span class="n">activesupport</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Fire up your IRB:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="nb">require</span> <span class="s1">&#39;active_support/core_ext/hash/indifferent_access&#39;</span>
+</span><span class="line"><span class="n">my_mix_hash</span> <span class="o">=</span> <span class="no">HashWithIndifferentAccess</span><span class="o">.</span><span class="n">new</span>
+</span><span class="line">
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="s1">&#39;special_key&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="s1">&#39;special_key&#39;</span><span class="o">]</span>
+</span><span class="line"><span class="c1"># =&gt; value</span>
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="ss">:special_key</span><span class="o">]</span>
+</span><span class="line"><span class="c1"># =&gt; value</span>
+</span><span class="line">
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="ss">:special_key</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="s1">&#39;special_key&#39;</span><span class="o">]</span>
+</span><span class="line"><span class="c1"># =&gt; value</span>
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="ss">:special_key</span><span class="o">]</span>
+</span><span class="line"><span class="c1"># =&gt; value</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see above, our <code>my_mix_hash</code> now both points to same value regardless the type of the key.</p>
+
+<h2 id="application-in-rails">Application in Rails</h2>
+
+<p>You can find traces of HashWithIndifferentAccess in Rails controller, the magical <code>params</code> method.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to solve Silicon Straits Saigon hiring challenge]]></title>
@@ -3005,50 +3108,6 @@ it with pumactl. See you in the next article.</p>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>That&#8217;s it folks!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0]]></title>
-    <link href="http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/"/>
-    <updated>2013-10-03T19:45:00+10:00</updated>
-    <id>http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0</id>
-    <content type="html"><![CDATA[
-<p>Majority of Ruby 2.0 syntaxes are backward-compatible with Ruby 1.9. Yet there is one tiny change in the way that Ruby 2.0 does lambda rocket that would break backward-compatability with Ruby 1.9. That is&#8230;a single space. Yes, you heard it correctly.</p>
-
-<!--more-->
-
-<p>So, in Ruby 2.0, you could declare shorthand <code>lambda</code> with <code>-&gt;</code>. Here is example:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The above code runs fine under 2.0 yet failed spectacularly with 1.9:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">SyntaxError</span><span class="p">:</span> <span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">1</span><span class="p">:</span> <span class="n">syntax</span> <span class="n">error</span><span class="p">,</span> <span class="n">unexpected</span> <span class="n">tLPAREN_ARG</span><span class="p">,</span> <span class="n">expecting</span> <span class="n">keyword_do_LAMBDA</span> <span class="ow">or</span> <span class="n">tLAMBEG</span>
-</span><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
-</span><span class="line">                  <span class="o">^</span>
-</span><span class="line"><span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">1</span><span class="p">:</span> <span class="n">syntax</span> <span class="n">error</span><span class="p">,</span> <span class="n">unexpected</span> <span class="n">tLAMBEG</span><span class="p">,</span> <span class="n">expecting</span> <span class="vg">$end</span>
-</span><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
-</span><span class="line">                            <span class="o">^</span>
-</span><span class="line">  <span class="n">from</span> <span class="sr">/Users/</span><span class="n">trung_le</span><span class="o">/.</span><span class="n">rubies</span><span class="o">/</span><span class="n">ruby</span><span class="o">-</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">3</span><span class="o">-</span><span class="n">p448</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="ss">irb</span><span class="p">:</span><span class="mi">12</span><span class="ss">:in</span> <span class="sb">`&lt;main&gt;&#39;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>In order to fix this issue, we have to rid of the space between <code>-&gt;</code> and <code>(message)</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Weird, isn&#8217;t it? At least you are aware of this discrepancy now.</p>
 ]]></content>
   </entry>
   

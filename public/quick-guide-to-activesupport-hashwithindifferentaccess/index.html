@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Avoid unless syntax in a chain of conditions statement - Ruby Journal</title>
+  <title>Quick guide to ActiveSupport::HashWithIndifferentAccess - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Ruby gives us a nice human friendly unless which is equivalent to negation of if. Yet if we abuse using this method in a long complex statements, it &hellip;">
+  <meta name="description" content="Hash is beautiful. It is one of many things why I love Ruby. As you might have known,
+Hash is identified by a key, this key could be either a String &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/">
+  <link rel="canonical" href="http://ruby-journal.com/quick-guide-to-activesupport-hashwithindifferentaccess/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -78,7 +79,7 @@
   
   <header>
     
-      <h1 class="entry-title">Avoid Unless Syntax in a Chain of Conditions Statement</h1>
+      <h1 class="entry-title">Quick Guide to ActiveSupport::HashWithIndifferentAccess</h1>
     
     
       <p class="meta">
@@ -94,7 +95,7 @@
   
 
 
-<time datetime="2013-11-23T23:11:00+11:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2013</time>
+<time datetime="2014-10-09T10:49:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -104,33 +105,100 @@
 
 
 <div class="entry-content">
-<p>Ruby gives us a nice human friendly <code>unless</code> which is equivalent to negation of <code>if</code>. Yet if we abuse using this method in a long complex statements, it could add more confusion for normal readers. In this article, I&#8217;ll give you one example to prove that you should not use <code>unless</code> in a chain of conditions statement.</p>
+<p>Hash is beautiful. It is one of many things why I love Ruby. As you might have known,
+Hash is identified by a key, this key could be either a String or a Symbol. For most
+of cases, people tend to go for symbol because it would take up less memory (though it
+might come with a side effect that is Symbol is not GC-colletable (Ruby 2.2.0 does clean
+it up though)).</p>
+
+<p>There are access usecases that requires our hash key to be interchangable between String and Symbol
+key. For example, web application request parameter processing.</p>
+
+<p>We could typecast the key to either String or Symbol but it would soon emerge an
+annoying pattern. Instead, with the help of ActiveSupport, you can create a hash with
+no differences if accessing using String or Symbol key. Introducing ActiveSupport::HashWithIndifferentAccess.</p>
 
 <!--more-->
 
-<p>I have been using <code>unless</code> for a long time and to my surprise using this method in a chain of conditions is confusing for human brain as many of my colleagues misinterpret the code all the time. Here is one example:</p>
+<h2 id="basic-hash">Basic Hash</h2>
+
+<p>A String hash is like below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">my_string_hash</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;special_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;the string value&#39;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Or with Symbol:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">my_symbol_hash</span> <span class="o">=</span> <span class="p">{</span> <span class="ss">:special_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;the symbol value&#39;</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted that the key might looks similar but they are different to each other in concept.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">unless</span> <span class="vi">@employee</span><span class="o">.</span><span class="n">on_annual_leave?</span> <span class="o">||</span> <span class="vi">@employee</span><span class="o">.</span><span class="n">on_parental_leave?</span>
-</span><span class="line">  <span class="nb">puts</span> <span class="s2">&quot;You have no leave yet!&quot;</span>
-</span><span class="line"><span class="k">end</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">my_mix_hash</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;special_key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;the string value&#39;</span><span class="p">,</span> <span class="ss">:special_key</span> <span class="o">=&gt;</span> <span class="s1">&#39;the symbol value&#39;</span> <span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="s1">&#39;special_key&#39;</span><span class="o">]</span>
+</span><span class="line"><span class="c1">#=&gt; &#39;the string value&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="ss">:special_key</span><span class="o">]</span>
+</span><span class="line"><span class="c1">#=&gt; &#39;the symbol value&#39;</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Majority of normal human would read it as &#8220;if employee is not on annual leave or employee is on parental leave&#8221;. Which is completely wrong, this ambiguous code is supposed to read &#8220;if employee is <em>not</em> annual leave and employee is <em>not</em> on parental leave&#8221;. And for a complex piece of code, misreading this condition could yield detrimental issues. So I&#8217;d suggest not to use <code>unless</code> and instead to use <code>if !condition</code>. Let&#8217;s refactor our code:</p>
+<h2 id="the-indifferent-access-hash">The Indifferent Access Hash</h2>
+
+<p>If we want to consolidate two type keys into one, ActviveSupport provides a convenient way to do it:</p>
+
+<p>Ensure you install <code>actives_support</code> gem first:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">gem</span> <span class="n">install</span> <span class="n">activesupport</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Fire up your IRB:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">if</span> <span class="o">!</span><span class="vi">@employee</span><span class="o">.</span><span class="n">on_annual_leave?</span> <span class="o">||</span> <span class="o">!</span><span class="vi">@employee</span><span class="o">.</span><span class="n">on_parental_leave?</span>
-</span><span class="line">  <span class="nb">puts</span> <span class="s2">&quot;You have no leave yet!&quot;</span>
-</span><span class="line"><span class="k">end</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="nb">require</span> <span class="s1">&#39;active_support/core_ext/hash/indifferent_access&#39;</span>
+</span><span class="line"><span class="n">my_mix_hash</span> <span class="o">=</span> <span class="no">HashWithIndifferentAccess</span><span class="o">.</span><span class="n">new</span>
+</span><span class="line">
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="s1">&#39;special_key&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="s1">&#39;special_key&#39;</span><span class="o">]</span>
+</span><span class="line"><span class="c1"># =&gt; value</span>
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="ss">:special_key</span><span class="o">]</span>
+</span><span class="line"><span class="c1"># =&gt; value</span>
+</span><span class="line">
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="ss">:special_key</span><span class="o">]</span> <span class="o">=</span> <span class="s1">&#39;value&#39;</span>
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="s1">&#39;special_key&#39;</span><span class="o">]</span>
+</span><span class="line"><span class="c1"># =&gt; value</span>
+</span><span class="line"><span class="n">my_mix_hash</span><span class="o">[</span><span class="ss">:special_key</span><span class="o">]</span>
+</span><span class="line"><span class="c1"># =&gt; value</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>This code would always read as &#8220;if employee is not on annual leave or employee is not on parental leave&#8221;, which is precise to the context. So be wise before using <code>unless</code>, in cases negation with <code>if</code> is much more concise.</p>
+<p>As you can see above, our <code>my_mix_hash</code> now both points to same value regardless the type of the key.</p>
 
-<p>I hope you enjoy this short article, and please leave comments if you like it.</p>
+<h2 id="application-in-rails">Application in Rails</h2>
+
+<p>You can find traces of HashWithIndifferentAccess in Rails controller, the magical <code>params</code> method.</p>
 </div>
 
 
@@ -153,7 +221,7 @@
   
 
 
-<time datetime="2013-11-23T23:11:00+11:00" pubdate data-updated="true">Nov 23<span>rd</span>, 2013</time>
+<time datetime="2014-10-09T10:49:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
       
 
 
@@ -161,7 +229,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/" data-via="joneslee85" data-counturl="http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/quick-guide-to-activesupport-hashwithindifferentaccess/" data-via="joneslee85" data-counturl="http://ruby-journal.com/quick-guide-to-activesupport-hashwithindifferentaccess/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -174,10 +242,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/digesting-pumactl/" title="Previous Post: Digesting pumactl">&laquo; Digesting pumactl</a>
+        <a class="basic-alignment left" href="/how-to-solve-sss-hiring-challenge/" title="Previous Post: How to solve Silicon Straits Saigon hiring challenge">&laquo; How to solve Silicon Straits Saigon hiring challenge</a>
       
-      
-        <a class="basic-alignment right" href="/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/" title="Next Post: Graceful fallback for not found ActiveRecord lookup with NullObject pattern">Graceful fallback for not found ActiveRecord lookup with NullObject pattern &raquo;</a>
       
     </p>
   </footer>
@@ -305,8 +371,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/';
-        var disqus_url = 'http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/';
+        var disqus_identifier = 'http://ruby-journal.com/quick-guide-to-activesupport-hashwithindifferentaccess/';
+        var disqus_url = 'http://ruby-journal.com/quick-guide-to-activesupport-hashwithindifferentaccess/';
         var disqus_script = 'embed.js';
       
     (function () {

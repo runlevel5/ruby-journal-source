@@ -9,8 +9,8 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Hello folks For whom who might have not heard of Silicon Straits Saigon (SSS), this
-company is one cool company in Vietnam with strong focus in tech &hellip;">
+  <meta name="description" content="Hash is beautiful. It is one of many things why I love Ruby. As you might have known,
+Hash is identified by a key, this key could be either a String &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,61 @@ company is one cool company in Vietnam with strong focus in tech &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/quick-guide-to-activesupport-hashwithindifferentaccess/">Quick Guide to ActiveSupport::HashWithIndifferentAccess</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-10-09T10:49:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
+        
+         | <a href="/quick-guide-to-activesupport-hashwithindifferentaccess/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>Hash is beautiful. It is one of many things why I love Ruby. As you might have known,
+Hash is identified by a key, this key could be either a String or a Symbol. For most
+of cases, people tend to go for symbol because it would take up less memory (though it
+might come with a side effect that is Symbol is not GC-colletable (Ruby 2.2.0 does clean
+it up though)).</p>
+
+<p>There are access usecases that requires our hash key to be interchangable between String and Symbol
+key. For example, web application request parameter processing.</p>
+
+<p>We could typecast the key to either String or Symbol but it would soon emerge an
+annoying pattern. Instead, with the help of ActiveSupport, you can create a hash with
+no differences if accessing using String or Symbol key. Introducing ActiveSupport::HashWithIndifferentAccess.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/quick-guide-to-activesupport-hashwithindifferentaccess/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -499,53 +554,6 @@ in controller.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/genereate-gems-dependency-graph-with-bundler/">Genereate Gems Dependency Graph With Bundler</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-03-18T13:34:00+11:00" pubdate data-updated="true">Mar 18<span>th</span>, 2014</time>
-        
-         | <a href="/genereate-gems-dependency-graph-with-bundler/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>One of the features I like about RubyMine is the gems dependency graph.
-This graps shows you all explicit/implicit dependencies of gems defined in
-your Gemfile. In this short tutorial, I&#8217;ll show how to generate this graph
-with Bundler.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/genereate-gems-dependency-graph-with-bundler/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -568,6 +576,10 @@ with Bundler.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/quick-guide-to-activesupport-hashwithindifferentaccess/">Quick guide to ActiveSupport::HashWithIndifferentAccess</a>
+      </li>
+    
+      <li class="post">
         <a href="/how-to-solve-sss-hiring-challenge/">How to solve Silicon Straits Saigon hiring challenge</a>
       </li>
     
@@ -581,10 +593,6 @@ with Bundler.</p>
     
       <li class="post">
         <a href="/how-to-write-custom-serializer-for-activerecord-number-serialize/">How to write custom serializer for ActiveRecord#serialize</a>
-      </li>
-    
-      <li class="post">
-        <a href="/how-to-override-default-primary-key-id-in-rails/">How to override default primary key id in Rails</a>
       </li>
     
   </ul>
