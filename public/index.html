@@ -9,7 +9,8 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="So you search for how to moneykey-patch a class in Ruby? Read on, I&#8217;ll show you how. Note Ruby is very powerful and flexible. Before I show &hellip;">
+  <meta name="description" content="By default, SQL ADD COLUMN would add new column to the tail of columns. What if you
+want to add a new column and append this new column after an &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +76,78 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/how-to-add-new-column-after-existing-column-with-mysql-in-rails/">How to Add New Column After Existing Column With MySQL in Rails?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-10-09T15:27:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
+        
+         | <a href="/how-to-add-new-column-after-existing-column-with-mysql-in-rails/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>By default, SQL <code>ADD COLUMN</code> would add new column to the tail of columns. What if you
+want to add a new column and append this new column after an existing column? Read on
+and I&#8217;ll show you how to do that with Rails in MySQL</p>
+
+<hr />
+
+<h2 id="add-new-column-after-existing-column-in-sql">Add new column after existing column in SQL</h2>
+
+<p>MySQL provides <code>AFTER</code> contrainst for <code>ADD COLUMN</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="sql"><span class="line"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">mytable</span>
+</span><span class="line"><span class="k">ADD</span> <span class="k">COLUMN</span>  <span class="n">new_column</span> <span class="o">&lt;</span><span class="k">type</span><span class="o">&gt;</span>
+</span><span class="line"><span class="k">AFTER</span>       <span class="n">existing_column</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The example above tell MySQL to create new <code>new_column</code> after <code>existing_column</code>.</p>
+
+<h2 id="doing-it-with-rails-migration">Doing it with Rails migration</h2>
+
+<p>With Rails, we could use ActiveRecord::Migration helper for the job. Let&#8217;s create
+a new migration with content:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">change</span>
+</span><span class="line">  <span class="n">add_column</span> <span class="ss">:mytable</span><span class="p">,</span> <span class="ss">:new_column</span><span class="p">,</span> <span class="s1">&#39;&lt;type&gt; AFTER existing_column&#39;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That&#8217;s all for today folks</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -580,52 +653,6 @@ and show you how to refactor it.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/">How to Style Kaminari Pagination With Twitter Bootstrap 3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-04-01T19:04:00+11:00" pubdate data-updated="true">Apr 1<span>st</span>, 2014</time>
-        
-         | <a href="/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>Kamiari is an awesome that would do all heavy-lifting work if you want to do pagination.
-Yet Kaminari&#8217;s default layout does not fit well with Twitter Bootstrap pagination styling.
-In this tutorial, I&#8217;ll show you how to make Kaminari play well with Bootstrap v3.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -648,6 +675,10 @@ In this tutorial, I&#8217;ll show you how to make Kaminari play well with Bootst
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/how-to-add-new-column-after-existing-column-with-mysql-in-rails/">How to add new column after existing column with MySQL in Rails?</a>
+      </li>
+    
+      <li class="post">
         <a href="/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/">How to open/override/monkey-patch a class in Ruby?</a>
       </li>
     
@@ -661,10 +692,6 @@ In this tutorial, I&#8217;ll show you how to make Kaminari play well with Bootst
     
       <li class="post">
         <a href="/what-is-the-difference-between-git-rebase-and-git-merge/">What is the difference between git rebase and git merge</a>
-      </li>
-    
-      <li class="post">
-        <a href="/override-ordering-with-activerecord/">Override ordering with ActiveRecord</a>
       </li>
     
   </ul>

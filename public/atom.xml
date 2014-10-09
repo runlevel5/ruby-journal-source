@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-10-09T11:31:04+11:00</updated>
+  <updated>2014-10-09T15:34:37+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,49 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to add new column after existing column with MySQL in Rails?]]></title>
+    <link href="http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/"/>
+    <updated>2014-10-09T15:27:00+11:00</updated>
+    <id>http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails</id>
+    <content type="html"><![CDATA[
+<p>By default, SQL <code>ADD COLUMN</code> would add new column to the tail of columns. What if you
+want to add a new column and append this new column after an existing column? Read on
+and I&#8217;ll show you how to do that with Rails in MySQL</p>
+
+<hr />
+
+<h2 id="add-new-column-after-existing-column-in-sql">Add new column after existing column in SQL</h2>
+
+<p>MySQL provides <code>AFTER</code> contrainst for <code>ADD COLUMN</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="sql"><span class="line"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">mytable</span>
+</span><span class="line"><span class="k">ADD</span> <span class="k">COLUMN</span>  <span class="n">new_column</span> <span class="o">&lt;</span><span class="k">type</span><span class="o">&gt;</span>
+</span><span class="line"><span class="k">AFTER</span>       <span class="n">existing_column</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The example above tell MySQL to create new <code>new_column</code> after <code>existing_column</code>.</p>
+
+<h2 id="doing-it-with-rails-migration">Doing it with Rails migration</h2>
+
+<p>With Rails, we could use ActiveRecord::Migration helper for the job. Let&#8217;s create
+a new migration with content:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">change</span>
+</span><span class="line">  <span class="n">add_column</span> <span class="ss">:mytable</span><span class="p">,</span> <span class="ss">:new_column</span><span class="p">,</span> <span class="s1">&#39;&lt;type&gt; AFTER existing_column&#39;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That&#8217;s all for today folks</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to open/override/monkey-patch a class in Ruby?]]></title>
@@ -3103,71 +3146,6 @@ it with pumactl. See you in the next article.</p>
 <p>Now, how many minutes you think our bash script would take to finish? It is <em>3 mintutes</em> - no kidding! This is a massive gain compared to 2hrs.</p>
 
 <p>Ruby/Rails are not the best for dealing with huge chunk of memory. So before deciding to try some SQL way, you can be pragmatic and abuse UNIX by spawning as many processes as your computer can handle and you&#8217;ll be surprised on how much gain you would achieve. Good luck!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Faster TravisCI test]]></title>
-    <link href="http://ruby-journal.com/faster-travisci-test/"/>
-    <updated>2013-10-11T12:37:00+11:00</updated>
-    <id>http://ruby-journal.com/faster-travisci-test</id>
-    <content type="html"><![CDATA[
-<p>Running test suite is time consuming. There are various techniques to optimize the runtime performance of the CI by stub/mock, parallel_test, etc. In this short tutorial, I&#8217;ll show you how to optimize your TravisCI test suite by splitting your test suit into concurrent jobs, which drastically improve the build time.</p>
-
-<!--more-->
-
-<p>I have a Rails app with rspec. Here are specs that are run sequentially:</p>
-
-<ul>
-  <li>models</li>
-  <li>controllers</li>
-  <li>helpers</li>
-  <li>routing</li>
-  <li>views</li>
-  <li>features</li>
-</ul>
-
-<p>Running specs sequentially is slow. Travis can break these specs into concurrent jobs for you. You need to modify your <code>.travis.yml</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">language: ruby
-</span><span class="line">rvm:
-</span><span class="line">  - 2.0.0
-</span><span class="line">bundler_args: --without development production --quiet
-</span><span class="line">env:
-</span><span class="line">  - TEST_SUITE=features
-</span><span class="line">  - TEST_SUITE=controllers
-</span><span class="line">  - TEST_SUITE=helpers
-</span><span class="line">  - TEST_SUITE=models
-</span><span class="line">  - TEST_SUITE=routing
-</span><span class="line">  - TEST_SUITE=views
-</span><span class="line">script:
-</span><span class="line">  - bundle exec rspec spec/$TEST_SUITE/*</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>As you can see in the above YAML file, we set <code>$TEST_SUITE</code> env variable with the name of our spec folders. This variable will get substitute into <code>bundle exec rspec spec/$TEST_SUITE/*</code> call.</p>
-
-<p>Once you push new change to your GitHub, TravisCI now run 6 concurrent jobs at the same time. My build before take 45mins, now reduce to 18mins. That&#8217;s a great improvement. Please be noted that, please upgrade to 10 concurrent build plan if you are using Travis Pro service.</p>
-
-<p>Furthmore, you could cut at least 3 more mins by enabling the experimental bundler caching (which is only available for Travis Pro plan now). Append to your <code>.travis.yml</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">cache: bundler</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Travis will cache your bundler and next build will not waste their time with bundler install anymore which save time.</p>
-
-<p>By using <code>env</code> and <code>cache</code> option, you could reduce the build time by at least 60%. You could push further by breaking your slow specs and group them together and have them run separately too. Or you could introduce parallel_test gem into your app, this would save you at least 30% more. I hope you enjoy the tutorial and see you next time.</p>
 ]]></content>
   </entry>
   

@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Becareful with space in lambda rocket syntax between Ruby 1.9 and 2.0 - Ruby Journal</title>
+  <title>How to add new column after existing column with MySQL in Rails? - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Majority of Ruby 2.0 syntaxes are backward-compatible with Ruby 1.9. Yet there is one tiny change in the way that Ruby 2.0 does lambda rocket that &hellip;">
+  <meta name="description" content="By default, SQL ADD COLUMN would add new column to the tail of columns. What if you
+want to add a new column and append this new column after an &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/">
+  <link rel="canonical" href="http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -78,7 +79,7 @@
   
   <header>
     
-      <h1 class="entry-title">Becareful With Space in Lambda Rocket Syntax Between Ruby 1.9 and 2.0</h1>
+      <h1 class="entry-title">How to Add New Column After Existing Column With MySQL in Rails?</h1>
     
     
       <p class="meta">
@@ -94,7 +95,7 @@
   
 
 
-<time datetime="2013-10-03T19:45:00+10:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2013</time>
+<time datetime="2014-10-09T15:27:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -104,41 +105,40 @@
 
 
 <div class="entry-content">
-<p>Majority of Ruby 2.0 syntaxes are backward-compatible with Ruby 1.9. Yet there is one tiny change in the way that Ruby 2.0 does lambda rocket that would break backward-compatability with Ruby 1.9. That is&#8230;a single space. Yes, you heard it correctly.</p>
+<p>By default, SQL <code>ADD COLUMN</code> would add new column to the tail of columns. What if you
+want to add a new column and append this new column after an existing column? Read on
+and I&#8217;ll show you how to do that with Rails in MySQL</p>
 
-<!--more-->
+<hr />
 
-<p>So, in Ruby 2.0, you could declare shorthand <code>lambda</code> with <code>-&gt;</code>. Here is example:</p>
+<h2 id="add-new-column-after-existing-column-in-sql">Add new column after existing column in SQL</h2>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The above code runs fine under 2.0 yet failed spectacularly with 1.9:</p>
+<p>MySQL provides <code>AFTER</code> contrainst for <code>ADD COLUMN</code>:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">SyntaxError</span><span class="p">:</span> <span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">1</span><span class="p">:</span> <span class="n">syntax</span> <span class="n">error</span><span class="p">,</span> <span class="n">unexpected</span> <span class="n">tLPAREN_ARG</span><span class="p">,</span> <span class="n">expecting</span> <span class="n">keyword_do_LAMBDA</span> <span class="ow">or</span> <span class="n">tLAMBEG</span>
-</span><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
-</span><span class="line">                  <span class="o">^</span>
-</span><span class="line"><span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">1</span><span class="p">:</span> <span class="n">syntax</span> <span class="n">error</span><span class="p">,</span> <span class="n">unexpected</span> <span class="n">tLAMBEG</span><span class="p">,</span> <span class="n">expecting</span> <span class="vg">$end</span>
-</span><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
-</span><span class="line">                            <span class="o">^</span>
-</span><span class="line">  <span class="n">from</span> <span class="sr">/Users/</span><span class="n">trung_le</span><span class="o">/.</span><span class="n">rubies</span><span class="o">/</span><span class="n">ruby</span><span class="o">-</span><span class="mi">1</span><span class="o">.</span><span class="mi">9</span><span class="o">.</span><span class="mi">3</span><span class="o">-</span><span class="n">p448</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="ss">irb</span><span class="p">:</span><span class="mi">12</span><span class="ss">:in</span> <span class="sb">`&lt;main&gt;&#39;</span>
+</pre></td><td class="code"><pre><code class="sql"><span class="line"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">mytable</span>
+</span><span class="line"><span class="k">ADD</span> <span class="k">COLUMN</span>  <span class="n">new_column</span> <span class="o">&lt;</span><span class="k">type</span><span class="o">&gt;</span>
+</span><span class="line"><span class="k">AFTER</span>       <span class="n">existing_column</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>In order to fix this issue, we have to rid of the space between <code>-&gt;</code> and <code>(message)</code>:</p>
+<p>The example above tell MySQL to create new <code>new_column</code> after <code>existing_column</code>.</p>
+
+<h2 id="doing-it-with-rails-migration">Doing it with Rails migration</h2>
+
+<p>With Rails, we could use ActiveRecord::Migration helper for the job. Let&#8217;s create
+a new migration with content:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">hello_world</span> <span class="o">=</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span> <span class="nb">puts</span> <span class="n">message</span> <span class="p">}</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">change</span>
+</span><span class="line">  <span class="n">add_column</span> <span class="ss">:mytable</span><span class="p">,</span> <span class="ss">:new_column</span><span class="p">,</span> <span class="s1">&#39;&lt;type&gt; AFTER existing_column&#39;</span>
+</span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Weird, isn&#8217;t it? At least you are aware of this discrepancy now.</p>
+<p>That&#8217;s all for today folks</p>
 </div>
 
 
@@ -161,7 +161,7 @@
   
 
 
-<time datetime="2013-10-03T19:45:00+10:00" pubdate data-updated="true">Oct 3<span>rd</span>, 2013</time>
+<time datetime="2014-10-09T15:27:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
       
 
 
@@ -169,7 +169,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/" data-via="joneslee85" data-counturl="http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -182,10 +182,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/rails-4-changes-join-table-naming-convention/" title="Previous Post: Rails 4 changes habtm join table naming convention">&laquo; Rails 4 changes habtm join table naming convention</a>
+        <a class="basic-alignment left" href="/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/" title="Previous Post: How to open/override/monkey-patch a class in Ruby?">&laquo; How to open/override/monkey-patch a class in Ruby?</a>
       
-      
-        <a class="basic-alignment right" href="/how-to-uninstall-all-ruby-gems/" title="Next Post: How to uninstall all Ruby gems">How to uninstall all Ruby gems &raquo;</a>
       
     </p>
   </footer>
@@ -313,8 +311,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/';
-        var disqus_url = 'http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/';
+        var disqus_identifier = 'http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/';
+        var disqus_url = 'http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/';
         var disqus_script = 'embed.js';
       
     (function () {
