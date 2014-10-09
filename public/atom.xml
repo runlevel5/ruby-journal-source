@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-10-09T11:11:21+11:00</updated>
+  <updated>2014-10-09T11:31:04+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,96 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to open/override/monkey-patch a class in Ruby?]]></title>
+    <link href="http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/"/>
+    <updated>2014-10-09T11:18:00+11:00</updated>
+    <id>http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby</id>
+    <content type="html"><![CDATA[
+<p>So you search for how to moneykey-patch a class in Ruby? Read on, I&#8217;ll show you how.</p>
+
+<h2 id="note">Note</h2>
+
+<p>Ruby is very powerful and flexible. Before I show you how to override a class, I want to
+ensure that you understand that monkey-patching is not considered a good practice. It might
+be the source of hard to trace bugs.</p>
+
+<h2 id="open-existing-class-by-re-defining-class">Open existing class by re-defining class</h2>
+
+<p>Imagine we have following class:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello world&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You can open your existing class easily by re-declaring the class and its methods:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello Uncle!&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>Greeter#hello</code> would be overriden with new message <em>if</em> class <code>Greeter</code> does exist.</p>
+
+<p>If class <code>Greeter</code> has not been defined, then our above code would define a new Greeter class. And
+that could lead to side effect if we are not careful.</p>
+
+<h2 id="open-existing-class-with-classeval">Open existing class with class_eval</h2>
+
+<p>Alternatively, Ruby provide <code>class_eval</code> method which would check for the existence of the to-be overriden
+class. If the class does exist, the block of code that is parsed to <code>class_eval</code> would be evaluated and
+replace the existing methods. So our example above will be:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Greeter</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello WORLD!&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If class does not exist, an NameError exeception will be raised:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">NonExistingGreeter</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello WORLD!&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line"><span class="c1">#=&gt; NameError: uninitialized constant NonExistingGreeter</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Be aware of your action before you override a class and I highly recommend you to use <code>class_eval</code> because
+it does gives you extra class existence check.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Quick guide to ActiveSupport::HashWithIndifferentAccess]]></title>
@@ -3078,36 +3168,6 @@ it with pumactl. See you in the next article.</p>
 <p>Travis will cache your bundler and next build will not waste their time with bundler install anymore which save time.</p>
 
 <p>By using <code>env</code> and <code>cache</code> option, you could reduce the build time by at least 60%. You could push further by breaking your slow specs and group them together and have them run separately too. Or you could introduce parallel_test gem into your app, this would save you at least 30% more. I hope you enjoy the tutorial and see you next time.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to uninstall all Ruby gems]]></title>
-    <link href="http://ruby-journal.com/how-to-uninstall-all-ruby-gems/"/>
-    <updated>2013-10-11T12:01:00+11:00</updated>
-    <id>http://ruby-journal.com/how-to-uninstall-all-ruby-gems</id>
-    <content type="html"><![CDATA[
-<p>In order to uninstall all gems, you have to loop through all entries in <code>gem list</code> with bash scripting. This method is very inconveninent. Thanks to Rubygems 2.1.0, you now could do it with one command.</p>
-
-<!--more-->
-
-<p>Firstly, please make sure you upgrade your Rubygems to 2.1.0 or newer:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">gem</span> <span class="n">update</span> <span class="o">--</span><span class="nb">system</span>
-</span><span class="line"><span class="n">gem</span> <span class="o">--</span><span class="n">version</span>
-</span><span class="line"><span class="c1"># 2.1.8</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>and in order to uninstall all gems:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">gem</span> <span class="n">uninstall</span> <span class="o">--</span><span class="n">all</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>That&#8217;s it folks!</p>
 ]]></content>
   </entry>
   

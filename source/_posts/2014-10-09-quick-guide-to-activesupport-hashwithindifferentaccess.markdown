@@ -4,7 +4,7 @@ title: "Quick guide to ActiveSupport::HashWithIndifferentAccess"
 date: 2014-10-09 10:49
 comments: true
 categories:
-tags: postgresql, ruby, rails
+tags: ruby, rails
 author: "Trung Lê"
 ---
 

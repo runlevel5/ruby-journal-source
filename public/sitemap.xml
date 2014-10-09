@@ -178,14 +178,20 @@
     </url>
     <url>
         <loc>http://ruby-journal.com/quick-guide-to-activesupport-hashwithindifferentaccess/</loc>
-        <lastmod>2014-10-09T11:10:32+11:00</lastmod>
+        <lastmod>2014-10-09T11:18:26+11:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/
+        </loc>
+        <lastmod>2014-10-09T11:30:35+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2014-10-09T11:10:32+11:00</lastmod>
+        <lastmod>2014-10-09T11:30:35+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2014-10-09T11:10:32+11:00</lastmod>
+        <lastmod>2014-10-09T11:30:35+11:00</lastmod>
     </url>
 </urlset>

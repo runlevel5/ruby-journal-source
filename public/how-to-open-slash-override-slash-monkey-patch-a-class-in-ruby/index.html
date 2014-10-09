@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>How to style kaminari pagination with Twitter Bootstrap 3 - Ruby Journal</title>
+  <title>How to open/override/monkey-patch a class in Ruby? - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Kamiari is an awesome that would do all heavy-lifting work if you want to do pagination.
-Yet Kaminari&#8217;s default layout does not fit well with &hellip;">
+  <meta name="description" content="So you search for how to moneykey-patch a class in Ruby? Read on, I&#8217;ll show you how. Note Ruby is very powerful and flexible. Before I show &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ Yet Kaminari&#8217;s default layout does not fit well with &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/">
+  <link rel="canonical" href="http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +78,7 @@ Yet Kaminari&#8217;s default layout does not fit well with &hellip;">
   
   <header>
     
-      <h1 class="entry-title">How to Style Kaminari Pagination With Twitter Bootstrap 3</h1>
+      <h1 class="entry-title">How to Open/override/monkey-patch a Class in Ruby?</h1>
     
     
       <p class="meta">
@@ -95,7 +94,7 @@ Yet Kaminari&#8217;s default layout does not fit well with &hellip;">
   
 
 
-<time datetime="2014-04-01T19:04:00+11:00" pubdate data-updated="true">Apr 1<span>st</span>, 2014</time>
+<time datetime="2014-10-09T11:18:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,34 +104,68 @@ Yet Kaminari&#8217;s default layout does not fit well with &hellip;">
 
 
 <div class="entry-content">
-<p>Kamiari is an awesome that would do all heavy-lifting work if you want to do pagination.
-Yet Kaminari&#8217;s default layout does not fit well with Twitter Bootstrap pagination styling.
-In this tutorial, I&#8217;ll show you how to make Kaminari play well with Bootstrap v3.</p>
+<p>So you search for how to moneykey-patch a class in Ruby? Read on, I&#8217;ll show you how.</p>
 
-<!--more-->
+<h2 id="note">Note</h2>
 
-<p>First thing, assume we have <code>app/views/products/index.html.haml</code>, place the
-Kaminari&#8217;s <code>paginate</code> call in this template:</p>
+<p>Ruby is very powerful and flexible. Before I show you how to override a class, I want to
+ensure that you understand that monkey-patching is not considered a good practice. It might
+be the source of hard to trace bugs.</p>
+
+<h2 id="open-existing-class-by-re-defining-class">Open existing class by re-defining class</h2>
+
+<p>Imagine we have following class:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class="haml"><span class="line">...
-</span><span class="line"><span class="p">=</span> <span class="n">paginate</span> <span class="vi">@products</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello world&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>By default, Kaminari will generate a list of <code>nav</code> wrapped under a div, which is
-totally different to the <code>ul li</code> structures of Bootstrap pagination.</p>
-
-<p>No problemo! we could tweak this. Now we need to tell bootstrap to generate template files:</p>
+<p>You can open your existing class easily by re-declaring the class and its methods:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="haml"><span class="line">rails generate kaminari:views bootstrap
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello Uncle!&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>which create various fields under <code>app/views/kaminari</code>.</p>
+<p>The <code>Greeter#hello</code> would be overriden with new message <em>if</em> class <code>Greeter</code> does exist.</p>
 
-<p>Next, we need to edit <code>app/views/kaminari/_paginator.html.haml</code> and replace the
-content with:</p>
+<p>If class <code>Greeter</code> has not been defined, then our above code would define a new Greeter class. And
+that could lead to side effect if we are not careful.</p>
+
+<h2 id="open-existing-class-with-classeval">Open existing class with class_eval</h2>
+
+<p>Alternatively, Ruby provide <code>class_eval</code> method which would check for the existence of the to-be overriden
+class. If the class does exist, the block of code that is parsed to <code>class_eval</code> would be evaluated and
+replace the existing methods. So our example above will be:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Greeter</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello WORLD!&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If class does not exist, an NameError exeception will be raised:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -140,30 +173,18 @@ content with:</p>
 <span class="line-number">4</span>
 <span class="line-number">5</span>
 <span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-</pre></td><td class="code"><pre><code class="haml"><span class="line"><span class="p">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">render</span> <span class="k">do</span>
-</span><span class="line">  <span class="nt">%ul</span><span class="nc">.pagination.pagination-lg</span>
-</span><span class="line">    <span class="p">=</span> <span class="n">first_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">first?</span>
-</span><span class="line">    <span class="p">=</span> <span class="n">prev_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">first?</span>
-</span><span class="line">    <span class="p">-</span> <span class="n">each_page</span> <span class="k">do</span> <span class="o">|</span><span class="n">page</span><span class="o">|</span>
-</span><span class="line">      <span class="p">-</span> <span class="k">if</span> <span class="n">page</span><span class="o">.</span><span class="n">left_outer?</span> <span class="o">||</span> <span class="n">page</span><span class="o">.</span><span class="n">right_outer?</span> <span class="o">||</span> <span class="n">page</span><span class="o">.</span><span class="n">inside_window?</span>
-</span><span class="line">        <span class="p">=</span> <span class="n">page_tag</span> <span class="n">page</span>
-</span><span class="line">      <span class="p">-</span> <span class="k">elsif</span> <span class="o">!</span><span class="n">page</span><span class="o">.</span><span class="n">was_truncated?</span>
-</span><span class="line">        <span class="p">=</span> <span class="n">gap_tag</span>
-</span><span class="line">    <span class="p">=</span> <span class="n">next_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">last?</span>
-</span><span class="line">    <span class="p">=</span> <span class="n">last_page_tag</span> <span class="k">unless</span> <span class="n">current_page</span><span class="o">.</span><span class="n">last?</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">NonExistingGreeter</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello WORLD!&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line"><span class="c1">#=&gt; NameError: uninitialized constant NonExistingGreeter</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>What we did above is getting rid of <code>div.pagination</code> and adding class
-<code>pagination</code> to <code>ul</code> tag</p>
+<h2 id="conclusion">Conclusion</h2>
 
-<p>That&#8217;s it, now you have Twitter Bootstrap 3 pagination powered by Kaminari!</p>
-
-<p>Keep on learning guys!</p>
+<p>Be aware of your action before you override a class and I highly recommend you to use <code>class_eval</code> because
+it does gives you extra class existence check.</p>
 </div>
 
 
@@ -186,7 +207,7 @@ content with:</p>
   
 
 
-<time datetime="2014-04-01T19:04:00+11:00" pubdate data-updated="true">Apr 1<span>st</span>, 2014</time>
+<time datetime="2014-10-09T11:18:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
       
 
 
@@ -194,7 +215,7 @@ content with:</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -207,10 +228,8 @@ content with:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/create-dummy-controller-for-testing-with-rspec-rails/" title="Previous Post: Create dummy controller for testing with rspec-rails">&laquo; Create dummy controller for testing with rspec-rails</a>
+        <a class="basic-alignment left" href="/quick-guide-to-activesupport-hashwithindifferentaccess/" title="Previous Post: Quick guide to ActiveSupport::HashWithIndifferentAccess">&laquo; Quick guide to ActiveSupport::HashWithIndifferentAccess</a>
       
-      
-        <a class="basic-alignment right" href="/liquid-template-in-ruby-done-right/" title="Next Post: Liquid template in Ruby done right">Liquid template in Ruby done right &raquo;</a>
       
     </p>
   </footer>
@@ -338,8 +357,8 @@ content with:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/';
-        var disqus_url = 'http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/';
+        var disqus_identifier = 'http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/';
+        var disqus_url = 'http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/';
         var disqus_script = 'embed.js';
       
     (function () {

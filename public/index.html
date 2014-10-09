@@ -9,8 +9,7 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Hash is beautiful. It is one of many things why I love Ruby. As you might have known,
-Hash is identified by a key, this key could be either a String &hellip;">
+  <meta name="description" content="So you search for how to moneykey-patch a class in Ruby? Read on, I&#8217;ll show you how. Note Ruby is very powerful and flexible. Before I show &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +75,125 @@ Hash is identified by a key, this key could be either a String &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/">How to Open/override/monkey-patch a Class in Ruby?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-10-09T11:18:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
+        
+         | <a href="/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>So you search for how to moneykey-patch a class in Ruby? Read on, I&#8217;ll show you how.</p>
+
+<h2 id="note">Note</h2>
+
+<p>Ruby is very powerful and flexible. Before I show you how to override a class, I want to
+ensure that you understand that monkey-patching is not considered a good practice. It might
+be the source of hard to trace bugs.</p>
+
+<h2 id="open-existing-class-by-re-defining-class">Open existing class by re-defining class</h2>
+
+<p>Imagine we have following class:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello world&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You can open your existing class easily by re-declaring the class and its methods:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello Uncle!&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>Greeter#hello</code> would be overriden with new message <em>if</em> class <code>Greeter</code> does exist.</p>
+
+<p>If class <code>Greeter</code> has not been defined, then our above code would define a new Greeter class. And
+that could lead to side effect if we are not careful.</p>
+
+<h2 id="open-existing-class-with-classeval">Open existing class with class_eval</h2>
+
+<p>Alternatively, Ruby provide <code>class_eval</code> method which would check for the existence of the to-be overriden
+class. If the class does exist, the block of code that is parsed to <code>class_eval</code> would be evaluated and
+replace the existing methods. So our example above will be:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Greeter</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello WORLD!&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If class does not exist, an NameError exeception will be raised:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">NonExistingGreeter</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="s2">&quot;hello WORLD!&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line"><span class="c1">#=&gt; NameError: uninitialized constant NonExistingGreeter</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Be aware of your action before you override a class and I highly recommend you to use <code>class_eval</code> because
+it does gives you extra class existence check.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -508,52 +626,6 @@ In this tutorial, I&#8217;ll show you how to make Kaminari play well with Bootst
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/create-dummy-controller-for-testing-with-rspec-rails/">Create Dummy Controller for Testing With Rspec-rails</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-03-24T09:21:00+11:00" pubdate data-updated="true">Mar 24<span>th</span>, 2014</time>
-        
-         | <a href="/create-dummy-controller-for-testing-with-rspec-rails/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>Today I learned a nitfy trick from Jon Rowe on how to to create anonymous controller
-with rspec-rails for controller spec. This would aid testing action callbacks testing
-in controller.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/create-dummy-controller-for-testing-with-rspec-rails/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -576,6 +648,10 @@ in controller.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/">How to open/override/monkey-patch a class in Ruby?</a>
+      </li>
+    
+      <li class="post">
         <a href="/quick-guide-to-activesupport-hashwithindifferentaccess/">Quick guide to ActiveSupport::HashWithIndifferentAccess</a>
       </li>
     
@@ -589,10 +665,6 @@ in controller.</p>
     
       <li class="post">
         <a href="/override-ordering-with-activerecord/">Override ordering with ActiveRecord</a>
-      </li>
-    
-      <li class="post">
-        <a href="/how-to-write-custom-serializer-for-activerecord-number-serialize/">How to write custom serializer for ActiveRecord#serialize</a>
       </li>
     
   </ul>
