@@ -392,6 +392,13 @@ report = Report.find(id)
 SomeJob.perform_later(report)
 ```
 
+## Rails 3.2.x support?
+
+I back-ported AJ to Rails 3.2.x, you can find the gem at:
+
+https://github.com/ruby-journal/passive_job/
+
+
 ## Conclusion
 
 ActiveJob is surely a nice addition to Rails stack, it makes scheduling background jobs easier and more intuitive.

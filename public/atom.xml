@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-10-04T07:56:51+10:00</updated>
+  <updated>2014-10-13T20:05:43+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -743,6 +743,12 @@ or GlobalID instances.</p>
 </span><span class="line"><span class="n">report</span> <span class="o">=</span> <span class="no">Report</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
 </span><span class="line"><span class="no">SomeJob</span><span class="o">.</span><span class="n">perform_later</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="rails-32x-support">Rails 3.2.x support?</h2>
+
+<p>I back-ported AJ to Rails 3.2.x, you can find the gem at:</p>
+
+<p>https://github.com/ruby-journal/passive_job/</p>
 
 <h2 id="conclusion">Conclusion</h2>
 
