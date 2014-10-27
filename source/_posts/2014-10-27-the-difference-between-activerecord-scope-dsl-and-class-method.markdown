@@ -77,7 +77,7 @@ is returned implicitly. For the DSL version, the chain scope is returend,
 that is the ActiveRelation object.
 
 I naively copy 1:1 the same implementation of DSL to my class method implementation
-and I got `nil` as reuturn value instead. This breaks the chain (if we use our scope in combination
+and I got `nil` as returned value instead. This breaks the chain (if we use our scope in combination
 with other scopes). The class method must be rewritten as:
 
 
