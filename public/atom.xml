@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-10-28T00:03:41+11:00</updated>
+  <updated>2014-10-28T00:24:46+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -116,7 +116,7 @@ is returned implicitly. For the DSL version, the chain scope is returend,
 that is the ActiveRelation object.</p>
 
 <p>I naively copy 1:1 the same implementation of DSL to my class method implementation
-and I got <code>nil</code> as reuturn value instead. This breaks the chain (if we use our scope in combination
+and I got <code>nil</code> as returned value instead. This breaks the chain (if we use our scope in combination
 with other scopes). The class method must be rewritten as:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
