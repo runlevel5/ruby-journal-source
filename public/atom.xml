@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-10-13T20:05:43+11:00</updated>
+  <updated>2014-10-28T00:03:41+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,139 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The difference between ActiveRecord scope DSL and class method]]></title>
+    <link href="http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/"/>
+    <updated>2014-10-27T12:14:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method</id>
+    <content type="html"><![CDATA[
+<p>Now and then I get question from people should they use class method or the
+scope DSL for ActiveRecord scope. At first I thought they are the same but
+in fact there are minor differences.</p>
+
+<!--more-->
+
+<h2 id="how-to-define-scope">How to define scope?</h2>
+
+<p>There are 2 ways to define ActiveRecord model scope:</p>
+
+<ul>
+  <li>scope DSL</li>
+  <li>class method</li>
+</ul>
+
+<h2 id="simple-example">Simple example</h2>
+
+<p>Let&#8217;s see both of them in action with following example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># DSL</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Taxi</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">scope</span> <span class="ss">:by_driver</span><span class="p">,</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span> <span class="p">{</span> <span class="n">where</span><span class="p">(</span><span class="n">driver_id</span><span class="p">:</span> <span class="n">driver</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="p">}</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="c1"># class method</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Taxi</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">by_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</span><span class="line">    <span class="n">where</span><span class="p">(</span><span class="n">driver_id</span><span class="p">:</span> <span class="n">driver</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Both ways returns us ActiveRelation scope which seems the same. In fact
+in this case, they are alike with one minor difference, that is the DSL
+version doc comment won&#8217;t be picked up by RDoc.</p>
+
+<h2 id="complex-example">Complex example</h2>
+
+<p>Please be careful if you have a complex scope like below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># DSL</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Driver</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">scope</span> <span class="ss">:by_shift</span><span class="p">,</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span> <span class="k">do</span>
+</span><span class="line">    <span class="k">return</span> <span class="k">if</span> <span class="n">shift</span> <span class="o">==</span> <span class="s1">&#39;night&#39;</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">where</span><span class="p">(</span><span class="ss">shift</span><span class="p">:</span> <span class="n">shift</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="c1"># A wrong or naive version using class method</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Driver</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">by_shift</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+</span><span class="line">    <span class="k">return</span> <span class="k">if</span> <span class="n">shift</span> <span class="o">==</span> <span class="s1">&#39;night&#39;</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">where</span><span class="p">(</span><span class="ss">shift</span><span class="p">:</span> <span class="n">shift</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see above, the scope involves condition check and in the DSL
+would <code>return</code> if it is night shift. You might be wondering what object
+is returned implicitly. For the DSL version, the chain scope is returend,
+that is the ActiveRelation object.</p>
+
+<p>I naively copy 1:1 the same implementation of DSL to my class method implementation
+and I got <code>nil</code> as reuturn value instead. This breaks the chain (if we use our scope in combination
+with other scopes). The class method must be rewritten as:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Driver</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">by_shift</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">scoped</span> <span class="k">if</span> <span class="n">shift</span> <span class="o">==</span> <span class="s1">&#39;night&#39;</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">where</span><span class="p">(</span><span class="ss">shift</span><span class="p">:</span> <span class="n">shift</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted that I returned a <code>scoped</code> which is an anonymous scope. This object
+is a ActiveRelation object and would keep the chain intact.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>What would you use? I myself prefer class method for I find sugar syntax of Rails (which
+is nice) does not add in much value. Yet having said so, I do use DSL from time to time
+if the scope is tiny.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to add new column after existing column with MySQL in Rails?]]></title>
@@ -3290,246 +3423,6 @@ code, if the employee could be be found by email, <code>EmployeeLookupService.fi
 <p>This code would always read as &#8220;if employee is not on annual leave or employee is not on parental leave&#8221;, which is precise to the context. So be wise before using <code>unless</code>, in cases negation with <code>if</code> is much more concise.</p>
 
 <p>I hope you enjoy this short article, and please leave comments if you like it.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Digesting pumactl]]></title>
-    <link href="http://ruby-journal.com/digesting-pumactl/"/>
-    <updated>2013-11-22T16:39:00+11:00</updated>
-    <id>http://ruby-journal.com/digesting-pumactl</id>
-    <content type="html"><![CDATA[
-<p>Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
-for many production servers in the world. Given its short time of development, you&#8217;ll likely
-to see issues. One of the issue that I and many people often bump into is processes management.
-By default, puma offers <code>pumactl</code>, yet this utitlity hasn&#8217;t lived up to expectation (this is a year
-ago), thus people seeks different approaches with custom bash script by calling <code>puma</code> directly,
-upstart, monit, etc. However, today when I revisit <code>pumactl</code>, this tool has been polished and
-now does exactly what it promises. In this short article, I&#8217;ll go through with you how to use
-<code>pumactl</code> to manage your puma processes.</p>
-
-<!--more-->
-
-<h2 id="anatomy-of-puma-processes">Anatomy of puma processes</h2>
-
-<p>Like any other UNIX web server, puma is run as daemon, spawning child processes (in puma term,
-they called in puma cluster worker) to handle requests from the outside world.</p>
-
-<p>For example:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
-</span><span class="line">1000      2527  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
-</span><span class="line">1000      2530  0.0  2.2 870928 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 2527
-</span><span class="line">1000      2533  0.0  2.3 870868 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 2527</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>You can see above that process with PID 2527 is our mother process which spawn two children.
-Both children with PID 2530 and 2533 respectively clearly states that its mother is PID 2527.</p>
-
-<p>Next, we are going to look into how to manage puma process manually.</p>
-
-<h3 id="stop-puma-process">Stop puma process</h3>
-
-<p>To stop this process, we send a SIGTERM signal to PID 2557</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ kill -s SIGTERM 2557</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And we could check if the process has been cleanly killed with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma | grep 2557
-</span><span class="line"># yields no results</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<h3 id="hard-restart-puma-process">Hard restart puma process</h3>
-
-<p>To restart this process, we send a SIGUSR2 signal to PID 2557.</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ kill -s SIGUSR 2557</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Please note, this action is equivalent to killing the mother process and start a new one. Avoid this thing in production environment at all cost. Because we do not want downtime.</p>
-
-<p>Checking the ps yields:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
-</span><span class="line">1000      3001  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
-</span><span class="line">1000      3010  0.0  2.2 880321 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 3001
-</span><span class="line">1000      3020  0.0  2.3 700828 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 3001</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The output shows that our PID 2557 is killed and a new PID 3001 is created.</p>
-
-<h3 id="graceful-restart-puma-process">Graceful restart puma process</h3>
-
-<p>In order to achieve zero downtime, we only kill these 2 children and respawn
-with 2 new one instead of killing the mother process. In puma term, they call it <code>phased-restart</code>,
-that is sending SIGUSR1 signal to PID 2557.</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ kill -S SIGUSR1 2557</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Let verify the result:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
-</span><span class="line">1000      2527  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
-</span><span class="line">1000      3001  0.0  2.2 870928 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 2527
-</span><span class="line">1000      3002  0.0  2.3 870868 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 2527</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The 2 children are killed and two new spawn children appears. Just what we expect.</p>
-
-<h3 id="checking-status-of-puma-process">Checking status of puma process</h3>
-
-<p>In order to check process, you have to start puma with <code>-S</code> parameter, this points to a state
-file which stores all statuses of our puma process. Example:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ puma -S /var/run/app.state</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Now you could hook this file into any monitoring tools. I find this state file idea not helpful
-as many of us relies on other system to manage status such as monit or god.</p>
-
-<h2 id="introduction-to-pumactl">Introduction to pumactl</h2>
-
-<p>As we can see that above operations can be tedious and error prone and definitely not fun to work
-with a big deployment scale. Introducing pumactl, this utility automates all of above tasks. Let&#8217;s
-see how we could reproduce all above steps</p>
-
-<h3 id="start-puma-process">Start puma process</h3>
-
-<p>We setup a config file that asks puma to store its PID in a pid file and run in daemon mode. We&#8217;ll
-carry out a test on an Rails app. Create <code>config/puma.rb</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">environment ENV['RAILS_ENV'] || 'production'
-</span><span class="line">daemonize
-</span><span class="line">
-</span><span class="line">workers    2 # should be same number of your CPU core
-</span><span class="line">threads    1, 6
-</span><span class="line">
-</span><span class="line">pidfile    "/var/run/puma_app1.pid"</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>We now can start puma with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb start</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Verify with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
-</span><span class="line">1000      2527  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
-</span><span class="line">1000      2530  0.0  2.2 870928 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 2527
-</span><span class="line">1000      2533  0.0  2.3 870868 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 2527</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>we can see above that pumactl will start our server with <code>puma -C config/puma.rb</code>. Sweet. Next
-we check to see if pid file store correct PID:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ cat /var/run/puma_app1.pid
-</span><span class="line">2527</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Just as expected.</p>
-
-<h3 id="stop-puma-process-1">Stop puma process</h3>
-
-<p>Simply with:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb stop</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>There is no output yielded with</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma | grep 2557</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>indicates that the process is cleanly killed</p>
-
-<h3 id="hard-restart-puma-process-1">Hard restart puma process</h3>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb restart</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
-</span><span class="line">1000      3001  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
-</span><span class="line">1000      3010  0.0  2.2 880321 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 3001
-</span><span class="line">1000      3020  0.0  2.3 700828 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 3001</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The output shows that 2557 is killed and new PID 3001 is created. We could check to see if
-our pid file is updated with 3001:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ cat /var/run/puma_app1.pid
-</span><span class="line">3001</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Magic! It&#8217;s working!</p>
-
-<h3 id="graceful-restart-puma-process-1">Graceful restart puma process</h3>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb phased-restart</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>and check again:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ ps aux | grep puma
-</span><span class="line">1000      2527  0.0  0.2  80824 20312 ?        Sl   Nov21   0:02 puma -C config/puma.rb
-</span><span class="line">1000      3001  0.0  2.2 870928 184180 ?       Sl   Nov21   0:33 puma: cluster worker: 2527
-</span><span class="line">1000      3002  0.0  2.3 870868 188284 ?       Sl   Nov21   0:32 puma: cluster worker: 2527</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>PID 2527 is still there and only its children are respawned. Perfect!</p>
-
-<h3 id="checking-status-of-puma-process-1">Checking status of puma process</h3>
-
-<p>Now we do not need other tool to tell if our PID is running, we could do with one command:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle exec pumactl -F config/puma.rb status</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>if PID is running we would get output:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">PID 2557 is running</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>else</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">No puma process</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>That&#8217;s it folk. Now you know how to use pumactl, why don&#8217;t you delete your custom script and replace
-it with pumactl. See you in the next article.</p>
-
 ]]></content>
   </entry>
   

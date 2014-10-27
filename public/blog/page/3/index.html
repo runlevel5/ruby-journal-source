@@ -9,7 +9,8 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="In today tutorial, I&#8217;ll show you how to optimise a ActiveRecord import script by 300%. My solution is better than other solution as it doesn&# &hellip;">
+  <meta name="description" content="Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
+for many production servers in the world. Given its &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +76,57 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/digesting-pumactl/">Digesting Pumactl</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-22T16:39:00+11:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2013</time>
+        
+         | <a href="/digesting-pumactl/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>Puma is multi-threaded web server which is implemented in Ruby and has become a popular choice
+for many production servers in the world. Given its short time of development, you&#8217;ll likely
+to see issues. One of the issue that I and many people often bump into is processes management.
+By default, puma offers <code>pumactl</code>, yet this utitlity hasn&#8217;t lived up to expectation (this is a year
+ago), thus people seeks different approaches with custom bash script by calling <code>puma</code> directly,
+upstart, monit, etc. However, today when I revisit <code>pumactl</code>, this tool has been polished and
+now does exactly what it promises. In this short article, I&#8217;ll go through with you how to use
+<code>pumactl</code> to manage your puma processes.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/digesting-pumactl/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -475,50 +527,6 @@ solution works both with selenium and polstergeist driver.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/learn-to-know-myself-better/">Learn to Know Myself Better</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-08-27T22:59:00+10:00" pubdate data-updated="true">Aug 27<span>th</span>, 2013</time>
-        
-         | <a href="/learn-to-know-myself-better/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>Unlike some of my friends, I <em>occassionally</em> write or blog. Because I don&#8217;t know how to express myself in verbal or writting form. In fact I suck at both. It is not because I hate them, on the contrary I <em>love</em> communication and always get fascinated by charismatic speeches. I have been always avoiding confronting this very own problem of mine. Gradually I refrain to question the problem at all.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/learn-to-know-myself-better/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -543,6 +551,10 @@ solution works both with selenium and polstergeist driver.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/rails/the-difference-between-activerecord-scope-dsl-and-class-method/">The difference between ActiveRecord scope DSL and class method</a>
+      </li>
+    
+      <li class="post">
         <a href="/how-to-add-new-column-after-existing-column-with-mysql-in-rails/">How to add new column after existing column with MySQL in Rails?</a>
       </li>
     
@@ -556,10 +568,6 @@ solution works both with selenium and polstergeist driver.</p>
     
       <li class="post">
         <a href="/how-to-integrate-sidekiq-with-activejob/">How to integrate Sidekiq with ActiveJob</a>
-      </li>
-    
-      <li class="post">
-        <a href="/how-to-solve-sss-hiring-challenge/">How to solve Silicon Straits Saigon hiring challenge</a>
       </li>
     
   </ul>

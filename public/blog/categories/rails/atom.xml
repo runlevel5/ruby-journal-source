@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Ruby Journal]]></title>
   <link href="http://ruby-journal.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-10-13T20:05:47+11:00</updated>
+  <updated>2014-10-28T00:03:45+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,99 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The difference between ActiveRecord scope DSL and class method]]></title>
+    <link href="http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/"/>
+    <updated>2014-10-27T12:14:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method</id>
+    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+
+<p>Now and then I get question from people should they use class method or the
+scope DSL for ActiveRecord scope. At first I thought they are the same but
+in fact there are minor differences.</p>
+
+<!--more-->
+
+<h2 id="how-to-define-scope">How to define scope?</h2>
+
+<p>There are 2 ways to define ActiveRecord model scope:</p>
+
+<ul>
+  <li>scope DSL</li>
+  <li>class method</li>
+</ul>
+
+<h2 id="simple-example">Simple example</h2>
+
+<p>Let’s see both of them in action with following example:</p>
+
+<p>```ruby
+# DSL
+class Taxi &lt; ActiveRecord::Base
+  scope :by_driver, -&gt;(driver) { where(driver_id: driver.id) }
+end</p>
+
+<h1 id="class-method">class method</h1>
+<p>class Taxi &lt; ActiveRecord::Base
+  def self.by_driver(driver)
+    where(driver_id: driver.id)
+  end
+end
+```</p>
+
+<p>Both ways returns us ActiveRelation scope which seems the same. In fact
+in this case, they are alike with one minor difference, that is the DSL
+version doc comment won’t be picked up by RDoc.</p>
+
+<h2 id="complex-example">Complex example</h2>
+
+<p>Please be careful if you have a complex scope like below:</p>
+
+<p>```ruby
+# DSL
+class Driver &lt; ActiveRecord::Base
+  scope :by_shift, -&gt;(shift) do
+    return if shift == ‘night’</p>
+
+<pre><code>where(shift: shift)   end end
+</code></pre>
+
+<h1 id="a-wrong-or-naive-version-using-class-method">A wrong or naive version using class method</h1>
+<p>class Driver &lt; ActiveRecord::Base
+  def self.by_shift(shift)
+    return if shift == ‘night’</p>
+
+<pre><code>where(shift: shift)   end end ```
+</code></pre>
+
+<p>As you can see above, the scope involves condition check and in the DSL
+would <code>return</code> if it is night shift. You might be wondering what object
+is returned implicitly. For the DSL version, the chain scope is returend,
+that is the ActiveRelation object.</p>
+
+<p>I naively copy 1:1 the same implementation of DSL to my class method implementation
+and I got <code>nil</code> as reuturn value instead. This breaks the chain (if we use our scope in combination
+with other scopes). The class method must be rewritten as:</p>
+
+<p>```ruby
+class Driver &lt; ActiveRecord::Base
+  def self.by_shift(shift)
+    return scoped if shift == ‘night’</p>
+
+<pre><code>where(shift: shift)   end end ```
+</code></pre>
+
+<p>Please be noted that I returned a <code>scoped</code> which is an anonymous scope. This object
+is a ActiveRelation object and would keep the chain intact.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>What would you use? I myself prefer class method for I find sugar syntax of Rails (which
+is nice) does not add in much value. Yet having said so, I do use DSL from time to time
+if the scope is tiny.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to update attributes with validations and callbacks skipped]]></title>

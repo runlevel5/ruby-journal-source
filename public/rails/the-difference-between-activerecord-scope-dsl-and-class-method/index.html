@@ -5,12 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>How to block old IE version with Rails - Ruby Journal</title>
+  <title>The difference between ActiveRecord scope DSL and class method - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="There are many ways to detect browser agent, it could be front-end side with Javascript or backend.
-In this short tutorial, I&#8217;ll walk you &hellip;">
+  <meta name="description" content="Now and then I get question from people should they use class method or the
+scope DSL for ActiveRecord scope. At first I thought they are the same &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +19,7 @@ In this short tutorial, I&#8217;ll walk you &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/">
+  <link rel="canonical" href="http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +79,7 @@ In this short tutorial, I&#8217;ll walk you &hellip;">
   
   <header>
     
-      <h1 class="entry-title">How to Block Old IE Version With Rails</h1>
+      <h1 class="entry-title">The Difference Between ActiveRecord Scope DSL and Class Method</h1>
     
     
       <p class="meta">
@@ -95,7 +95,7 @@ In this short tutorial, I&#8217;ll walk you &hellip;">
   
 
 
-<time datetime="2013-03-16T17:56:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
+<time datetime="2014-10-27T12:14:00+11:00" pubdate data-updated="true">Oct 27<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,34 +105,58 @@ In this short tutorial, I&#8217;ll walk you &hellip;">
 
 
 <div class="entry-content">
-<p>There are many ways to detect browser agent, it could be front-end side with Javascript or backend.
-In this short tutorial, I&#8217;ll walk you through on how to detect browser version with Ruby On Rails</p>
-
-<p>This applies for Rails &gt; 2.x</p>
+<p>Now and then I get question from people should they use class method or the
+scope DSL for ActiveRecord scope. At first I thought they are the same but
+in fact there are minor differences.</p>
 
 <!--more-->
 
-<h2 id="how-does-thing-work">How does thing work?</h2>
+<h2 id="how-to-define-scope">How to define scope?</h2>
 
-<p>When you surf the site, your browser name and versions are stored in <code>HTTP_USER_AGENT</code> in the request. We need to process this string to work out the browser version and name to decide to greet viewers with warning text or not.</p>
+<p>There are 2 ways to define ActiveRecord model scope:</p>
 
-<h2 id="implementation">Implementation</h2>
+<ul>
+  <li>scope DSL</li>
+  <li>class method</li>
+</ul>
 
-<p>We will use <code>ActionDispatch</code>&#8217;s <code>request.user_agent</code> to grab the <code>HTTP_USER_AGENT</code> string. An example of user agent string:</p>
+<h2 id="simple-example">Simple example</h2>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>Let&#8217;s see both of them in action with following example:</p>
 
-<p>With a bit of text processing, we could work out the browser version, OS platform. Sound simple, isn&#8217;t it? A bit of regex magic and you could write your own detect method. However, we will not do reinvent the wheel in this tutorial, instead we will use the <code>useragent</code> gem for the sake of convenience.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># DSL</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Taxi</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">scope</span> <span class="ss">:by_driver</span><span class="p">,</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span> <span class="p">{</span> <span class="n">where</span><span class="p">(</span><span class="n">driver_id</span><span class="p">:</span> <span class="n">driver</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="p">}</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="c1"># class method</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Taxi</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">by_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+</span><span class="line">    <span class="n">where</span><span class="p">(</span><span class="n">driver_id</span><span class="p">:</span> <span class="n">driver</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Install <code>useragent</code> gem by appending to <code>Gemfile</code>:</p>
+<p>Both ways returns us ActiveRelation scope which seems the same. In fact
+in this case, they are alike with one minor difference, that is the DSL
+version doc comment won&#8217;t be picked up by RDoc.</p>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem 'useragent'</span></code></pre></td></tr></table></div></figure></notextile></div>
+<h2 id="complex-example">Complex example</h2>
 
-<p>then <code>bundle install</code></p>
-
-<p>Now we will inject a filter in <code>ApplicationController</code> to detect user agent. Below is the source code:</p>
+<p>Please be careful if you have a complex scope like below:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -152,42 +176,59 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
 <span class="line-number">16</span>
 <span class="line-number">17</span>
 <span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ApplicationController</span> <span class="o">&lt;</span> <span class="ss">ActionController</span><span class="p">:</span><span class="ss">:Base</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># DSL</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Driver</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">scope</span> <span class="ss">:by_shift</span><span class="p">,</span> <span class="o">-&gt;</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span> <span class="k">do</span>
+</span><span class="line">    <span class="k">return</span> <span class="k">if</span> <span class="n">shift</span> <span class="o">==</span> <span class="s1">&#39;night&#39;</span>
 </span><span class="line">
-</span><span class="line">  <span class="n">before_filter</span> <span class="ss">:check_browser</span>
+</span><span class="line">    <span class="n">where</span><span class="p">(</span><span class="ss">shift</span><span class="p">:</span> <span class="n">shift</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
 </span><span class="line">
-</span><span class="line">  <span class="kp">private</span>
 </span><span class="line">
-</span><span class="line">    <span class="no">Browser</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:browser</span><span class="p">,</span> <span class="ss">:version</span><span class="p">)</span>
+</span><span class="line"><span class="c1"># A wrong or naive version using class method</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">Driver</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">by_shift</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+</span><span class="line">    <span class="k">return</span> <span class="k">if</span> <span class="n">shift</span> <span class="o">==</span> <span class="s1">&#39;night&#39;</span>
 </span><span class="line">
-</span><span class="line">    <span class="no">SupportedBrowsers</span> <span class="o">=</span> <span class="o">[</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Safari&#39;</span><span class="p">,</span> <span class="s1">&#39;6.0.2&#39;</span><span class="p">),</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Firefox&#39;</span><span class="p">,</span> <span class="s1">&#39;19.0.2&#39;</span><span class="p">),</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Internet Explorer&#39;</span><span class="p">,</span> <span class="s1">&#39;9.0&#39;</span><span class="p">),</span>
-</span><span class="line">      <span class="no">Browser</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Chrome&#39;</span><span class="p">,</span> <span class="s1">&#39;25.0.1364.160&#39;</span><span class="p">)</span>
-</span><span class="line">    <span class="o">]</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">def</span> <span class="nf">check_browser</span>
-</span><span class="line">      <span class="n">user_agent</span> <span class="o">=</span> <span class="no">UserAgent</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user_agent</span><span class="p">)</span>
-</span><span class="line">      <span class="k">unless</span> <span class="no">SupportedBrowsers</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">browser</span><span class="o">|</span> <span class="n">user_agent</span> <span class="o">&gt;=</span> <span class="n">browser</span> <span class="p">}</span>
-</span><span class="line">        <span class="n">render</span> <span class="ss">text</span><span class="p">:</span> <span class="s1">&#39;Your browser is not supported!&#39;</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
+</span><span class="line">    <span class="n">where</span><span class="p">(</span><span class="ss">shift</span><span class="p">:</span> <span class="n">shift</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Let&#8217;s digest what&#8217;s happening the code above.</p>
+<p>As you can see above, the scope involves condition check and in the DSL
+would <code>return</code> if it is night shift. You might be wondering what object
+is returned implicitly. For the DSL version, the chain scope is returend,
+that is the ActiveRelation object.</p>
 
-<p><code>Browsers</code> is a <code>Struct</code> object with two attributes <code>:browser</code> and <code>:version</code>. This models after the way <code>UserAgent</code> create browser object. Pay attention to <code>SupportedBrowsers</code> closely, this array defines a stack of supported browsers.</p>
+<p>I naively copy 1:1 the same implementation of DSL to my class method implementation
+and I got <code>nil</code> as reuturn value instead. This breaks the chain (if we use our scope in combination
+with other scopes). The class method must be rewritten as:</p>
 
-<p><code>check_browser</code> will get called before any action, this method compare your current user agent with <code>SupportedBrowsers</code>. If the condition is not met, we render a simple text to warn the user. You could extend it to use HTML template if you like.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Driver</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">by_shift</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">scoped</span> <span class="k">if</span> <span class="n">shift</span> <span class="o">==</span> <span class="s1">&#39;night&#39;</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">where</span><span class="p">(</span><span class="ss">shift</span><span class="p">:</span> <span class="n">shift</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>Please be noted that I assume all your controllers are subclass of <code>ApplicationController</code>. Please adapt the source code accordingly should your controllers extends different parent controller class.</p>
+<p>Please be noted that I returned a <code>scoped</code> which is an anonymous scope. This object
+is a ActiveRelation object and would keep the chain intact.</p>
 
+<h2 id="conclusion">Conclusion</h2>
+
+<p>What would you use? I myself prefer class method for I find sugar syntax of Rails (which
+is nice) does not add in much value. Yet having said so, I do use DSL from time to time
+if the scope is tiny.</p>
 </div>
 
 
@@ -210,15 +251,21 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
   
 
 
-<time datetime="2013-03-16T17:56:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
+<time datetime="2014-10-27T12:14:00+11:00" pubdate data-updated="true">Oct 27<span>th</span>, 2014</time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/rails/'>rails</a>
+  
+</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-block-old-ie-version-with-rails/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/" data-via="joneslee85" data-counturl="http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -231,10 +278,8 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/how-to-setup-rails-app-with-puma-and-nginx/" title="Previous Post: How to setup Rails app with puma and NGINX">&laquo; How to setup Rails app with puma and NGINX</a>
+        <a class="basic-alignment left" href="/how-to-add-new-column-after-existing-column-with-mysql-in-rails/" title="Previous Post: How to add new column after existing column with MySQL in Rails?">&laquo; How to add new column after existing column with MySQL in Rails?</a>
       
-      
-        <a class="basic-alignment right" href="/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/" title="Next Post: How to install Ruby 2.0 on OSX 10.7 or newer">How to install Ruby 2.0 on OSX 10.7 or newer &raquo;</a>
       
     </p>
   </footer>
@@ -362,8 +407,8 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/how-to-block-old-ie-version-with-rails/';
-        var disqus_url = 'http://ruby-journal.com/how-to-block-old-ie-version-with-rails/';
+        var disqus_identifier = 'http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/';
+        var disqus_url = 'http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/';
         var disqus_script = 'embed.js';
       
     (function () {
