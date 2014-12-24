@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-12-24T09:22:35+11:00</updated>
+  <updated>2014-12-24T11:09:22+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -116,23 +116,13 @@ in clear text, this could pose great security risk.</p>
 <span class="line-number">9</span>
 <span class="line-number">10</span>
 <span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">Web</span>
 </span><span class="line">  <span class="k">class</span> <span class="nc">Application</span> <span class="o">&lt;</span> <span class="ss">Lotus</span><span class="p">:</span><span class="ss">:Application</span>
-</span><span class="line">    <span class="n">configure</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">configure</span> <span class="ss">:development</span> <span class="k">do</span>
+</span><span class="line">      <span class="c1">#..whatever there</span>
 </span><span class="line">
-</span><span class="line">    <span class="c1">#..whatever there already</span>
-</span><span class="line">
-</span><span class="line">      <span class="n">configure</span> <span class="ss">:development</span> <span class="k">do</span>
-</span><span class="line">        <span class="c1">#..whatever there</span>
-</span><span class="line">
-</span><span class="line">        <span class="n">middleware</span><span class="o">.</span><span class="n">use</span> <span class="ss">Rack</span><span class="p">:</span><span class="ss">:Auth</span><span class="o">::</span><span class="no">Basic</span><span class="p">,</span> <span class="s2">&quot;Protected Area&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">|</span>
-</span><span class="line">          <span class="n">username</span> <span class="o">==</span> <span class="s1">&#39;admin&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">password</span> <span class="o">==</span> <span class="s1">&#39;password&#39;</span>
-</span><span class="line">        <span class="k">end</span>
+</span><span class="line">      <span class="n">middleware</span><span class="o">.</span><span class="n">use</span> <span class="ss">Rack</span><span class="p">:</span><span class="ss">:Auth</span><span class="o">::</span><span class="no">Basic</span><span class="p">,</span> <span class="s2">&quot;Protected Area&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">|</span>
+</span><span class="line">        <span class="n">username</span> <span class="o">==</span> <span class="s1">&#39;admin&#39;</span> <span class="o">&amp;&amp;</span> <span class="n">password</span> <span class="o">==</span> <span class="s1">&#39;password&#39;</span>
 </span><span class="line">      <span class="k">end</span>
 </span><span class="line">    <span class="k">end</span>
 </span><span class="line">  <span class="k">end</span>

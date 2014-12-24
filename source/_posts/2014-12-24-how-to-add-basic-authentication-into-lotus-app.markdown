@@ -88,16 +88,11 @@ If you want to put protection only on development environment, you can move the 
 ```ruby
 module Web
   class Application < Lotus::Application
-    configure do
+    configure :development do
+      #..whatever there
 
-    #..whatever there already
-
-      configure :development do
-        #..whatever there
-
-        middleware.use Rack::Auth::Basic, "Protected Area" do |username, password|
-          username == 'admin' && password == 'password'
-        end
+      middleware.use Rack::Auth::Basic, "Protected Area" do |username, password|
+        username == 'admin' && password == 'password'
       end
     end
   end
