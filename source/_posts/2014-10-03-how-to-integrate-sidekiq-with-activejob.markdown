@@ -317,7 +317,17 @@ The above code tells ActiveJob to execute `#notify_manager` after the CsvImporte
 
 FYI, I use method `NotificationMailer#deliver_later`, this would tell ActiveJob to deliver email in the background too.
 
-Furthermore, the same options of `ActiveJob.set` also apply for mailer class, which provides
+Please be noted that by default, Rails Mailer uses `mailers` queues when delivering email, thus we need to modify
+the queues setting in `config/sidekiq.yml`:
+
+```
+:queues:
+  - default
+  - mailers
+  - [high_priority, 2]
+```
+
+You know what is even cooler? The same options of `ActiveJob.set` also apply for mailer class, which provides
 a consistent API for background mailer jobs, thus you could use `wait` option, for eg:
 
 ```ruby
@@ -337,7 +347,7 @@ the import job fails too! How can we do that? Introducing the `#rescue_from` met
 class CsvImportJob < ActiveJob::Base
   queue_as :default
 
-  rescue_from(StandardErrors) do |exception|
+  rescue_from(StandardError) do |exception|
     notify_failed_job_to_manager(exception)
   end
 
