@@ -4,7 +4,7 @@
   <title><![CDATA[Category: lotusrb | Ruby Journal]]></title>
   <link href="http://ruby-journal.com/blog/categories/lotusrb/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2015-01-05T00:24:48+11:00</updated>
+  <updated>2015-01-05T00:27:42+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -18,7 +18,7 @@
     <link href="http://ruby-journal.com/lotusrb/how-to-add-basic-authentication-into-lotus-app/"/>
     <updated>2014-12-24T08:28:00+11:00</updated>
     <id>http://ruby-journal.com/lotusrb/how-to-add-basic-authentication-into-lotus-app</id>
-    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+    <content type="html"><![CDATA[<p></p>
 
 <p>Today Lotus Framework officially release its 0.2.0 milestone with many new features.
 One is the standardised container architecture app generator. What does that mean?

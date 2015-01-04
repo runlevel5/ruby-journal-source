@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2014-12-24T11:09:22+11:00</updated>
+  <updated>2015-01-05T00:27:42+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -921,7 +921,20 @@ callbacks:</p>
 
 <p>FYI, I use method <code>NotificationMailer#deliver_later</code>, this would tell ActiveJob to deliver email in the background too.</p>
 
-<p>Furthermore, the same options of <code>ActiveJob.set</code> also apply for mailer class, which provides
+<p>Please be noted that by default, Rails Mailer uses <code>mailers</code> queues when delivering email, thus we need to modify
+the queues setting in <code>config/sidekiq.yml</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="ss">:queues</span><span class="p">:</span>
+</span><span class="line">  <span class="o">-</span> <span class="n">default</span>
+</span><span class="line">  <span class="o">-</span> <span class="n">mailers</span>
+</span><span class="line">  <span class="o">-</span> <span class="o">[</span><span class="n">high_priority</span><span class="p">,</span> <span class="mi">2</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You know what is even cooler? The same options of <code>ActiveJob.set</code> also apply for mailer class, which provides
 a consistent API for background mailer jobs, thus you could use <code>wait</code> option, for eg:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
@@ -960,7 +973,7 @@ the import job fails too! How can we do that? Introducing the <code>#rescue_from
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">CsvImportJob</span> <span class="o">&lt;</span> <span class="ss">ActiveJob</span><span class="p">:</span><span class="ss">:Base</span>
 </span><span class="line">  <span class="n">queue_as</span> <span class="ss">:default</span>
 </span><span class="line">
-</span><span class="line">  <span class="n">rescue_from</span><span class="p">(</span><span class="no">StandardErrors</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">exception</span><span class="o">|</span>
+</span><span class="line">  <span class="n">rescue_from</span><span class="p">(</span><span class="no">StandardError</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">exception</span><span class="o">|</span>
 </span><span class="line">    <span class="n">notify_failed_job_to_manager</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span>
 </span><span class="line">  <span class="k">end</span>
 </span><span class="line">
