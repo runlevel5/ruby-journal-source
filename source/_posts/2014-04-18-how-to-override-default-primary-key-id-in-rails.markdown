@@ -28,7 +28,7 @@ $ rails g scaffold products sku
 
 ## What is primary key?
 
-A column is called a primay key when it is:
+A column is called a primary key when it is:
 
 * has not NULL constraint
 * has UNIQUE contraint
@@ -232,11 +232,11 @@ All lovely and readable ;)
 
 ## Model
 
-We tell our model `Product` to use `sku` as primay key:
+We tell our model `Product` to use `sku` as primary key:
 
 ```ruby
 class Product < ActiveRecord::Base
-  self.primay_key = 'sku'
+  self.primary_key = 'sku'
 end
 ```
 
@@ -281,11 +281,11 @@ If you don't like to use `#id` and `#id=`, you could override them in your class
 class Product < ActiveRecord::Base
   ....
   def id
-    raise NoMethodError, "Please call #{self.class.primay_key} instead."
+    raise NoMethodError, "Please call #{self.class.primary_key} instead."
   end
 
   def id=(value)
-    raise NoMethodError, "Please call #{self.class.primay_key}= instead."
+    raise NoMethodError, "Please call #{self.class.primary_key}= instead."
   end
 
   ....
