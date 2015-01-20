@@ -37,13 +37,13 @@ job queuer. This helps changing from one job backend to the other much easily.
 ## Install Rails 4.2
 
 ActiveJob is only available in Rails 4.2 and you need to install the latest version of
-4.2 (at the time of the writing is 4.2.0-beta2).
+4.2.
 
 
 And in your Gemfile of your app, change the version to
 
 ```
-gem 'rails', '4.2.0.beta2'
+gem 'rails', '4.2.0'
 ```
 
 And do the `bundle install`

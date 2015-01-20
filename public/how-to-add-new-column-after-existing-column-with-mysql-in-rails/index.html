@@ -134,6 +134,16 @@ a new migration with content:</p>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
 </pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">change</span>
+</span><span class="line">  <span class="n">add_column</span> <span class="ss">:mytable</span><span class="p">,</span> <span class="ss">:new_column</span><span class="p">,</span> <span class="ss">after</span><span class="p">:</span> <span class="s1">&#39;existing_column&#39;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>OR if you prefer the SQL way:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">change</span>
 </span><span class="line">  <span class="n">add_column</span> <span class="ss">:mytable</span><span class="p">,</span> <span class="ss">:new_column</span><span class="p">,</span> <span class="s1">&#39;&lt;type&gt; AFTER existing_column&#39;</span>
 </span><span class="line"><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>

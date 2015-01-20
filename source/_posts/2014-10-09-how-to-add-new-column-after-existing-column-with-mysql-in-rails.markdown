@@ -33,6 +33,13 @@ The example above tell MySQL to create new `new_column` after `existing_column`.
 With Rails, we could use ActiveRecord::Migration helper for the job. Let's create
 a new migration with content:
 
+```ruby
+def change
+  add_column :mytable, :new_column, after: 'existing_column'
+end
+```
+
+OR if you prefer the SQL way:
 
 ```ruby
 def change
