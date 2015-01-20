@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2015-01-21T10:49:35+11:00</updated>
+  <updated>2015-01-21T10:54:43+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -2475,7 +2475,7 @@ and show you how to refactor it.</p>
 </span><span class="line"><span class="k">end</span>
 </span><span class="line">
 </span><span class="line"><span class="c1"># app/services/car_report_generation.rb</span>
-</span><span class="line"><span class="k">class</span> <span class="nc">CarReportGeneration</span> <span class="k">do</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">CarReportGeneration</span>
 </span><span class="line">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">car</span><span class="p">)</span>
 </span><span class="line">    <span class="vi">@car</span> <span class="o">=</span> <span class="n">car</span>
 </span><span class="line">  <span class="k">end</span>

@@ -67,7 +67,7 @@ class Customer < ActiveRecord::Base
 end
 
 # app/services/car_report_generation.rb
-class CarReportGeneration do
+class CarReportGeneration
   def initialize(car)
     @car = car
   end
