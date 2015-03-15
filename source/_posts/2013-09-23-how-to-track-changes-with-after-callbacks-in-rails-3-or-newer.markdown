@@ -32,8 +32,35 @@ If we save our model
 @product.name_changed? # => false
 ```
 
-The `false` value indicates that ActiveRecord::Dirty is not persisent after the model is saved. What if now you are being asked to add in a code to notify the inventory system if product name is changed? We can
-simply workaround by using `around` callback. Here is details:
+The `false` value indicates that ActiveRecord::Dirty is not persisent after the model is saved. What if now you are being asked to add in a code to notify the inventory system if product name is changed?
+
+Well, luckily Rails provides us `previous_changes` method which entails what
+changes has made previously.
+
+```
+@product.previous_changes # => {'name' => ['Diamond, 'Ruby']}
+```
+
+Let's see how we write this:
+
+```ruby
+class Product < ActiveRecord::Base
+  after_update :notify_systtem_if_name_is_changed
+
+  private
+
+  def notify_systtem_if_name_is_changed
+    notify_system if previous_changes['name'].any?
+  end
+
+end
+```
+
+We uses `after_update` callback to check if any changes previously
+made to `name`. If so, we invoke `notify_system` method.
+
+Alternatively, there is another way to write this code. That is to use
+`around` callback. Here is details:
 
 ```ruby
 class Product < ActiveRecord::Base
@@ -60,5 +87,5 @@ end
 
 In our example above, we store the changing state of attribute `name` into `named_change` variable. The `yield` executes the `update` action. The changing state then can be referenced afterward and will send out notification if name is truly changed.
 
-The `around` callbacks are very powerful features of ActiveRecord. I hope that you should take advantage of it more. See you in the next tutorial.
-
+The `previous_changes` is convenient to tell if changes are made to attributes.
+I hope that you should take advantage of it more. See you in the next tutorial.

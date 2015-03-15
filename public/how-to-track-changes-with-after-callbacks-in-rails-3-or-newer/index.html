@@ -132,8 +132,44 @@
 </span><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">name_changed?</span> <span class="c1"># =&gt; false</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>The <code>false</code> value indicates that ActiveRecord::Dirty is not persisent after the model is saved. What if now you are being asked to add in a code to notify the inventory system if product name is changed? We can
-simply workaround by using <code>around</code> callback. Here is details:</p>
+<p>The <code>false</code> value indicates that ActiveRecord::Dirty is not persisent after the model is saved. What if now you are being asked to add in a code to notify the inventory system if product name is changed?</p>
+
+<p>Well, luckily Rails provides us <code>previous_changes</code> method which entails what
+changes has made previously.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="vi">@product</span><span class="o">.</span><span class="n">previous_changes</span> <span class="c1"># =&gt; {&#39;name&#39; =&gt; [&#39;Diamond, &#39;Ruby&#39;]}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Let&#8217;s see how we write this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class="line">  <span class="n">after_update</span> <span class="ss">:notify_systtem_if_name_is_changed</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">notify_systtem_if_name_is_changed</span>
+</span><span class="line">    <span class="n">notify_system</span> <span class="k">if</span> <span class="n">previous_changes</span><span class="o">[</span><span class="s1">&#39;name&#39;</span><span class="o">].</span><span class="n">any?</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>We uses <code>after_update</code> callback to check if any changes previously
+made to <code>name</code>. If so, we invoke <code>notify_system</code> method.</p>
+
+<p>Alternatively, there is another way to write this code. That is to use
+<code>around</code> callback. Here is details:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -175,8 +211,8 @@ simply workaround by using <code>around</code> callback. Here is details:</p>
 
 <p>In our example above, we store the changing state of attribute <code>name</code> into <code>named_change</code> variable. The <code>yield</code> executes the <code>update</code> action. The changing state then can be referenced afterward and will send out notification if name is truly changed.</p>
 
-<p>The <code>around</code> callbacks are very powerful features of ActiveRecord. I hope that you should take advantage of it more. See you in the next tutorial.</p>
-
+<p>The <code>previous_changes</code> is convenient to tell if changes are made to attributes.
+I hope that you should take advantage of it more. See you in the next tutorial.</p>
 </div>
 
 
