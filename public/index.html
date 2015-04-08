@@ -9,8 +9,8 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Today Lotus Framework officially release its 0.2.0 milestone with many new features.
-One is the standardised container architecture app generator. &hellip;">
+  <meta name="description" content="If you have touched module before, you would know that function can be called
+with module as receiver or as instance method when mixed in class. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +76,53 @@ One is the standardised container architecture app generator. &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/ruby/what-is-module-function/">How to Consolidate Module Functions?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-04-08T09:22:00+10:00" pubdate data-updated="true">Apr 8<span>th</span>, 2015</time>
+        
+         | <a href="/ruby/what-is-module-function/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>If you have touched module before, you would know that function can be called
+with module as receiver or as instance method when mixed in class. Today I am
+going to show you a nitfy trick to consolidate your module function so it can
+be used for both purposes at same time by using <code>Module#module_function</code>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/ruby/what-is-module-function/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -519,52 +566,6 @@ this ordering scope in queries by using <code>reorder</code> method.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-write-custom-serializer-for-activerecord-number-serialize/">How to Write Custom Serializer for ActiveRecord#serialize</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-04-21T07:49:00+10:00" pubdate data-updated="true">Apr 21<span>st</span>, 2014</time>
-        
-         | <a href="/how-to-write-custom-serializer-for-activerecord-number-serialize/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>Rails comes with a powerful and convenient <code>serialize</code> method that would do the serialization/deserializtion
-for a specify column of an ActiveRecord model. In today tutorial, I&#8217;ll walk you through on how to write a
-custom serializer that would encrypt/decrypt your serialized value for extra security.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-write-custom-serializer-for-activerecord-number-serialize/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -585,6 +586,10 @@ custom serializer that would encrypt/decrypt your serialized value for extra sec
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/ruby/what-is-module-function/">How to consolidate module functions?</a>
+      </li>
+    
+      <li class="post">
         <a href="/lotusrb/how-to-add-basic-authentication-into-lotus-app/">How to add basic authentication into Lotus app</a>
       </li>
     
@@ -598,10 +603,6 @@ custom serializer that would encrypt/decrypt your serialized value for extra sec
     
       <li class="post">
         <a href="/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/">How to open/override/monkey-patch a class in Ruby?</a>
-      </li>
-    
-      <li class="post">
-        <a href="/quick-guide-to-activesupport-hashwithindifferentaccess/">Quick guide to ActiveSupport::HashWithIndifferentAccess</a>
       </li>
     
   </ul>

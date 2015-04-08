@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2015-03-15T22:09:18+11:00</updated>
+  <updated>2015-04-08T10:37:37+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,134 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to consolidate module functions?]]></title>
+    <link href="http://ruby-journal.com/ruby/what-is-module-function/"/>
+    <updated>2015-04-08T09:22:00+10:00</updated>
+    <id>http://ruby-journal.com/ruby/what-is-module-function</id>
+    <content type="html"><![CDATA[
+<p>If you have touched module before, you would know that function can be called
+with module as receiver or as instance method when mixed in class. Today I am
+going to show you a nitfy trick to consolidate your module function so it can
+be used for both purposes at same time by using <code>Module#module_function</code>.</p>
+
+<!--more-->
+
+<h2 id="concept">Concept</h2>
+
+<h3 id="instance-functions">Instance functions</h3>
+
+<p>Module functions can be mixed into classes and thus are invoked as instance
+methods for the object of that classes. For example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">MyLibrary</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="nb">puts</span> <span class="s2">&quot;Hello world&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
+</span><span class="line">  <span class="kp">include</span> <span class="no">MyLibrary</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="no">Greeter</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">hello</span> <span class="c1"># =&gt; Hello world</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="module-functions">Module functions</h3>
+
+<p>Module functions can be invoked with module as receiver. For example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">MyLibrary</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">hello</span>
+</span><span class="line">    <span class="nb">puts</span> <span class="s2">&quot;Hello world&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="no">MyLibrary</span><span class="o">.</span><span class="n">hello</span> <span class="c1"># =&gt; Hello world</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="i-want-both-how">I want both, how?</h3>
+
+<p>Well, you can, here is my ugly version:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">MyLibrary</span>
+</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">hello</span>
+</span><span class="line">    <span class="nb">puts</span> <span class="s2">&quot;Hello world&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="no">MyLibrary</span><span class="o">.</span><span class="n">hello</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see from the code above, we reference <code>hello</code> method to module
+function <code>MyLibrary.hello</code>.</p>
+
+<p>It looks duplicating, isn&#8217;t it? Thanks to Ruby, there is an alternative:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">MyLibrary</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">hello</span>
+</span><span class="line">    <span class="nb">puts</span> <span class="s2">&quot;Hello world&quot;</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">module_function</span> <span class="ss">:hello</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">Greeter</span>
+</span><span class="line">  <span class="kp">include</span> <span class="no">MyLibrary</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="no">Greeter</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">hello</span> <span class="c1"># =&gt; Hello world</span>
+</span><span class="line"><span class="no">MyLibrary</span><span class="o">.</span><span class="n">hello</span> <span class="c1"># =&gt; Hello world</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Ruby gives us <code>Module#module_function</code> which takes the method name and automatically
+generate the module function that is equivalent to <code>MyLibrary.hello</code> for us.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to add basic authentication into Lotus app]]></title>
@@ -3369,195 +3497,6 @@ works with custom and directory archive dump.</p>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Which only generate only 1 SQL UPDATE query.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Graceful fallback for not found ActiveRecord lookup with NullObject pattern]]></title>
-    <link href="http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/"/>
-    <updated>2013-11-23T23:27:00+11:00</updated>
-    <id>http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern</id>
-    <content type="html"><![CDATA[
-<p>In my application, I bump to Exception when trying to delegate a method to an unfound ActiveRecord instance. This poses two issues for me:</p>
-
-<ul>
-  <li>Hard to write test for you have to set up fixture/factory correctly</li>
-  <li>Not a good user experience to see error on production</li>
-</ul>
-
-<p>I tackle this with NullObject pattern to provide a graceful fallback.</p>
-
-<!--more-->
-
-<p>Firstly, let me show you my code:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-<span class="line-number">24</span>
-<span class="line-number">25</span>
-<span class="line-number">26</span>
-<span class="line-number">27</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">Employee</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-</span><span class="line">  <span class="c1"># in schema, each employee has a unique email column as :string type</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nf">employee_of_the_month?</span>
-</span><span class="line">    <span class="c1"># yeah, code to determine</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">class</span> <span class="nc">EmployeeLookupService</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find_employee_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
-</span><span class="line">    <span class="no">Employee</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">email</span><span class="p">:</span> <span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">class</span> <span class="nc">ReportService</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">generate_for_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
-</span><span class="line">    <span class="n">employee</span> <span class="o">=</span> <span class="no">EmployeeLookupService</span><span class="o">.</span><span class="n">find_employee_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">if</span> <span class="n">employee</span><span class="o">.</span><span class="n">employee_of_the_month?</span>
-</span><span class="line">      <span class="c1"># do something</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>I have a Report which generates report for an employee with matching email. As you can in the above
-code, if the employee could be be found by email, <code>EmployeeLookupService.find_employee_by_email</code> would yield a <code>nil</code> and calling <code>employee_of_the_month?</code> on <code>nil</code> would raise exception. So how could we make sure that our code could handle this exception gracefully?</p>
-
-<h2 id="bad-way">Bad way</h2>
-
-<p>Well, there is one quick bad way, that is to add a addtional presence check for employee, so:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">ReportService</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">generate_for_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
-</span><span class="line">    <span class="n">employee</span> <span class="o">=</span> <span class="no">EmployeeLookupService</span><span class="o">.</span><span class="n">find_employee_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">if</span> <span class="n">employee</span> <span class="o">&amp;&amp;</span> <span class="n">employee</span><span class="o">.</span><span class="n">employee_of_the_month?</span>
-</span><span class="line">      <span class="c1"># do something</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>As you can see, I add <code>if employee</code> clause to ensure the presence of employee. What&#8217;s wrong with this way? I find many Rails developers code this way, but to me it is not good enough. In term of OO design, I expect <code>EmployeeLookupService.find_employee_by_email</code> returns me an object which responds to <code>employee_of_the_month?</code> consistently instead of returning me a <code>nil</code>. Furthermore, it is not the responsibiltiy of <code>ReportService</code> to do presence checkup.</p>
-
-<h2 id="good-way">Good way</h2>
-
-<p>Here is how I refactor the code, I use NullObject pattern to create a new class, called <code>NullEmployee</code> and ensure that this class has the same interface as <code>Employee</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">NullEmployee</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
-</span><span class="line">    <span class="vi">@email</span> <span class="o">=</span> <span class="n">email</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nf">employee_of_the_month?</span>
-</span><span class="line">    <span class="kp">nil</span>
-</span><span class="line">  <span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>and I also refactor my lookup code:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">EmployeeLookupService</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find_employee_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
-</span><span class="line">    <span class="no">Employee</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">email</span><span class="p">:</span> <span class="n">email</span><span class="p">)</span><span class="o">.</span><span class="n">first</span> <span class="o">||</span> <span class="no">NullEmployee</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Let&#8217;s digest what I did above, I make <code>EmployeeLookupService.find_employee_by_email</code> to create a new instance of <code>NullEmployee</code> class if not found and this <code>NullEmployee#employee_of_the_month?</code> always return <code>nil</code>. Now we do have a consistency in returned employee object. And testing it would be much more pleasant, we do not have to care about setting up this employee fixture correctly, we could simply stub <code>employee_of_the_month?</code> which makes testing faster and reduces coupling.</p>
-
-<p>Now, there is one caveat with this NullObject patter and ActiveRecord, what if we call an ActiveRecord API on this NullEmployee instance. Well, we could add all ActiveRecord API into our class and return nil, right? No, I must be kidding in saying that. There are hundreds of them, our class would look messy. The elegant solution is provide graceful fallback for missing methods by implement <code>method_missing</code> call. Here is the code:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">class</span> <span class="nc">NullEmployee</span>
-</span><span class="line">
-</span><span class="line">  <span class="c1"># whatever there before</span>
-</span><span class="line">
-</span><span class="line">  <span class="k">def</span> <span class="nf">method_missing</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-</span><span class="line">    <span class="kp">nil</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Now calling a missing method won&#8217;t yield any exception.</p>
-
-<p>That&#8217;s it folks. I hope you enjoy it and please never keep learning and remembering these thumb rules:</p>
-
-<ul>
-  <li>Single Reponsibility</li>
-  <li>Interface Consistency</li>
-  <li>Never mix persisence layer with business logic layer</li>
-  <li>If hard to write test, your code might be wrong</li>
-</ul>
-
-<p>See you in the next article. Peace!</p>
 ]]></content>
   </entry>
   
