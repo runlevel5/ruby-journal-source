@@ -211,11 +211,17 @@
         <lastmod>2015-04-08T10:36:46+10:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://ruby-journal.com/how-to-create-images-slash-files-upload-form-in-lotus-framework/
+        </loc>
+        <lastmod>2015-04-27T01:21:30+10:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2015-04-08T10:36:46+10:00</lastmod>
+        <lastmod>2015-04-27T01:21:30+10:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2015-04-08T10:36:46+10:00</lastmod>
+        <lastmod>2015-04-27T01:21:30+10:00</lastmod>
     </url>
 </urlset>

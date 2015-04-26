@@ -9,8 +9,9 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="Rails comes with a powerful and convenient serialize method that would do the serialization/deserializtion
-for a specify column of an ActiveRecord &hellip;">
+  <meta name="description" content="
+If your ActiveRecord models happen to have default ordering scope, you could override
+this ordering scope in queries by using reorder method. ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +77,51 @@ for a specify column of an ActiveRecord &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/override-ordering-with-activerecord/">Override Ordering With ActiveRecord</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-23T14:33:00+10:00" pubdate data-updated="true">May 23<span>rd</span>, 2014</time>
+        
+         | <a href="/override-ordering-with-activerecord/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>If your ActiveRecord models happen to have default ordering scope, you could override
+this ordering scope in queries by using <code>reorder</code> method.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/override-ordering-with-activerecord/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -490,58 +536,6 @@ multiple concurrent process do it for you.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/">How to Update Attributes With Validations and Callbacks Skipped</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-02-26T18:20:00+11:00" pubdate data-updated="true">Feb 26<span>th</span>, 2014</time>
-        
-         | <a href="/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>In this short tutorial, I&#8217;ll show you how to update attributes for ActiveRecord model with:</p>
-
-<ul>
-  <li>Validations are skipped.</li>
-  <li>Callbacks are skipped.</li>
-  <li><code>updated_at</code>/<code>updated_on</code> are not updated.</li>
-</ul>
-
-<p>Solutions for both Rails 3 and 4 are provided.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -564,6 +558,10 @@ multiple concurrent process do it for you.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/how-to-create-images-slash-files-upload-form-in-lotus-framework/">How to create images/files upload form in Lotus Framework?</a>
+      </li>
+    
+      <li class="post">
         <a href="/ruby/what-is-module-function/">How to consolidate module functions?</a>
       </li>
     
@@ -577,10 +575,6 @@ multiple concurrent process do it for you.</p>
     
       <li class="post">
         <a href="/how-to-add-new-column-after-existing-column-with-mysql-in-rails/">How to add new column after existing column with MySQL in Rails?</a>
-      </li>
-    
-      <li class="post">
-        <a href="/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/">How to open/override/monkey-patch a class in Ruby?</a>
       </li>
     
   </ul>

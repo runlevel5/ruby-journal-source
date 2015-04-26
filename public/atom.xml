@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2015-04-08T10:37:37+10:00</updated>
+  <updated>2015-04-27T01:24:23+10:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,492 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to create images/files upload form in Lotus Framework?]]></title>
+    <link href="http://ruby-journal.com/how-to-create-images-slash-files-upload-form-in-lotus-framework/"/>
+    <updated>2015-04-13T09:25:00+10:00</updated>
+    <id>http://ruby-journal.com/how-to-create-images-slash-files-upload-form-in-lotus-framework</id>
+    <content type="html"><![CDATA[
+<p>In today tutorial, I will show you how to create an image uploader with Lotus.</p>
+
+<p>You will learn:</p>
+
+<ul>
+  <li>Create file input and multipart HTML form</li>
+  <li>Process uploaded file request</li>
+  <li>Good practices on making your code nice and clean</li>
+</ul>
+
+<!--more-->
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>Lotus is progressing so quickly that I am afraid this post might get out-of-date
+quickly. I will try my best to keep it up-to-date as much as I can. For the time
+being, please ensure you meet following requirements:</p>
+
+<ul>
+  <li>Lotus 0.3.1</li>
+</ul>
+
+<h2 id="initial-setup">Initial Setup</h2>
+
+<p>Generate a new demo app:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">lotus new demo
+</span><span class="line">cd demo</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The above command will generate a new lotus container with one web app that
+resides in <code>apps/web</code>.</p>
+
+<h2 id="create-web-form">Create Web Form</h2>
+
+<h3 id="make-new-controller-actions">Make new controller actions</h3>
+
+<p>I create a new RESTful controller action</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec lotus generate action web images#new</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which would create a new <code>Web::Controllers::Images</code> controller where we will
+put our form for the image resource.</p>
+
+<p>We also need <code>images#create</code> controller to handle submitted form:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec lotus generate action web images#create</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>By default, lotus action generator generates a GET route to <code>images#create</code>. We
+tweak this route to POST by modifying the <code>apps/web/config/routes.rb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">get</span> <span class="s1">&#39;/images&#39;</span><span class="p">,</span> <span class="ss">to</span><span class="p">:</span> <span class="s1">&#39;images#new&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># from</span>
+</span><span class="line"><span class="c1"># get &#39;/images&#39;, to: &#39;images#create&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="c1"># to</span>
+</span><span class="line"><span class="n">post</span> <span class="s1">&#39;/images&#39;</span><span class="p">,</span> <span class="ss">to</span><span class="p">:</span> <span class="s1">&#39;images#create&#39;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Even better, we can turn our route to be RESTful resource by getting rid of
+our 2 existing routes and replace them with one line route:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">resources</span> <span class="ss">:images</span><span class="p">,</span> <span class="ss">only</span><span class="p">:</span> <span class="o">[</span><span class="ss">:new</span><span class="p">,</span> <span class="ss">:create</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Let&#8217;s double-check before moving on by command:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="err">$</span> <span class="n">bundle</span> <span class="nb">exec</span> <span class="n">lotus</span> <span class="n">routes</span>
+</span><span class="line"><span class="n">new_images</span> <span class="no">GET</span><span class="p">,</span> <span class="no">HEAD</span>  <span class="sr">/images/ne</span><span class="n">w</span>  <span class="ss">Web</span><span class="p">:</span><span class="ss">:Controllers</span><span class="o">::</span><span class="ss">Images</span><span class="p">:</span><span class="ss">:New</span>
+</span><span class="line">    <span class="n">images</span> <span class="no">POST</span>       <span class="sr">/images      Web::Controllers::Images::Create</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The output above indicates that our app now has 2 routes that we wanted :).</p>
+
+<p>Besides, we should also clean up the view part of create action:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">rm</span> <span class="n">apps</span><span class="o">/</span><span class="n">web</span><span class="o">/</span><span class="n">templates</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">create</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">erb</span>
+</span><span class="line"><span class="n">rm</span> <span class="n">apps</span><span class="o">/</span><span class="n">web</span><span class="o">/</span><span class="n">views</span><span class="o">/</span><span class="n">images</span><span class="o">/</span><span class="n">create</span><span class="o">.</span><span class="n">rb</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="create-the-upload-form-html-template">Create the upload form HTML template</h3>
+
+<p>We add our HTML form by modifying <code>apps/web/templates/images/new.html.erb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="o">&lt;</span><span class="n">form</span> <span class="nb">method</span><span class="o">=</span><span class="s2">&quot;post&quot;</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;&lt;%= Web::Routes.url(:images) %&gt;&quot;</span> <span class="n">enctype</span><span class="o">=</span><span class="s2">&quot;multipart/form-data&quot;</span><span class="o">&gt;</span>
+</span><span class="line">  <span class="o">&lt;</span><span class="n">input</span> <span class="n">type</span><span class="o">=</span><span class="s2">&quot;file&quot;</span> <span class="nb">name</span><span class="o">=</span><span class="s2">&quot;image&quot;</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="o">&gt;</span>
+</span><span class="line">  <span class="o">&lt;</span><span class="n">input</span> <span class="n">type</span><span class="o">=</span><span class="s2">&quot;submit&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;Upload&quot;</span><span class="o">&gt;</span>
+</span><span class="line"><span class="o">&lt;</span><span class="sr">/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please pay attention that our <code>form</code> uses POST method with action attribute points to
+the <code>images#create</code> action and encryption type is <code>multipart/form-data</code>. The last
+option tells Lotus that we are going to take in non-text or binary submitted data.
+Additionaly, we have one input field of type file so user could choose file to upload.</p>
+
+<p>Let&#8217;s give it a check, start the server first with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">bundle</span> <span class="nb">exec</span> <span class="n">lotus</span> <span class="n">server</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and browser <code>http://localhost:2300/images/new</code> and you see our new form.</p>
+
+<h2 id="refactor-upload-form-with-lotus-helpers-optional">Refactor upload form with lotus helpers (optional)</h2>
+
+<p>While we are on this template layer, I&#8217;d like to show you how to create a template
+helper for this upload form. Unlike Rails, Lotus has a clear separation between
+the controller and the presenter. In other words, Lotus&#8217;s controller does not
+render HTML template, but taking parsed request parameters then calling to
+model for processing and delgate the presentation to View class (presenter class).</p>
+
+<p>We create our upload form in <code>Web::Views:Images</code> class. We modify <code>apps/web/views/images/new.rb</code>
+file with following content:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">Web::Views::Images</span>
+</span><span class="line">  <span class="k">class</span> <span class="nc">New</span>
+</span><span class="line">    <span class="kp">include</span> <span class="ss">Web</span><span class="p">:</span><span class="ss">:View</span>
+</span><span class="line">    <span class="kp">include</span> <span class="ss">Lotus</span><span class="p">:</span><span class="ss">:Helpers</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">upload_form</span>
+</span><span class="line">      <span class="n">html</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="nb">method</span><span class="p">:</span> <span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="ss">action</span><span class="p">:</span> <span class="n">create_images_url</span><span class="p">,</span> <span class="ss">enctype</span><span class="p">:</span> <span class="s1">&#39;multipart/form-data&#39;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class="line">        <span class="n">input</span><span class="p">(</span><span class="ss">type</span><span class="p">:</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;image&#39;</span><span class="p">)</span>
+</span><span class="line">        <span class="n">input</span><span class="p">(</span><span class="ss">type</span><span class="p">:</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span> <span class="ss">value</span><span class="p">:</span> <span class="s1">&#39;Upoad&#39;</span><span class="p">)</span>
+</span><span class="line">      <span class="k">end</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">    <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">create_images_url</span>
+</span><span class="line">      <span class="ss">Web</span><span class="p">:</span><span class="ss">:Routes</span><span class="o">.</span><span class="n">url</span><span class="p">(</span><span class="ss">:images</span><span class="p">)</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The example codes above indicates the inclusion of <code>Lotus::Helpers</code> of which <code>html</code>
+method that we used in <code>Web::Views::Images#upload_form</code>. Lotus makes writing
+helpers simple, users don&#8217;t have to deal with string concatenation like Rails.
+And I think you can work out how to use Helpers on yourself.</p>
+
+<p>Please make sure we update our template to use our new presenter method, by
+modifying <code>apps/web/templates/images/new.html.erb</code> file with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="o">&lt;%=</span> <span class="n">upload_form</span> <span class="o">%&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted that future version will likely introduce <code>form_for</code> method
+for convenience.</p>
+
+<h3 id="handle-submitted-payload-in-controller-action">Handle submitted payload in controller action</h3>
+
+<p>The last part of the tutorial is to handle the submitted image in controller.</p>
+
+<p>We modify our <code>Web::Controllers::Images::Create</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">Web::Controllers::Images</span>
+</span><span class="line">  <span class="k">class</span> <span class="nc">Create</span>
+</span><span class="line">    <span class="kp">include</span> <span class="ss">Web</span><span class="p">:</span><span class="ss">:Action</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span><span class="line">      <span class="n">dest_dir</span> <span class="o">=</span> <span class="ss">Web</span><span class="p">:</span><span class="ss">:Application</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;public/uploads&#39;</span><span class="p">)</span>
+</span><span class="line">      <span class="no">FileUtils</span><span class="o">.</span><span class="n">mkdir_p</span><span class="p">(</span><span class="n">dest_dir</span><span class="p">)</span>
+</span><span class="line">      <span class="n">tempfile</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;image&#39;</span><span class="o">][</span><span class="s1">&#39;tempfile&#39;</span><span class="o">]</span>
+</span><span class="line">      <span class="n">filename</span> <span class="o">=</span> <span class="n">dest_dir</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="s1">&#39;image&#39;</span><span class="o">][</span><span class="s1">&#39;filename&#39;</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">to_s</span>
+</span><span class="line">      <span class="k">begin</span>
+</span><span class="line">        <span class="no">FileUtils</span><span class="o">.</span><span class="n">cp</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+</span><span class="line">        <span class="nb">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> has been successfully uploaded.&quot;</span>
+</span><span class="line">      <span class="k">rescue</span> <span class="o">=&gt;</span> <span class="n">e</span>
+</span><span class="line">        <span class="nb">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="s2">&quot;Failed to upload </span><span class="si">#{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> due to: </span><span class="si">#{</span><span class="n">e</span><span class="o">.</span><span class="n">backtrace</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class="line">      <span class="k">ensure</span>
+</span><span class="line">        <span class="n">tempfile</span><span class="o">.</span><span class="n">close</span>
+</span><span class="line">        <span class="n">tempfile</span><span class="o">.</span><span class="n">unlink</span>
+</span><span class="line">      <span class="k">end</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Let&#8217;s dive in a bit, as you can see in the above code, <code>params['image']</code> has
+the uploaded file (which is now temporarily stored) and the filename. We copy this
+temp file to to <code>apps/web/public/uploads</code>. You can see this directory is always
+get created with <code>mkdir_p</code> to ensure we always have this folder setup. We could
+refactor the code by having this folder created manually by hand and getting rid
+of that line. Lastly, it&#8217;s a good practice to clean up tempfile :)</p>
+
+<p>You can give this a test go by using the browser and try to upload file. If nothing
+goes wrong, you should see a new page with message filenmas has been successfully
+uploaded.</p>
+
+<h2 id="refactor-controller-action-with-interactor-optional">Refactor controller action with interactor (optional)</h2>
+
+<p>We could refactor our controller code to have less intimate knowledge about the
+file moving logic by moving those chunks of business domain logics to Service Object.
+Fortunately, Lotus offers <a href="https://github.com/lotus/utils/blob/master/lib/lotus/interactor.rb">Lotus::Interactor</a> right out of the box for this scenario.</p>
+
+<p>We create a new folder for our interactor:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">mkdir</span> <span class="n">apps</span><span class="o">/</span><span class="n">web</span><span class="o">/</span><span class="n">interactors</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And tell <code>Web::Application</code> to load this path by modifying <code>apps/web/application.rb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">load_paths</span> <span class="o">&lt;&lt;</span> <span class="o">[</span>
+</span><span class="line">  <span class="s1">&#39;controllers&#39;</span><span class="p">,</span>
+</span><span class="line">  <span class="s1">&#39;views&#39;</span><span class="p">,</span>
+</span><span class="line">  <span class="s1">&#39;interactors&#39;</span> <span class="c1"># &lt;= we add this new line</span>
+</span><span class="line"><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then create our service class at <code>apps/web/interactors/upload_image.rb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="nb">require</span> <span class="s1">&#39;lotus/interactor&#39;</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">UploadImage</span>
+</span><span class="line">  <span class="kp">include</span> <span class="ss">Lotus</span><span class="p">:</span><span class="ss">:Interactor</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">attr_reader</span> <span class="ss">:tempfile</span><span class="p">,</span> <span class="ss">:filename</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">tempfile</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+</span><span class="line">    <span class="n">dest_dir</span> <span class="o">=</span> <span class="n">get_upload_path</span>
+</span><span class="line">    <span class="vi">@tempfile</span> <span class="o">=</span> <span class="n">tempfile</span>
+</span><span class="line">    <span class="vi">@filename</span> <span class="o">=</span> <span class="n">dest_dir</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">call</span>
+</span><span class="line">    <span class="k">begin</span>
+</span><span class="line">      <span class="no">FileUtils</span><span class="o">.</span><span class="n">cp</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span>
+</span><span class="line">    <span class="k">rescue</span> <span class="o">=&gt;</span> <span class="n">e</span>
+</span><span class="line">      <span class="n">e</span><span class="o">.</span><span class="n">backtrace</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">msg</span><span class="o">|</span> <span class="n">error</span> <span class="n">msg</span> <span class="p">}</span>
+</span><span class="line">    <span class="k">ensure</span>
+</span><span class="line">      <span class="n">tempfile</span><span class="o">.</span><span class="n">close</span>
+</span><span class="line">      <span class="n">tempfile</span><span class="o">.</span><span class="n">unlink</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="kp">private</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">root</span>
+</span><span class="line">    <span class="ss">Web</span><span class="p">:</span><span class="ss">:Application</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">root</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">get_upload_path</span>
+</span><span class="line">    <span class="n">dir</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;public/uploads&#39;</span><span class="p">)</span>
+</span><span class="line">    <span class="no">FileUtils</span><span class="o">.</span><span class="n">mkdir_p</span><span class="p">(</span><span class="n">dir</span><span class="p">)</span>
+</span><span class="line">    <span class="n">dir</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and change our controller to:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">Web::Controllers::Images</span>
+</span><span class="line">  <span class="k">class</span> <span class="nc">Create</span>
+</span><span class="line">    <span class="kp">include</span> <span class="ss">Web</span><span class="p">:</span><span class="ss">:Action</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span><span class="line">      <span class="n">tempfile</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;image&#39;</span><span class="o">][</span><span class="s1">&#39;tempfile&#39;</span><span class="o">]</span>
+</span><span class="line">      <span class="n">filename</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;image&#39;</span><span class="o">][</span><span class="s1">&#39;filename&#39;</span><span class="o">]</span>
+</span><span class="line">
+</span><span class="line">      <span class="n">result</span> <span class="o">=</span> <span class="no">UploadImage</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">tempfile</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">call</span>
+</span><span class="line">
+</span><span class="line">      <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">success?</span>
+</span><span class="line">        <span class="nb">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2"> has been successfully uploaded.&quot;</span>
+</span><span class="line">      <span class="k">else</span>
+</span><span class="line">        <span class="nb">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="s2">&quot;Failed to upload </span><span class="si">#{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> due to: </span><span class="si">#{</span><span class="n">result</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class="line">      <span class="k">end</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Interactor returns a result object after calling <code>#call</code>. The result object
+will determine the success of the usecase by checking if there is any errors.
+If there are any, we tell controller to list them out with result errors.</p>
+
+<p>As you can see, controller now only do params parsing and delegate the responsiblity
+to the use case object. This is a beautiful patter that I think Rails should
+have by default.</p>
+
+<p>If you pay close attention, you can see that we do not have any codes to
+check for the presence of required params. If you are familiar with Rails, you
+might think of something similar to Strong Parameters for whitelisting params
+and having Service class check for the presence. With Lotus, you could easily
+do that within your controller:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">Web::Controllers::Images</span>
+</span><span class="line">  <span class="k">class</span> <span class="nc">Create</span>
+</span><span class="line">    <span class="kp">include</span> <span class="ss">Web</span><span class="p">:</span><span class="ss">:Action</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">params</span> <span class="k">do</span>
+</span><span class="line">      <span class="n">param</span> <span class="ss">:image</span> <span class="k">do</span>
+</span><span class="line">        <span class="n">param</span> <span class="ss">:tempfile</span><span class="p">,</span> <span class="ss">presence</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class="line">        <span class="n">param</span> <span class="ss">:filename</span><span class="p">,</span> <span class="ss">presence</span><span class="p">:</span> <span class="kp">true</span>
+</span><span class="line">      <span class="k">end</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</span><span class="line">      <span class="n">tempfile</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;image&#39;</span><span class="o">][</span><span class="s1">&#39;tempfile&#39;</span><span class="o">]</span>
+</span><span class="line">      <span class="n">filename</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="s1">&#39;image&#39;</span><span class="o">][</span><span class="s1">&#39;filename&#39;</span><span class="o">]</span>
+</span><span class="line">
+</span><span class="line">      <span class="n">result</span> <span class="o">=</span> <span class="no">UploadImage</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">tempfile</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">call</span>
+</span><span class="line">
+</span><span class="line">      <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">success?</span>
+</span><span class="line">        <span class="nb">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2"> has been successfully uploaded.&quot;</span>
+</span><span class="line">      <span class="k">else</span>
+</span><span class="line">        <span class="nb">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="s2">&quot;Failed to upload </span><span class="si">#{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> due to: </span><span class="si">#{</span><span class="n">result</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class="line">      <span class="k">end</span>
+</span><span class="line">    <span class="k">end</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see in the above code, we added new <code>params</code> block. We tell Lotus to whitelist
+the nested params <code>:image</code> as well as check for presence of <code>:tempfile</code> and <code>:filename</code>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I hope you are now familiar with the process uploading file in Lotus. Here is
+few key points that you should be remember:</p>
+
+<ul>
+  <li>Create upload HTML form with POST type and <code>enctype="multipart/form-data"</code></li>
+  <li>Controller access to upload files via <code>params['image']</code></li>
+  <li>Business Logic can be extracted to Interactor class</li>
+  <li>Params whitelisting/validation can be done within controller action</li>
+</ul>
+
+<p>If you have any question, please do not hesitate to ask.</p>
+
+<p>The sample code can be found at <a href="https://github.com/ruby-journal/lotus-file-upload-demo">github.com/ruby-journal/lotus-file-upload-demo</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to consolidate module functions?]]></title>
@@ -3443,60 +3929,6 @@ slow down the process due to thrashing.</p>
 works with custom and directory archive dump.</p>
 
 <p>That&#8217;s it for today, folks. Keep on learning!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to update attributes with validations and callbacks skipped]]></title>
-    <link href="http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/"/>
-    <updated>2014-02-26T18:20:00+11:00</updated>
-    <id>http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped</id>
-    <content type="html"><![CDATA[
-<p>In this short tutorial, I&#8217;ll show you how to update attributes for ActiveRecord model with:</p>
-
-<ul>
-  <li>Validations are skipped.</li>
-  <li>Callbacks are skipped.</li>
-  <li><code>updated_at</code>/<code>updated_on</code> are not updated.</li>
-</ul>
-
-<p>Solutions for both Rails 3 and 4 are provided.</p>
-
-<!--more-->
-
-<h2 id="rails-4">Rails 4</h2>
-
-<p>Rails 4 comes with method <code>update_columns</code> which takes in a hash parameter.</p>
-
-<p>Here is one example how to use it:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">user</span><span class="o">.</span><span class="n">update_columns</span><span class="p">(</span><span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>At the background, one SQL UPDATE is run and will update both two attributes.</p>
-
-<h2 id="rails-3">Rails 3</h2>
-
-<p>Rails 3 does not have <code>update_columns</code> method, however there is <code>update_column</code> method, so we could loop through the parameters like below:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="p">{</span> <span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span> <span class="p">}</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="o">|</span>
-</span><span class="line">  <span class="n">user</span><span class="o">.</span><span class="n">update_column</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>However this solution sucks because there are 2 SQL UPDATE queries involved!</p>
-
-<p>There is a work-around by using <code>update_all</code></p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">User</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">update_all</span><span class="p">(</span><span class="n">last_request_at</span><span class="p">:</span> <span class="no">Time</span><span class="o">.</span><span class="n">current</span><span class="p">,</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Trung Le&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Which only generate only 1 SQL UPDATE query.</p>
 ]]></content>
   </entry>
   
