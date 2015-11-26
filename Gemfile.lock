@@ -24,12 +24,11 @@ GEM
     liquid (2.3.0)
     maruku (0.7.2)
     posix-spawn (0.3.9)
-    puma (2.10.2)
-      rack (>= 1.1, < 2.0)
+    puma (2.15.3)
     pygments.rb (0.3.7)
       posix-spawn (~> 0.3.6)
       yajl-ruby (~> 1.1.0)
-    rack (1.5.2)
+    rack (1.6.4)
     rack-protection (1.5.3)
       rack
     rake (10.4.0)
@@ -66,3 +65,6 @@ DEPENDENCIES
   sass-globbing (~> 1.0.0)
   sinatra (~> 1.4.2)
   stringex (~> 1.5.1)
+
+BUNDLED WITH
+   1.10.6
