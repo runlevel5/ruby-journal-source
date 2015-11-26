@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: rails | Ruby Journal]]></title>
+  <link href="http://ruby-journal.com/blog/categories/rails/atom.xml" rel="self"/>
+  <link href="http://ruby-journal.com/"/>
+  <updated>2015-11-27T02:35:59+11:00</updated>
+  <id>http://ruby-journal.com/</id>
+  <author>
+    <name><![CDATA[Trung Lê]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[The difference between ActiveRecord scope DSL and class method]]></title>
+    <link href="http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/"/>
+    <updated>2014-10-27T12:14:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method</id>
+    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+
+<p>Now and then I get question from people should they use class method or the
+scope DSL for ActiveRecord scope. At first I thought they are the same but
+in fact there are minor differences.</p>
+
+<!--more-->
+
+<h2 id="how-to-define-scope">How to define scope?</h2>
+
+<p>There are 2 ways to define ActiveRecord model scope:</p>
+
+<ul>
+  <li>scope DSL</li>
+  <li>class method</li>
+</ul>
+
+<h2 id="simple-example">Simple example</h2>
+
+<p>Let’s see both of them in action with following example:</p>
+
+<p>```ruby
+# DSL
+class Taxi &lt; ActiveRecord::Base
+  scope :by_driver, -&gt;(driver) { where(driver_id: driver.id) }
+end</p>
+
+<h1 id="class-method">class method</h1>
+<p>class Taxi &lt; ActiveRecord::Base
+  def self.by_driver(driver)
+    where(driver_id: driver.id)
+  end
+end
+```</p>
+
+<p>Both ways returns us ActiveRelation scope which seems the same. In fact
+in this case, they are alike with one minor difference, that is the DSL
+version doc comment won’t be picked up by RDoc.</p>
+
+<h2 id="complex-example">Complex example</h2>
+
+<p>Please be careful if you have a complex scope like below:</p>
+
+<p>```ruby
+# DSL
+class Driver &lt; ActiveRecord::Base
+  scope :by_shift, -&gt;(shift) do
+    return if shift == ‘night’</p>
+
+<pre><code>where(shift: shift)   end end
+</code></pre>
+
+<h1 id="a-wrong-or-naive-version-using-class-method">A wrong or naive version using class method</h1>
+<p>class Driver &lt; ActiveRecord::Base
+  def self.by_shift(shift)
+    return if shift == ‘night’</p>
+
+<pre><code>where(shift: shift)   end end ```
+</code></pre>
+
+<p>As you can see above, the scope involves condition check and in the DSL
+would <code>return</code> if it is night shift. You might be wondering what object
+is returned implicitly. For the DSL version, the chain scope is returend,
+that is the ActiveRelation object.</p>
+
+<p>I naively copy 1:1 the same implementation of DSL to my class method implementation
+and I got <code>nil</code> as returned value instead. This breaks the chain (if we use our scope in combination
+with other scopes). The class method must be rewritten as:</p>
+
+<p>```ruby
+class Driver &lt; ActiveRecord::Base
+  def self.by_shift(shift)
+    return scoped if shift == ‘night’</p>
+
+<pre><code>where(shift: shift)   end end ```
+</code></pre>
+
+<p>Please be noted that I returned a <code>scoped</code> which is an anonymous scope. This object
+is a ActiveRelation object and would keep the chain intact.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>What would you use? I myself prefer class method for I find sugar syntax of Rails (which
+is nice) does not add in much value. Yet having said so, I do use DSL from time to time
+if the scope is tiny.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How to update attributes with validations and callbacks skipped]]></title>
+    <link href="http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/"/>
+    <updated>2014-02-26T18:20:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped</id>
+    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+
+<p>In this short tutorial, I’ll show you how to update attributes for ActiveRecord model with:</p>
+
+<ul>
+  <li>Validations are skipped.</li>
+  <li>Callbacks are skipped.</li>
+  <li><code>updated_at</code>/<code>updated_on</code> are not updated.</li>
+</ul>
+
+<p>Solutions for both Rails 3 and 4 are provided.</p>
+
+<!--more-->
+
+<h2 id="rails-4">Rails 4</h2>
+
+<p>Rails 4 comes with method <code>update_columns</code> which takes in a hash parameter.</p>
+
+<p>Here is one example how to use it:</p>
+
+<p><code>ruby
+user.update_columns(last_request_at: Time.current, name: 'Trung Le')
+</code></p>
+
+<p>At the background, one SQL UPDATE is run and will update both two attributes.</p>
+
+<h2 id="rails-3">Rails 3</h2>
+
+<p>Rails 3 does not have <code>update_columns</code> method, however there is <code>update_column</code> method, so we could loop through the parameters like below:</p>
+
+<p><code>ruby
+{ last_request_at: Time.current, name: 'Trung Le' }.each do |k, v|
+  user.update_column(k, v)
+end
+</code></p>
+
+<p>However this solution sucks because there are 2 SQL UPDATE queries involved!</p>
+
+<p>There is a work-around by using <code>update_all</code></p>
+
+<p><code>ruby
+User.where(id: user.id).update_all(last_request_at: Time.current, name: 'Trung Le')
+</code></p>
+
+<p>Which only generate only 1 SQL UPDATE query.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Exposing ActiveRecord model attributes to Liquid dynamically]]></title>
+    <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
+    <updated>2012-03-12T12:52:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
+    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+
+<p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
+used with rails. It is quite common that you have to expose ActiveRecord attributes
+to liquid. You can achieve that by implement <code>to_liquid</code> method in your ActiveRecord
+model so it acts as if it were <code>Liquid::Drop</code>, OR you can use the helper <code>liquid_methods</code>
+to tell which attributes / call-able methods of the instance that could be passed
+with the <code>liquid_methods</code> call. In most of cases, people tend to use the latter method
+because they could narrow the exposure scope to liquid.</p>
+
+<p>However, what if your model has so many attributes and typing all them out for
+the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
+creating a module:</p>
+
+<p>{% codeblock lib/attributes_to_liquid_methods_mapper.rb lang:ruby %}
+module AttributesToLiquidMethodsMapper
+  def self.included(base)
+    base.class_eval do
+      base.attribute_names.each do |attribute|
+        liquid_methods attribute.to_sym
+      end
+    end
+  end
+end
+{% endcodeblock %}</p>
+
+<p>And you also need to include the above module in the ActiveRecord classes that
+you want to be exposed to Liquid:</p>
+
+<p><code>ruby
+class MyObject &lt; ActiveRecord::Base
+  require 'attributes_to_liquid_methods_mapper'
+  include AttributesToLiquidMethodsMapper
+end
+</code></p>
+
+<p>Hope you enjoy this tutorial. Comments and feedbacks are greatly welcomed :)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Define Fixtures with Polymorphic Association]]></title>
+    <link href="http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/"/>
+    <updated>2012-03-09T15:16:00+11:00</updated>
+    <id>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association</id>
+    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+
+<p>It is more than often that you have to write a fixtures for models with polymorphic
+association. In this short tutorial, I will show you how to use few shortcut trick
+to create fixtures.</p>
+
+<p>Assume we have following code:</p>
+
+<p>```ruby
+class Car &lt; ActiveRecord::Base
+  belongs_to :borrowable, :polymorphic =&gt; true
+end</p>
+
+<p>class Company &lt; ActiveRecord::Base
+  has_many :cars, :as =&gt; :borrowable
+end</p>
+
+<p>```</p>
+
+<p>Above is just a very simple code declaring a polymorphic association between
+Company to Car. Next, we will write some fixtures for the sake
+of testing.</p>
+
+<p>```
+# Company fixtures
+google:
+  id: 1
+  name: Google</p>
+
+<h1 id="car-fixtures">car fixtures</h1>
+<p>ferrari:
+  name: F430
+  borrowable_id: 1
+  borrowable_type: Company
+```</p>
+
+<p>We could do better by referencing to Company fixture via named fixture, so
+the above car fixture would be:</p>
+
+<p><code>
+ferrari:
+  name: F430
+  borrowable: google (Company)
+</code></p>
+
+<p>Please be noted that the syntax of line <code>borrowable</code> now has an additonal <code>(Company)</code>
+keyword. This is to tell rails that the <code>borrowable_type</code> is of <code>Company</code> class.
+Without that, the fixtures will set <code>borrowable_type</code> to <code>nil</code>, thus invalid.</p>
+
+<p>Hope you find this tutorial useful. And please avoid using fixures as much as you can. Use factory_girl or machinist. See you in the next tutorial.</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ruby | Ruby Journal]]></title>
+  <link href="http://ruby-journal.com/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://ruby-journal.com/"/>
+  <updated>2015-11-27T02:35:59+11:00</updated>
+  <id>http://ruby-journal.com/</id>
+  <author>
+    <name><![CDATA[Trung Lê]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[How to consolidate module functions?]]></title>
+    <link href="http://ruby-journal.com/ruby/what-is-module-function/"/>
+    <updated>2015-04-08T09:22:00+10:00</updated>
+    <id>http://ruby-journal.com/ruby/what-is-module-function</id>
+    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+
+<p>If you have touched module before, you would know that function can be called
+with module as receiver or as instance method when mixed in class. Today I am
+going to show you a nitfy trick to consolidate your module function so it can
+be used for both purposes at same time by using <code>Module#module_function</code>.</p>
+
+<!--more-->
+
+<h2 id="concept">Concept</h2>
+
+<h3 id="instance-functions">Instance functions</h3>
+
+<p>Module functions can be mixed into classes and thus are invoked as instance
+methods for the object of that classes. For example:</p>
+
+<p>```ruby
+module MyLibrary
+  def hello
+    puts “Hello world”
+  end
+end</p>
+
+<p>class Greeter
+  include MyLibrary
+end</p>
+
+<p>Greeter.new.hello # =&gt; Hello world
+```</p>
+
+<h3 id="module-functions">Module functions</h3>
+
+<p>Module functions can be invoked with module as receiver. For example:</p>
+
+<p>```ruby
+module MyLibrary
+  def self.hello
+    puts “Hello world”
+  end
+end</p>
+
+<p>MyLibrary.hello # =&gt; Hello world
+```</p>
+
+<h3 id="i-want-both-how">I want both, how?</h3>
+
+<p>Well, you can, here is my ugly version:</p>
+
+<p>```ruby
+module MyLibrary
+  def self.hello
+    puts “Hello world”
+  end</p>
+
+<p>def hello
+    MyLibrary.hello
+  end
+end
+```</p>
+
+<p>As you can see from the code above, we reference <code>hello</code> method to module
+function <code>MyLibrary.hello</code>.</p>
+
+<p>It looks duplicating, isn’t it? Thanks to Ruby, there is an alternative:</p>
+
+<p>```ruby
+module MyLibrary
+  def hello
+    puts “Hello world”
+  end</p>
+
+<p>module_function :hello
+end</p>
+
+<p>class Greeter
+  include MyLibrary
+end</p>
+
+<p>Greeter.new.hello # =&gt; Hello world
+MyLibrary.hello # =&gt; Hello world
+```</p>
+
+<p>Ruby gives us <code>Module#module_function</code> which takes the method name and automatically
+generate the module function that is equivalent to <code>MyLibrary.hello</code> for us.</p>
+]]></content>
+  </entry>
+  
+</feed>

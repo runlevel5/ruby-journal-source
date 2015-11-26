@@ -1,0 +1,556 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>How to solve Silicon Straits Saigon hiring challenge - Ruby Journal</title>
+  <meta name="author" content="Trung Lê">
+
+  
+  <meta name="description" content="Hello folks For whom who might have not heard of Silicon Straits Saigon (SSS), this
+company is one cool company in Vietnam with strong focus in tech &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ruby-journal.com/how-to-solve-sss-hiring-challenge/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Ruby Journal" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+  
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-54360362-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ruby Journal</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:ruby-journal.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">How to Solve Silicon Straits Saigon Hiring Challenge</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-21T17:04:00+10:00" pubdate data-updated="true">Aug 21<span>st</span>, 2014</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Hello folks</p>
+
+<p>For whom who might have not heard of Silicon Straits Saigon (SSS), this
+company is one cool company in Vietnam with strong focus in tech such
+as iOS and Web. When I use the word cool, I did not mean it before I
+touch base with their hiring challenge.</p>
+
+<p>SSS is known to have a quite unique way to challenge potential employees.
+They give you a very cryptic page <a href="http://hiring.siliconstraits.vn">http://hiring.siliconstraits.vn</a> and
+asks you to hack them.</p>
+
+<p>Well, today I am going to show you how to solve this problem step by step.
+I hope Mr. An (Director of SSS) won’t hate me for this.</p>
+
+<p>Spoiler alert! Go give the challange a go yourself before reading!</p>
+
+<!--more-->
+
+<h2 id="the-challenge">The challenge</h2>
+
+<p>Use your favourite browser and go apply for job at SSS at http://hiring.siliconstraits.vn.</p>
+
+<p>Okay, where is my form? How could I fill in my name and my CV. Is this some kind
+of troll? Oh hold on, I see something cryptic, that is cryptic <code>L3VzZXJzLzppZC9hcHBseSAg</code> string.</p>
+
+<p>And the problem is “Call the API”. Which API? Give me API, damm it!</p>
+
+<h2 id="decode-the-engima-not-really">Decode the Engima (not really)</h2>
+
+<p>Honestly, I am clueless, been asked to call an API and given an encrypted string. I tried
+to squeeze my tiny brain to put these two pieces of the puzzle together, and the only hypothesis
+that is plausible enough is that the encrypted string has all details about the API.</p>
+
+<p>Firstly, we need to decode this encrypted string. As you might know there are various ways
+to encrypt a message, and you could go easy with Caesar Cipher or maniac with AES-256bit.
+If you think SSS would give you an AES-256bit encrypted message, then I might be looking
+for job at wrong place. SSS touts themselves a iOS and Web firm, not a security firm, thus
+pragmatically I would not want to go back opening thick books of algorithm which turns
+out useless because in theory you could not decode it within your lifetime!</p>
+
+<p>Now, I assume this is something that does not require a private key to decrypt. Something
+that is easy, something that is related to SSS’s expertise that is iOS or Web. Ouch, my
+brain cell is burning, it hurts, by instinct I know that Web CSS and Backend code uses
+Base64 quite often, so it is only plausible that I give Base64 a trial.</p>
+
+<p>Let’s fire up Ruby REPL, that is <code>irb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ irb
+</span><span class="line">&gt; require 'base64'
+</span><span class="line">&gt; Base64.decode64 "L3VzZXJzLzppZC9hcHBseSAg"
+</span><span class="line">&gt; =&gt; "/users/:id/apply  "</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Wow, just by chance, I got it right the first time ;). So we have another clue, a string
+of “/users/:id/apply”. So this must be the location of the HTTP API that SSS call to</p>
+
+<h2 id="decode-the-id-param">Decode the :id param</h2>
+
+<p>Based on my experiences, this route “/users/:id/apply” looks like a RESTful resource
+of user which takes in a param <code>:id</code>. But what’s the <code>:id</code>? You asked me? I have no clues!</p>
+
+<p>Because this is a HTTP Web API, let’s divert from the question and play around by calling
+to this Web services first.</p>
+
+<p>I used <code>curl</code> to make all calls. I chose <code>id=1</code> for the API call:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl -X GET http://hiring.siliconstraits.vn/users/1/apply
+</span><span class="line">{"error":"Please authenticate using Basic Auth with your token as password"}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The response gives me another clue, that is the service uses Basic Auth with token
+as the password. This clue is very confusing because it does not tell me if my
+param <code>:id</code> is correct or not.</p>
+
+<p>I spent the next few minutes trying out other hypthosesis.</p>
+
+<p>With the assumption this is a User resource, by convention I could get all
+users from SSS by calling GET request to <code>/users</code>. I might give me the list
+of <code>:id</code> that might be the key for the problem.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl -X GET http://hiring.siliconstraits.vn/users
+</span><span class="line">Good luck, keep trying ;)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Sadly, it turns out that SSS would not give it to you that easily. Who would anyway right?
+If SSS does, I would stop here and look for a job elswhere.</p>
+
+<p>Okay, next let’s try to call a POST on the same URL:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl -X POST http://hiring.siliconstraits.vn/users
+</span><span class="line">{"error":"email is required (prefer Gravatar)"}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This time the message is helpful, it asks me to post a param <code>:email</code>. So I did:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl -X POST -d "email=trung.le@ruby-journal.com" http://hiring.siliconstraits.vn/users
+</span><span class="line">{"email":"trung.le@ruby-journal.com","id":3615,"mobile":null,"name":null,"profile_url":null,"token":"AQGNAOFHQFSECGD","updated_at":"2014-08-21T07:01:48Z"}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Viola! The response gave me the <code>:id</code> plus the <code>:token</code></p>
+
+<h2 id="by-passing-the-auth">By passing the Auth</h2>
+
+<p>Now we have 3 pieces:</p>
+
+<ul>
+  <li>URL to make a call to (I assume a POST call) is: http://hiring.siliconstraits.vn/users/:id/apply</li>
+  <li><code>:id</code> is <code>3615</code></li>
+  <li><code>:token</code> is <code>AQGNAOFHQFSECGD</code></li>
+</ul>
+
+<p>Let’s make a last call to the API and hope that SSS would come back or I would come to see them
+directly (still need to sort out few details for the Ruby Meetup 2 in September though). In the last
+section, we know that SSS is using Basic Auth and token.</p>
+
+<p>With the knowledge of the Auth type and token, we could send this detail to SSS for auth by setting
+the header with <code>Authorization: Basic &lt;TOKEN&gt;</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl -X POST -H "Authorization: Basic AQGNAOFHQFSECGD" http://hiring.siliconstraits.vn/users/3615/apply
+</span><span class="line">{"error":"Please authenticate using Basic Auth with your token as password"}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>WTF?! It does not work!? I thought that it would be similar like Spotify API or Twitter API. So I tried
+again with different header:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl -X POST -H "Authorization: Token token=AQGNAOFHQFSECGD" http://hiring.siliconstraits.vn/users/3615/apply
+</span><span class="line">{"error":"Please authenticate using Basic Auth with your token as password"}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Still not working! Hmm, so it seems to me my approach is wrong. I took a step back and thinking about the
+word ‘Basic Auth’. As you might have know, there is a more primitive HTTP Basic Authentication out there
+in the wild, so it might be that. Now try again:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl --user 3615:AQGNAOFHQFSECGD -X POST http://hiring.siliconstraits.vn/users/3615/apply
+</span><span class="line">{"error":"name, profile_url, mobile are required. Please update before apply (provide real, public data please)"}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>OMG, it worked (well partially), I was right!</p>
+
+<p>FYI, the <code>--user</code> param of curl takes <code>user:password</code>.</p>
+
+<p>We now need to update the details  <code>name</code>, <code>profile_url</code> and <code>mobile</code> and come back to submit :)</p>
+
+<h2 id="update-missing-details">Update missing details</h2>
+
+<p>Okay, so I was right, this is a REST API, which means by convention, sending a PUT request to <code>/users/:id</code>
+would upate the details for me.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl --user 3615:AQGNAOFHQFSECGD -X PUT -d name="Trung Le" -d profile_url="http://github.com/joneslee85" -d mobile="1080 888 888 888 888" http://hiring.siliconstraits.vn/users/3615
+</span><span class="line">{"email":"trung.le@ruby-journal.com","id":3615,"mobile":"1080 888 888 888 888","name":"Trung Le","profile_url":"http://github.com/joneslee85","token":"AQGNAOFHQFSECGD","updated_at":"2014-08-21T08:09:27Z"}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Hey hey, the response indicated that my details are now full-filled!</p>
+
+<h2 id="connecting-all-the-dots">Connecting all the dots!</h2>
+
+<p>Cut it short to 1 line and so I could head to the GYM:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl --user 3615:AQGNAOFHQFSECGD -X POST http://hiring.siliconstraits.vn/users/3615/apply
+</span><span class="line">{"message":"Congratulations Trung Le!, here's the next step /users/:id/profile"}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Finally I got to the last step, hold on! WTF it is not finished?! Are you kidding me? Okay, let’s
+check out my profile. My advice is making sure you check your CV at least 4 times before scheduling
+the interview.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl --user 3615:AQGNAOFHQFSECGD -X GET http://hiring.siliconstraits.vn/users/3615/profile
+</span><span class="line">Please authenticate yourself using token param</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Boom! -_- it did not work like I expected. Let’s give it the token param</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ curl -X GET "http://hiring.siliconstraits.vn/users/3615/profile -d token="DGCESFQHFOANGQA"</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and the response was:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;!DOCTYPE html&gt;
+</span><span class="line">&lt;html&gt;
+</span><span class="line">&lt;head&gt;
+</span><span class="line">  &lt;title&gt;We're young &amp; we're hiring&lt;/title&gt;
+</span><span class="line">  ...
+</span><span class="line">&lt;/html&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The response is HTML with content about my profile and embedded within is another secret:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">================================================
+</span><span class="line">U3R1Y2s/IEhlcmUncyBhIHRpcDogYml0Lmx5L1VUdlpoMyAg
+</span><span class="line">================================================</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and it is also Base64 encrypted string, decoding it gives:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Stuck? Here's a tip: bit.ly/UTvZh3</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>It turns out it is in turn encrypted with QR code. I start to like this game and what I get is:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Don't stress, just REST</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Very interesting, what is REST?! Nvm, lol</p>
+
+<p>I guess this ends our fun. I hope SSS would come up with some more fun in the future.</p>
+
+<p>Bye folks</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Trung Lê</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-21T17:04:00+10:00" pubdate data-updated="true">Aug 21<span>st</span>, 2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-solve-sss-hiring-challenge/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-solve-sss-hiring-challenge/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/what-is-the-difference-between-git-rebase-and-git-merge/" title="Previous Post: What is the difference between git rebase and git merge">&laquo; What is the difference between git rebase and git merge</a>
+      
+      
+        <a class="basic-alignment right" href="/how-to-integrate-sidekiq-with-activejob/" title="Next Post: How to integrate Sidekiq with ActiveJob">How to integrate Sidekiq with ActiveJob &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>Humble Ruby developer</p>
+  <p>Core dev at <a href="http://spreecommerce.com">Spree Commerce</a> and <a href="http://lotusrb.org">Lotus Framework</a></p>
+  <p>I love art, reading history book, table tennis, golf and my beloved <a href="http://ruby.org.vn">Ruby Vietnam</a></p>
+</section><section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/crystal/testing-whirlwind-tour-in-crystal-lang/">Testing Whirlwind tour in Crystal lang</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-to-create-images-slash-files-upload-form-in-lotus-framework/">How to create images/files upload form in Lotus Framework?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/ruby/what-is-module-function/">How to consolidate module functions?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/lotusrb/how-to-add-basic-authentication-into-lotus-app/">How to add basic authentication into Lotus app</a>
+      </li>
+    
+      <li class="post">
+        <a href="/rails/the-difference-between-activerecord-scope-dsl-and-class-method/">The difference between ActiveRecord scope DSL and class method</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/joneslee85">@joneslee85</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'joneslee85',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("joneslee85", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/joneslee85" class="twitter-follow-button" data-show-count="false">Follow @joneslee85</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/joneslee85?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Trung Lê -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ruby-journal';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ruby-journal.com/how-to-solve-sss-hiring-challenge/';
+        var disqus_url = 'http://ruby-journal.com/how-to-solve-sss-hiring-challenge/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,927 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>How to setup Rails app with puma and NGINX - Ruby Journal</title>
+  <meta name="author" content="Trung Lê">
+
+  
+  <meta name="description" content="In this tutorial, I&#8217;ll walk you through the concept behind using puma + NGINX, plus thorough instructions on setting them up on CentOS and &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ruby-journal.com/how-to-setup-rails-app-with-puma-and-nginx/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Ruby Journal" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+  
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-54360362-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ruby Journal</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:ruby-journal.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">How to Setup Rails App With Puma and NGINX</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-16T17:51:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<p>In this tutorial, I&#8217;ll walk you through the concept behind using puma + NGINX, plus thorough instructions on setting them up on CentOS and Ubuntu.</p>
+
+<!--more-->
+
+<h2 id="concept">Concept</h2>
+
+<p>Many people who come from the old Apache HTTPd day often ask me how reverse proxy + web server work?</p>
+
+<blockquote>
+  <p><em>&#8220;It&#8217;s different paradigm&#8221;</em></p>
+</blockquote>
+
+<p>Reverse proxy software (such as Varnish or NGINX) would acts as a load balancer that routes all external requests to a pool of web apps. The below diagram depicts simply how it works:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">                                           +---&gt; web app process 1 --&gt; threads
+</span><span class="line">                                           |
+</span><span class="line">[requests] &lt;------&gt;  [reverse proxy server]  --+---&gt; web app process 2 --&gt; threads
+</span><span class="line">                                           |
+</span><span class="line">                                           +---&gt; web app process 3 --&gt; threads</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>In constrast to Apache way, which is depicted below:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">                +--- web process fork
+</span><span class="line">                |
+</span><span class="line">[requests] ------&gt;  +--- web process fork
+</span><span class="line">                |
+</span><span class="line">                +--- web process fork</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>in which Apache HTTPd will act as both load balancer that route request to only 1 dedicated web app and automatically tell itself to fork more processes to meet demand.</p>
+
+<p>I am NOT going to dwelve into which way is better than which. My 5cent on this is, reverse proxy + web server is new way to do things, it offers distinct advantages on scalability on multi-tenancy scenario. In which you could up-scale and down-scale more web processes on demand without affecting other apps. The downside is you have to deal with process monitoring which requires understanding of UNIX processes.</p>
+
+<h2 id="installation">Installation</h2>
+
+<h3 id="puma">puma</h3>
+
+<p>puma is a multi-threaded high performance webserver written in Ruby. It is new in the market yet it has gained lots of traction. It can be used to server any ruby web app that support rack such as Sinatra or Ruby On Rails.</p>
+
+<p>As a first class Ruby project, you could install <code>puma</code> via RubyGems.</p>
+
+<p>With Rails 3+ app, simply append to <code>Gemfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'puma', '~&gt; 2.3.2'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then <code>bundle install</code></p>
+
+<p>You can now start your app with puma with <code>rails s</code>.  You should see output if it is started correctly:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma starting in single mode...
+</span><span class="line">* Version 2.3.2, codename: Delicious Thin Mints
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">...</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="nginx">NGINX</h3>
+
+<p>NGINX is utilised as reverse proxy server for its <code>HttpProxyModule</code> could perform proxy passing request to many virtual hosts.</p>
+
+<p>Firstly, we need to get the software installed on our server:</p>
+
+<p><strong>CentOS 5+</strong></p>
+
+<p>Create file name <code>/etc/yum.repos.d/nginx.repo</code> and paste following:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">[nginx]
+</span><span class="line">name=nginx repo
+</span><span class="line">baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+</span><span class="line">gpgcheck=0
+</span><span class="line">enabled=1</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Then we can install NGINX with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo yum install nginx</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and the server could be started with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo /etc/init.d/nginx start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>Ubuntu 12.04</strong></p>
+
+<p>The NGINX version in the Ubuntu repo is quite old (ie. 1.2.6), you could install
+newer version by adding the official nginx.org repo:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then add following line into the end of file <code>/etc/apt/sources.list</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">deb http://nginx.org/packages/ubuntu/ precise nginx</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>NOTE: If you have installed NGINX before, make sure you remove it first:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo apt-get purge nginx*</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then you can install the package with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo apt-get update
+</span><span class="line">sudo apt-get install nginx</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Once successfully installed, you could verify with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">nginx -v
+</span><span class="line"># nginx version: nginx/1.4.0</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>you can manually start the daemon using Upstart:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo service nginx start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>Due to the differences in file locations between CentOS and Ubuntu, I divide this section into two, please read the section that match your OS.</p>
+
+<p>Before continuing, there are few assumptions I would like you to be aware of:</p>
+
+<ul>
+  <li>You are running on Ruby 1.9.3 or newer</li>
+  <li>Your Rails app is 3.x or newer</li>
+  <li>You are running your app under <code>RAILS_ENV=production</code></li>
+  <li>Your rails app should be placed in <code>/var/www</code> folder.</li>
+  <li>You have setup correctly all permissions and firewall settings for your environment</li>
+</ul>
+
+<h3 id="nginx-configuration">NGINX configuration</h3>
+
+<p>We are going to configure NGINX to have an <code>upstream</code> directive, this directive tell NGINX where to proxy parse the request to.
+Next we will add a virtual host and use <code>proxy_pass</code> directive to tell NGINX to pass the request to the pool of processes defined in <code>upstream</code> section.</p>
+
+<p><strong>CentOS</strong></p>
+
+<p>The very first thing I normally do is to delete all default virtual hosts files:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo rm /etc/nginx/conf.d/default.conf</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next, let&#8217;s create a new host config file at <code>/etc/nginx/conf.d/my_app.conf</code> for our rails app, paste following:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">upstream my_app {
+</span><span class="line">  server unix:///var/run/my_app.sock;
+</span><span class="line">}
+</span><span class="line">
+</span><span class="line">server {
+</span><span class="line">  listen 80;
+</span><span class="line">  server_name my_app_url.com; # change to match your URL
+</span><span class="line">  root /var/www/my_app/public; # I assume your app is located at this location
+</span><span class="line">
+</span><span class="line">  location / {
+</span><span class="line">    proxy_pass http://my_app; # match the name of upstream directive which is defined above
+</span><span class="line">    proxy_set_header Host $host;
+</span><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class="line">  }
+</span><span class="line">
+</span><span class="line">  location ~* ^/assets/ {
+</span><span class="line">    # Per RFC2616 - 1 year maximum expiry
+</span><span class="line">    expires 1y;
+</span><span class="line">    add_header Cache-Control public;
+</span><span class="line">
+</span><span class="line">    # Some browsers still send conditional-GET requests if there's a
+</span><span class="line">    # Last-Modified header or an ETag header even if they haven't
+</span><span class="line">    # reached the expiry date sent in the Expires header.
+</span><span class="line">    add_header Last-Modified "";
+</span><span class="line">    add_header ETag "";
+</span><span class="line">    break;
+</span><span class="line">  }
+</span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then you can restart your NGINX server:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo /etc/init.id/nginx restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>Ubuntu</strong></p>
+
+<p>The very first thing I normally do is to disable default site by removing the symlink:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo rm /etc/nginx/conf.d/sites-enabled/default</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next, let&#8217;s create a new virtual host config file at <code>/etc/nginx/sites-available/my_app.conf</code> for our rails app, paste following:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">upstream my_app {
+</span><span class="line">  server unix:///var/run/my_app.sock;
+</span><span class="line">}
+</span><span class="line">
+</span><span class="line">server {
+</span><span class="line">  listen 80;
+</span><span class="line">  server_name my_app_url.com; # change to match your URL
+</span><span class="line">  root /var/www/my_app/public; # I assume your app is located at that location
+</span><span class="line">
+</span><span class="line">  location / {
+</span><span class="line">    proxy_pass http://my_app; # match the name of upstream directive which is defined above
+</span><span class="line">    proxy_set_header Host $host;
+</span><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class="line">  }
+</span><span class="line">
+</span><span class="line">  location ~* ^/assets/ {
+</span><span class="line">    # Per RFC2616 - 1 year maximum expiry
+</span><span class="line">    expires 1y;
+</span><span class="line">    add_header Cache-Control public;
+</span><span class="line">
+</span><span class="line">    # Some browsers still send conditional-GET requests if there's a
+</span><span class="line">    # Last-Modified header or an ETag header even if they haven't
+</span><span class="line">    # reached the expiry date sent in the Expires header.
+</span><span class="line">    add_header Last-Modified "";
+</span><span class="line">    add_header ETag "";
+</span><span class="line">    break;
+</span><span class="line">  }
+</span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and we need to enable it by creating symlink in <code>/etc/nginx/sites-enabled</code></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo ln -sf /etc/nginx/sites-available/my_app.conf /etc/nginx/sites-enabled/my_app.conf</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then you can restart your nginx server:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo service nginx restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="start-your-app-server">start your app server</h3>
+
+<p>Now we need to tell puma to start our app and bind it to a Unix socket:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">cd /var/www/my_app
+</span><span class="line">bundle exec puma -e production -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>if nothing goes wrong, you should see this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma starting in single mode...
+</span><span class="line">* Version 2.3.2, codename: Delicious Thin Mints
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">* Listening on unix:///var/run/my_app.sock
+</span><span class="line">Use Ctrl-C to stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and now try to surf your site with Firefox or Chrome, open <code>my_app_url.com</code>. Please substitute it with your site domain name instead here. And you should not see any error page like 403.</p>
+
+<p>Once you have verified that our puma has correctly serve the request, we now can run the puma server as daemon.</p>
+
+<p>Press <code>CTRL-C</code> to stop the foreground running puma processing and run command with <code>-d</code> parameter:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec puma -e production -d -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You could verify if the puma process is in background or not:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">ps aux | grep puma
+</span><span class="line"># 9594 92.8  1.4 496844 117280 ?       Rl   17:25   0:25 ruby /usr/lib/ruby/1.9.1/bin/puma -e production -d -b unix:///var/run/my_app.sock</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="restartstop-your-daemon-puma-server">restart/stop your daemon puma server</h3>
+
+<p>In order to restart our server, we use command <code>kill</code> to send in <code>SIGUSR2</code> signal
+to the puma PID, in our case the PID is 9594:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">kill -s SIGUSR2 9594</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The process kills itself and fork a new process with new PID</p>
+
+<p>If you want to stop the server, simply send <code>SIGTERM</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">kill -s SIGTERM 9594</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>you can verify if the process has been killed or not with <code>ps</code>.</p>
+
+<p>If you want UNIX fetch you the PID, you can start puma server with <code>--pidfile</code> params:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The PID will be store in <code>/var/run/puma.pid</code> and now you could just <code>cat</code> the PID out easily:</p>
+
+<p>To restart:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">kill -s SIGUSR2 `cat /var/run/puma.pid`</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>To stop:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">kill -s SIGTERM `cat /var/run/puma.pid`</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="a-better-way-to-manage-your-puma-processes">a better way to manage your puma processes</h3>
+
+<p>Dealing with UNIX PID is not something you want to deal with everyday. There are
+many tools to manage processes such as <code>god</code> or <code>monit</code>. You need to spend time
+to configure them correctly. Thanksfully, puma comes with a built-in process
+manager that help ease your admin job, introducing the awesome <code>pumactl</code> command line tool.</p>
+
+<p><code>pumactl</code> is the puma processes monitor and controller, it allows you to start/restart/stop the server with 3 ways:</p>
+
+<ul>
+  <li>PID</li>
+  <li>State file</li>
+  <li>Control Server</li>
+</ul>
+
+<p><em>WARNING</em>: Sadly, <code>pumactl</code> is very broken and yield inconsitent bugs. So for now, please <em>AVOID</em> using <code>pumactl</code> and instead use my production-grade bash script:</p>
+
+<p>https://gist.github.com/joneslee85/5844933</p>
+
+<p>Please read on if you want to know how <code>pumactl</code> does thing. If not, just skip it.</p>
+
+<h4 id="pid">PID</h4>
+
+<p>This is exactly like the traditional way of sending signal to process with <code>kill</code>. Please be noted that we could not start our server with this way because <code>pumactl</code> has no idea what our configuration, so you have to start the server the normal way with <code>puma</code> command.</p>
+
+<p>However, for existing running puma process, you could stop it with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -p &lt;pid&gt; stop
+</span><span class="line"># Command stop sent success</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and to restart it:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -p &lt;pid&gt; resart
+</span><span class="line"># Command restart sent success</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And in the case where you tell puma to store its PID in pid file:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec puma -e production -d -b unix:///var/run/my_app.sock --pidfile /var/run/puma.pid</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and then we could restart the process with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -P /var/run/puma.pid restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and stop process with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -P /var/run/puma.pid stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Isn&#8217;t that more civilized? At the moment of this writing, I find dealing with PID is very reliable. The downside is that you have to manually manage the process. I highly recommend you to use <code>monit</code> or <code>god</code> to manage the process instead of <code>pumactl</code> because <code>pumactl</code> suffers few bugs.</p>
+
+<h4 id="state-file-avoid">State file (AVOID)</h4>
+
+<p>Dealing with PID is painful, you need to type the whole <code>puma</code> start line over and over again. However, there is a better way, by storing all the configurations into one state file, <code>pumactl</code> would be able to manage processes easily.</p>
+
+<p>So firstly, we need to kill all puma processes running:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">sudo killall puma</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then we start our server with <code>-S</code> parameter:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec puma -e production -d -b unix:///var/run/my_app.sock -S /var/run/my_app.state</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>puma would generate <code>/var/run/my_app.state</code> file with content:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">---
+</span><span class="line">pid: 9654
+</span><span class="line">config: !ruby/object:Puma::Configuration
+</span><span class="line">  options:
+</span><span class="line">    :min_threads: 0
+</span><span class="line">    :max_threads: 16
+</span><span class="line">    :quiet: true
+</span><span class="line">    :debug: false
+</span><span class="line">    :binds:
+</span><span class="line">    - unix:///var/run/my_app.sock
+</span><span class="line">    :workers: 0
+</span><span class="line">    :daemon: true
+</span><span class="line">    :worker_boot: []
+</span><span class="line">    :environment: production
+</span><span class="line">    :worker_directory: /home/jr_deploy/staging/current
+</span><span class="line">    :state: /var/run/my_app.state</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>this is a serialized <code>Puma::Configuration</code> object, and <code>pumactl</code> would read this object to figure out where you bind your puma process and other details.</p>
+
+<p>Now to restart our puma, we do:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state restart
+</span><span class="line"># Command restart sent success</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and if you want to stop puma:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state stop
+</span><span class="line"># Command stop sent success</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The interesting thing is that <code>/var/run/my_app.state</code> will be peristent and you could start the server with all configurations retained:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec pumactl -S /var/run/my_app.state start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>the output I get is:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">* Listening on tcp://0.0.0.0:9292
+</span><span class="line">Use Ctrl-C to stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which is not the way I expected because the server is started in non-daemon mode and use TCP mode. I believe this is an issue with puma. So for now, please refrain from starting the server with pumactl. Instead, remove file <code>/var/run/my_app.state</code> and repeat the whole process again. I&#8217;ve lodged this issue with @evanphx at https://github.com/puma/puma/issues/287</p>
+
+<h4 id="control-server-avoid">Control Server (AVOID)</h4>
+
+<p>puma also comes with a built-in control server which will be started on localhost port 9293 when you run puma with <code>--control</code> params:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">RAILS_ENV=production bundle exec puma -e production -d -b unix:///var/run/my_app.sock --control unix:///var/run/my_app_pumactl.sock --control-token foo</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If nothing goes wrong, you should see:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">* Listening on unix:///var/run/my_app.sock
+</span><span class="line">* Starting status server on unix:///var/run/my_app_pumactl.sock
+</span><span class="line">Use Ctrl-C to stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please pay attention to <code>--control-token</code> param, this is auth token which is required by <code>pumactl</code> to talk to this control server.</p>
+
+<p>You can query status of the server with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">pumactl -C unix://var/run/my_app_pumactl.sock [status|restart|halt|stop]</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You should see:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma is started</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now let&#8217;s try to halt/stop/restart the server:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">pumactl -C unix://var/run/my_app_pumactl.sock -T foo [restart|halt|restart]</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted, if your <code>-T</code> token does not match the token the server used, in our case <code>foo</code>, you would get this error:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Unauthorized access to server (wrong auth token)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Okay, so far all goes well, let&#8217;s try to stop the server first then start it with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">pumactl -C unix://var/run/my_app_pumactl.sock -T foo start</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and the output:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Puma 2.1.1 starting...
+</span><span class="line">* Min threads: 0, max threads: 16
+</span><span class="line">* Environment: development
+</span><span class="line">* Listening on tcp://0.0.0.0:9292
+</span><span class="line">Use Ctrl-C to stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which is wrong, it seems to me puma suffers the same issue as of the State file. So please refrain from using State File and Control Server methods to monitor puma process. Instead, just go for the PID way and use <code>monit</code> or <code>god</code> instead. I&#8217;ll update this section once the issue is resolved.</p>
+
+<h3 id="capistrano-deployment">Capistrano deployment</h3>
+
+<p>Now you know how puma works, you could adapt what you learned for your deployment. If you use <code>capistrano</code>, you could use the <code>puma/capistrano</code> tasks by append to your <code>config/deploy.rb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">require 'puma/capistrano`</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and then</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec cap puma:start
+</span><span class="line">bundle exec cap puma:restart
+</span><span class="line">bundle exec cap puma:stop</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Trung Lê</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-03-16T17:51:00+11:00" pubdate data-updated="true">Mar 16<span>th</span>, 2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-setup-rails-app-with-puma-and-nginx/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-setup-rails-app-with-puma-and-nginx/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/install-ubuntu-with-pxe-via-osx/" title="Previous Post: Install Ubuntu with PXE via OSX">&laquo; Install Ubuntu with PXE via OSX</a>
+      
+      
+        <a class="basic-alignment right" href="/how-to-block-old-ie-version-with-rails/" title="Next Post: How to block old IE version with Rails">How to block old IE version with Rails &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>Humble Ruby developer</p>
+  <p>Core dev at <a href="http://spreecommerce.com">Spree Commerce</a> and <a href="http://lotusrb.org">Lotus Framework</a></p>
+  <p>I love art, reading history book, table tennis, golf and my beloved <a href="http://ruby.org.vn">Ruby Vietnam</a></p>
+</section><section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/crystal/testing-whirlwind-tour-in-crystal-lang/">Testing Whirlwind tour in Crystal lang</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-to-create-images-slash-files-upload-form-in-lotus-framework/">How to create images/files upload form in Lotus Framework?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/ruby/what-is-module-function/">How to consolidate module functions?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/lotusrb/how-to-add-basic-authentication-into-lotus-app/">How to add basic authentication into Lotus app</a>
+      </li>
+    
+      <li class="post">
+        <a href="/rails/the-difference-between-activerecord-scope-dsl-and-class-method/">The difference between ActiveRecord scope DSL and class method</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/joneslee85">@joneslee85</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'joneslee85',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("joneslee85", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/joneslee85" class="twitter-follow-button" data-show-count="false">Follow @joneslee85</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/joneslee85?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Trung Lê -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ruby-journal';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ruby-journal.com/how-to-setup-rails-app-with-puma-and-nginx/';
+        var disqus_url = 'http://ruby-journal.com/how-to-setup-rails-app-with-puma-and-nginx/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>How to DRY your Rails routes - Ruby Journal</title>
+  <meta name="author" content="Trung Lê">
+
+  
+  <meta name="description" content="So you have duplicated routes in your resources? In today tutorial, I&#8217;ll show you how to DRY it up abit. Sample code Just imagine we have &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ruby-journal.com/how-to-dry-your-rails-routes/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Ruby Journal" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+  
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-54360362-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ruby Journal</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:ruby-journal.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">How to DRY Your Rails Routes</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-18T09:29:00+10:00" pubdate data-updated="true">Apr 18<span>th</span>, 2014</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<p>So you have duplicated routes in your resources? In today tutorial, I&#8217;ll show you how to DRY it up abit.</p>
+
+<!--more-->
+
+<h2 id="sample-code">Sample code</h2>
+
+<p>Just imagine we have following routes:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="c1"># config/routes.rb</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:pamphlets</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">member</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:posters</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">member</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">collection</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:bulk_print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As we could see in the code above, we have two resources <code>:pamphlets</code> and <code>:posters</code> that both share same
+<code>post :print</code> route.</p>
+
+<h2 id="dry-with-rails-3">DRY with Rails 3</h2>
+
+<p>In order to DRY it, we could extract the block <code>member { post :print }</code> to a shared proc <code>printable</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">printable</span> <span class="o">=</span> <span class="no">Proc</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">member</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:pamphlets</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">printable</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:posters</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">printable</span><span class="o">.</span><span class="n">call</span>
+</span><span class="line">
+</span><span class="line">  <span class="n">collection</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:bulk_print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>resources</code> method take in a block, so for <code>pamphlets</code> we parse the whole <code>printable</code> in as block. It is
+a bit different with <code>posters</code> because this resource already have a block, here what we do is we call
+the proc <code>printable</code> within the block by using <code>call</code>.</p>
+
+<h3 id="dry-with-rails-4">DRY with Rails 4</h3>
+
+<p>With Rails 4, it is much easier by using routing concern. Here&#8217;s how:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">concern</span> <span class="ss">:printable</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">member</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:pamphlets</span><span class="p">,</span> <span class="ss">concerns</span><span class="p">:</span> <span class="ss">:printable</span>
+</span><span class="line">
+</span><span class="line"><span class="n">resources</span> <span class="ss">:posters</span><span class="p">,</span> <span class="ss">concerns</span><span class="p">:</span> <span class="ss">:printable</span> <span class="k">do</span>
+</span><span class="line">  <span class="n">collection</span> <span class="k">do</span>
+</span><span class="line">    <span class="n">post</span> <span class="ss">:bulk_print</span>
+</span><span class="line">  <span class="k">end</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>We create a routing concern by using method <code>concern</code> and specify which concern we want to use for each resource
+via argument <code>concerns</code>.</p>
+
+<h3 id="summary">Summary</h3>
+
+<p>Rails routing is very powerful and there are many magic that I want to talk to you in near future. For now, you learn
+how to extract shared routes into concern to DRY your routes. Go on, share it with everyone and keep on learning!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Trung Lê</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-18T09:29:00+10:00" pubdate data-updated="true">Apr 18<span>th</span>, 2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-dry-your-rails-routes/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-dry-your-rails-routes/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/liquid-template-in-ruby-done-right/" title="Previous Post: Liquid template in Ruby done right">&laquo; Liquid template in Ruby done right</a>
+      
+      
+        <a class="basic-alignment right" href="/how-to-override-default-primary-key-id-in-rails/" title="Next Post: How to override default primary key id in Rails">How to override default primary key id in Rails &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>Humble Ruby developer</p>
+  <p>Core dev at <a href="http://spreecommerce.com">Spree Commerce</a> and <a href="http://lotusrb.org">Lotus Framework</a></p>
+  <p>I love art, reading history book, table tennis, golf and my beloved <a href="http://ruby.org.vn">Ruby Vietnam</a></p>
+</section><section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/crystal/testing-whirlwind-tour-in-crystal-lang/">Testing Whirlwind tour in Crystal lang</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-to-create-images-slash-files-upload-form-in-lotus-framework/">How to create images/files upload form in Lotus Framework?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/ruby/what-is-module-function/">How to consolidate module functions?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/lotusrb/how-to-add-basic-authentication-into-lotus-app/">How to add basic authentication into Lotus app</a>
+      </li>
+    
+      <li class="post">
+        <a href="/rails/the-difference-between-activerecord-scope-dsl-and-class-method/">The difference between ActiveRecord scope DSL and class method</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/joneslee85">@joneslee85</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'joneslee85',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("joneslee85", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/joneslee85" class="twitter-follow-button" data-show-count="false">Follow @joneslee85</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/joneslee85?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Trung Lê -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ruby-journal';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ruby-journal.com/how-to-dry-your-rails-routes/';
+        var disqus_url = 'http://ruby-journal.com/how-to-dry-your-rails-routes/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
