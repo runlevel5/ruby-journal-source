@@ -4,7 +4,7 @@
   <title><![CDATA[Category: heroku | Ruby Journal]]></title>
   <link href="http://ruby-journal.com/blog/categories/heroku/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2015-11-27T02:31:09+11:00</updated>
+  <updated>2015-11-27T02:52:47+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -18,7 +18,7 @@
     <link href="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/"/>
     <updated>2012-03-12T16:57:00+11:00</updated>
     <id>http://ruby-journal.com/heroku/install-ghostscript-on-heroku</id>
-    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+    <content type="html"><![CDATA[<p></p>
 
 <p>In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
 As you might have known that Heroku virtual machine does come with a system-wide

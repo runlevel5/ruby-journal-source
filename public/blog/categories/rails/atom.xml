@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Ruby Journal]]></title>
   <link href="http://ruby-journal.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2015-11-27T02:31:09+11:00</updated>
+  <updated>2015-11-27T02:52:47+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -18,7 +18,7 @@
     <link href="http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/"/>
     <updated>2014-10-27T12:14:00+11:00</updated>
     <id>http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method</id>
-    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+    <content type="html"><![CDATA[<p></p>
 
 <p>Now and then I get question from people should they use class method or the
 scope DSL for ActiveRecord scope. At first I thought they are the same but
@@ -111,7 +111,7 @@ if the scope is tiny.</p>
     <link href="http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/"/>
     <updated>2014-02-26T18:20:00+11:00</updated>
     <id>http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped</id>
-    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+    <content type="html"><![CDATA[<p></p>
 
 <p>In this short tutorial, I’ll show you how to update attributes for ActiveRecord model with:</p>
 
@@ -164,7 +164,7 @@ User.where(id: user.id).update_all(last_request_at: Time.current, name: 'Trung L
     <link href="http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/"/>
     <updated>2012-03-12T12:52:00+11:00</updated>
     <id>http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically</id>
-    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+    <content type="html"><![CDATA[<p></p>
 
 <p><a href="http://liquidmarkup.org/">Liquid</a> is a powerful templating tool especially when
 used with rails. It is quite common that you have to expose ActiveRecord attributes
@@ -178,17 +178,26 @@ because they could narrow the exposure scope to liquid.</p>
 the <code>liquid_methods</code> seems arduous, you can dynamically mapping attributes by
 creating a module:</p>
 
-<p>{% codeblock lib/attributes_to_liquid_methods_mapper.rb lang:ruby %}
-module AttributesToLiquidMethodsMapper
-  def self.included(base)
-    base.class_eval do
-      base.attribute_names.each do |attribute|
-        liquid_methods attribute.to_sym
-      end
-    end
-  end
-end
-{% endcodeblock %}</p>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>lib/attributes_to_liquid_methods_mapper.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">AttributesToLiquidMethodsMapper</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">included</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">base</span><span class="o">.</span><span class="n">class_eval</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">base</span><span class="o">.</span><span class="n">attribute_names</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">attribute</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">liquid_methods</span> <span class="n">attribute</span><span class="o">.</span><span class="n">to_sym</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>And you also need to include the above module in the ActiveRecord classes that
 you want to be exposed to Liquid:</p>
@@ -209,7 +218,7 @@ end
     <link href="http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/"/>
     <updated>2012-03-09T15:16:00+11:00</updated>
     <id>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association</id>
-    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+    <content type="html"><![CDATA[<p></p>
 
 <p>It is more than often that you have to write a fixtures for models with polymorphic
 association. In this short tutorial, I will show you how to use few shortcut trick
