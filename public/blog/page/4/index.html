@@ -9,8 +9,7 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="
-In this short tutorial, I will show you how to do a View test with Rspec + capybara ">
+  <meta name="description" content="You can track changes to a ActiveRecord model with ActiveRecord::Dirty#changed?. Yet there is one caveat though, the tracking is lost after the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +75,50 @@ In this short tutorial, I will show you how to do a View test with Rspec + capyb
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/">How to Track Changes of a Model in a `after_callbacks` in Rails 3 or Newer</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-23T16:43:00+10:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2013</time>
+        
+         | <a href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>You can track changes to a ActiveRecord model with <code>ActiveRecord::Dirty#changed?</code>. Yet there is one caveat though, the tracking is lost after the model is saved. In this tutorial I&#8217;ll show how to track the changes to a record even the record has been saved, this comes handy when being used with ActiveRecord <code>after</code> callbacks</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -478,55 +521,6 @@ In this short tutorial, I&#8217;ll walk you through on how to detect browser ver
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/debug-your-failed-test-in-travis-ci/">Debug Your Failed Test in Travis CI</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-08-24T13:04:00+10:00" pubdate data-updated="true">Aug 24<span>th</span>, 2012</time>
-        
-         | <a href="/debug-your-failed-test-in-travis-ci/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-<p>Ever wondering why some tests passed locally but failed on Travis?
-Ever questioning how could I go about to debug why that failed test on remote Travis?
-Read on as I show you how</p>
-
-<p><br />
-<br />
-<br />
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/debug-your-failed-test-in-travis-ci/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -549,6 +543,10 @@ Read on as I show you how</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/crystal/testing-whirlwind-tour-in-crystal-lang/">Testing Whirlwind tour in Crystal lang</a>
+      </li>
+    
+      <li class="post">
         <a href="/how-to-create-images-slash-files-upload-form-in-lotus-framework/">How to create images/files upload form in Lotus Framework?</a>
       </li>
     
@@ -562,10 +560,6 @@ Read on as I show you how</p>
     
       <li class="post">
         <a href="/rails/the-difference-between-activerecord-scope-dsl-and-class-method/">The difference between ActiveRecord scope DSL and class method</a>
-      </li>
-    
-      <li class="post">
-        <a href="/how-to-add-new-column-after-existing-column-with-mysql-in-rails/">How to add new column after existing column with MySQL in Rails?</a>
       </li>
     
   </ul>

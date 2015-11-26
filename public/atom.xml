@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2015-04-27T01:24:23+10:00</updated>
+  <updated>2015-11-27T02:31:01+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,372 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Testing Whirlwind tour in Crystal lang]]></title>
+    <link href="http://ruby-journal.com/crystal/testing-whirlwind-tour-in-crystal-lang/"/>
+    <updated>2015-11-27T00:06:00+11:00</updated>
+    <id>http://ruby-journal.com/crystal/testing-whirlwind-tour-in-crystal-lang</id>
+    <content type="html"><![CDATA[<p><img class="left" src="http://ruby-journal.com/images/2015-11-27-testing-whirlwind-tour-in-crystal-lang/diamond-through-a-loupe.jpg" /></p>
+
+<p>TDD has been part of my development career thanks to Ruby. It is in my nature to try to figure out how to test code with a new language that I learn before picking up other concepts.</p>
+
+<p>Part of my learning of <a href="http://crystal-lang.org">Crystal lang</a>, I am going to walk you through how to write test in build in testing DSL.</p>
+
+<!--more-->
+
+<h2 id="prequisites">Prequisites</h2>
+
+<ul>
+  <li>Crystal 0.9.1</li>
+  <li>Basic understanding how to write a test case</li>
+</ul>
+
+<h2 id="anatomy-of-a-spec">Anatomy of a spec</h2>
+
+<p>Let’s see one simple spec:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">require "spec"
+</span><span class="line">require "../lib/greeter" # my greeter class
+</span><span class="line">
+</span><span class="line">describe Greeter do
+</span><span class="line">  describe "#shout" do
+</span><span class="line">    it "returns upcased string" do
+</span><span class="line">      Greeter.new.shout('hello world').should eq "HELLO WORLD"
+</span><span class="line">    end
+</span><span class="line">  end
+</span><span class="line">
+</span><span class="line">  describe ".hello" do
+</span><span class="line">    it "returns a static Hello string" do
+</span><span class="line">      Greeter.hello.should eq "Hello"
+</span><span class="line">    end
+</span><span class="line">  end
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As you can see above that this crystal source file require <a href="http://crystal-lang.org/api/Spec.html">Spec</a> module. A spec starts with a <code>describe</code> DSL, the parameter of the describe could be a class object or a string. In fact, it is recommended that you follow the convention of descring the classname follow by describing the method name. Just on the naming convention for method description, I observe that the <code>#</code> prefix is used to denote instance method and <code>.</code> prefix to denote class or module method. Spec main logic is wrapped under an <code>it</code> block. The matcher <code>should</code> divide the caller which is on the left hand side and the expected result on the right side. I’ll run through few common matcher in Matcher section.</p>
+
+<p>If you are familiar with RSpec, you could clearly see the similarity between RSpec and Crystal’s Spec, I am sure that Crystal is heavily inspired by the RSpec syntax.</p>
+
+<p>By convention, spec file lives under <code>spec/</code> folder.</p>
+
+<h2 id="run-a-spec">Run a spec</h2>
+
+<p>To run a spec, simply run <code>crystal spec &lt;spec_path&gt;</code>, for eg:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">crystal spec spec/my_spec.cr</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Furthermore, you could run specific test by providing the line number that the spec case is on, for example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">crystal spec spec/my_spec.cr:10</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This must be one of the best feature I enjoy with RSpec in Ruby world and I am glad that Crystal implemented it out of the box. I wish that the default Minitest that come with Ruby support this feature too.</p>
+
+<h2 id="structure-a-test-suite">Structure a test suite</h2>
+
+<p>A test suite by convention consists of many spec files that resides under <code>spec</code> folder. Spec files must comply to <code>_spec.cr</code> suffix, eg: <code>spec/greeter_spec.cr</code>.</p>
+
+<p>Crystal CLI <code>crystal spec</code> (without specifying the spec file) runs the whole test suite by recursively run all <code>spec/**/*_spec.cr</code>.</p>
+
+<h3 id="callbackshooks">Callbacks/Hooks</h3>
+
+<p>Spec fixture should be setup with <code>Spec.before_each</code> callback and then tear down with <code>Spec.after_each</code> callback. For example:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">describe FetchFilm do
+</span><span class="line">  describe "#fetch" do
+</span><span class="line">    Spec.before_each do
+</span><span class="line">      @@film_title = 'Hero'
+</span><span class="line">    end
+</span><span class="line">
+</span><span class="line">    Spec.before_each do
+</span><span class="line">      @@film_title = nil
+</span><span class="line">    end
+</span><span class="line">
+</span><span class="line">    context "when title is provided" do
+</span><span class="line">      it "should fetch correct movie" do
+</span><span class="line">        FetchFilm.new.fetch(@@film_title).should be_a(Film)
+</span><span class="line">      end
+</span><span class="line">    end
+</span><span class="line">  end
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>I try to look for equivalent of <code>let</code> and <code>let!</code> in Crystal but I could not any. So if you want to share a fixture, it’d be best to make it a global instance.</p>
+
+<h3 id="spec-helper">Spec helper</h3>
+
+<p>I recommend creating a <code>spec/spec_helper.cr</code> where common spec helpers are shared between specs. At its simplest form, it could just have:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">require "spec"
+</span><span class="line">
+</span><span class="line">Spec.before_each do
+</span><span class="line">  # things you want to run before every spec
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and every spec should include this helper:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">require "./spec_helper"
+</span><span class="line">require "../lib/greeter" # my greeter class
+</span><span class="line">
+</span><span class="line">describe Greeter do
+</span><span class="line">  # same as above example
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="load-file-when-required">Load file when required</h3>
+
+<p>Please avoid loading every library files in spec helper like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">require "spec"
+</span><span class="line">require "../lib/*"</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>To me this is an anti-pattern, autoloading all only slows down your test suite. Instead you should load the source on demand in the spec file:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">require "./spec_helper"
+</span><span class="line">require "../lib/file_i_want_test"
+</span><span class="line">
+</span><span class="line">describe "BlahBlahBlah" do
+</span><span class="line">  # test code here
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="expectation-matcher">Expectation matcher</h2>
+
+<p>There are a set of matchers defined in <a href="http://crystal-lang.org/api/Spec/Expectations.html">Spec::Expectation</a>. Matchers must be called after object extension syntax <code>should</code> or <code>should_not</code>.</p>
+
+<p>The most common matcher is <code>eq</code> that test if 2 object have same value:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">a.should eq(b)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Or you care about the identity of the object, you can test if both share same object_id with <code>be</code> matcher:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">a.should be(b)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And nothing guarantees that an object can be nil, we have <code>be_nil</code> matcher to test the nil-ness:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">nil.should be_nil</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Well, if you want to test a boolean? there are <code>be_false</code> and <code>be_true</code> matcher:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">true.should be_true
+</span><span class="line">false.should be_false</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>There are also matcher to test Truthy/Falsey <code>be_truthy</code> and <code>be_falsey</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">false.should be_falsey
+</span><span class="line">nil.should be_falsey
+</span><span class="line">"anthing other than false or nil".should be_truthy</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Not to mention, we could test inclusion with matcher <code>contain</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">[1,2,3].should contain(1)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and have you used the unpopular <code>be_close</code> matcher to test if the actual result is equal to expected result plus/minus delta:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">5.2.should be_close(5, 0.5)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Still want more? regex fan must be raved about <code>match</code> matcher:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">"troll".should match /troll/</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Or you might be wondering how to test the type of an object? look no further than <code>be_a</code> matcher:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">"troll".should be_a(String)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Last is the <code>expect_raises</code> macro to test a block invocation would raise exception or not:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">expect_raises(Exception) do
+</span><span class="line">  raise "Error"
+</span><span class="line">end
+</span><span class="line">
+</span><span class="line">expect_raises(Exception, "Error") do
+</span><span class="line">  raise "Error"
+</span><span class="line">end
+</span><span class="line">
+</span><span class="line"># you can even parse in regex to match the exception message
+</span><span class="line">expect_raises(Exception, /Err/) do
+</span><span class="line">  raise "Error"
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As of version 0.9.1, <code>Spec::DSL</code> is not very well documented, however the source is very straight-forward to pick up. I am not going to into details how to write a custom matcher, let’s leave it as a topic for the future writing.</p>
+
+<h2 id="extra-dsl-for-better-spec-writing">Extra DSL for better spec writing</h2>
+
+<h3 id="provide-more-context-with-context-dsl">Provide more context with <code>context</code> DSL</h3>
+
+<p>For most of the cases, you want to provide more context for your spec, you can always use <code>describe</code> for the job like Ruby’s Minitest or you can use <code>context</code> DSL:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">describe String do
+</span><span class="line">  describe "#to_s" do
+</span><span class="line">    context "when value is nil" do
+</span><span class="line">      it "should return empty string" do
+</span><span class="line">        nil.to_s.should eq("")
+</span><span class="line">      end
+</span><span class="line">    end
+</span><span class="line">  end
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="fail-fast">Fail fast</h3>
+
+<p>Spec::DSL provides <code>fail</code> DSL for failing a spec fast:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">describe String do
+</span><span class="line">  describe "#to_s" do
+</span><span class="line">    context "when value is nil" do
+</span><span class="line">      it "should return empty string" do
+</span><span class="line">        fail "I want it to fail on purpose"
+</span><span class="line">      end
+</span><span class="line">    end
+</span><span class="line">  end
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>which would yield <code>Failure/Error: fail</code> when the spec is run.</p>
+
+<h3 id="mark-spec-pending">Mark spec pending</h3>
+
+<p>Spec can be marked pending with <code>pending</code> DSL. It is usually used for quick interface design in TDD style:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">describe String do
+</span><span class="line">  describe "#to_s" do
+</span><span class="line">    context "when value is nil" do
+</span><span class="line">      pending "should return empty string" do
+</span><span class="line">        #Dude, can you please implement it
+</span><span class="line">      end
+</span><span class="line">    end
+</span><span class="line">  end
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Please be noted that it replaces the <code>it</code> DSL rather than living under the <code>it</code> block.</p>
+
+<h3 id="custom-assertion">Custom assertion</h3>
+
+<p>It is not always that you could test complex logic with default expectation matcher. Do you know that you could define custom assertion with <code>assert</code> syntax? The main assertion logic resides as a block:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">describe String do
+</span><span class="line">  describe "#to_s" do
+</span><span class="line">    context "when value is nil" do
+</span><span class="line">      assert "should return empty string" do
+</span><span class="line">        nil.to_s == ""
+</span><span class="line">      end
+</span><span class="line">    end
+</span><span class="line">  end
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Crystal language comes with a full-feature Spec module. The spec follows RSpec-like format with <code>describe</code> and <code>it</code>. Besides, the availability of popular matchers and setup/tear down callbacks makes testing working very pleasant. I’ve yet to figure out how Crystal do mock/stub.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to create images/files upload form in Lotus Framework?]]></title>
@@ -3890,45 +4256,6 @@ that you want and Firefox browser will open up if selenium is used. Eg:</p>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>That&#8217;s it for now folks. Credits to Nikolai Nemshilov, my ex-colleague who came up with this brilliant hybrid idea.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Speed up your PostgreSQL dump restore]]></title>
-    <link href="http://ruby-journal.com/speed-up-your-postgresql-dump-restore/"/>
-    <updated>2014-03-11T16:20:00+11:00</updated>
-    <id>http://ruby-journal.com/speed-up-your-postgresql-dump-restore</id>
-    <content type="html"><![CDATA[
-<p>Restore a DB dump with pg_restore is always a time-consuming process. However if
-you are using Postgres 8.4 or newer, you could speed it up easily by having
-multiple concurrent process do it for you.</p>
-
-<!--more-->
-
-<p>Version 8.4 introduced the <code>-j</code> or <code>--jobs</code> parameter for the pg_restore.</p>
-
-<p>This speed up the restore process drastically on a multi-cores machine.</p>
-
-<p>Here is how to use it:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">pg_restore [connection-options...] -j &lt;number_of_jobs&gt; [other-options...] [filename]</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Says, you specify <code>-j 4</code>, this tells pg_restore to run 4 jobs. Each job
-is one process or one thread depending on the OS and uses a separate
-connection to the server.</p>
-
-<p>So what is the optimal number? If you have to work this out by yourself,
-a good start is number of core minus 2, and then try to bump the number up
-while measuring the time taken to run. If the number is too high, it actually
-slow down the process due to thrashing.</p>
-
-<p>FYI, restoring a 500MB dump on 4 core with <code>-j 4</code> takes 6min instead of 17&#8217;.</p>
-
-<p>One more important thing that I should mention is that, this feature only
-works with custom and directory archive dump.</p>
-
-<p>That&#8217;s it for today, folks. Keep on learning!</p>
 ]]></content>
   </entry>
   
