@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: crystal | Ruby Journal]]></title>
+  <link href="http://ruby-journal.com/blog/categories/crystal/atom.xml" rel="self"/>
+  <link href="http://ruby-journal.com/"/>
+  <updated>2016-01-05T15:28:10+11:00</updated>
+  <id>http://ruby-journal.com/</id>
+  <author>
+    <name><![CDATA[Trung Lê]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Testing Whirlwind tour in Crystal lang]]></title>
+    <link href="http://ruby-journal.com/crystal/testing-whirlwind-tour-in-crystal-lang/"/>
+    <updated>2015-11-27T00:06:00+11:00</updated>
+    <id>http://ruby-journal.com/crystal/testing-whirlwind-tour-in-crystal-lang</id>
+    <content type="html"><![CDATA[<p>{% img left /images/2015-11-27-testing-whirlwind-tour-in-crystal-lang/diamond-through-a-loupe.jpg %}</p>
+
+<p>{{ post.title }}</p>
+
+<p>TDD has been part of my development career thanks to Ruby. It is in my nature to try to figure out how to test code with a new language that I learn before picking up other concepts.</p>
+
+<p>Part of my learning of <a href="http://crystal-lang.org">Crystal lang</a>, I am going to walk you through how to write test in build in testing DSL.</p>
+
+<!--more-->
+
+<h2 id="prequisites">Prequisites</h2>
+
+<ul>
+  <li>Crystal 0.9.1</li>
+  <li>Basic understanding how to write a test case</li>
+</ul>
+
+<h2 id="anatomy-of-a-spec">Anatomy of a spec</h2>
+
+<p>Let’s see one simple spec:</p>
+
+<p>```
+require “spec”
+require “../lib/greeter” # my greeter class</p>
+
+<p>describe Greeter do
+  describe “#shout” do
+    it “returns upcased string” do
+      Greeter.new.shout(‘hello world’).should eq “HELLO WORLD”
+    end
+  end</p>
+
+<p>describe “.hello” do
+    it “returns a static Hello string” do
+      Greeter.hello.should eq “Hello”
+    end
+  end
+end
+```</p>
+
+<p>As you can see above that this crystal source file require <a href="http://crystal-lang.org/api/Spec.html">Spec</a> module. A spec starts with a <code>describe</code> DSL, the parameter of the describe could be a class object or a string. In fact, it is recommended that you follow the convention of descring the classname follow by describing the method name. Just on the naming convention for method description, I observe that the <code>#</code> prefix is used to denote instance method and <code>.</code> prefix to denote class or module method. Spec main logic is wrapped under an <code>it</code> block. The matcher <code>should</code> divide the caller which is on the left hand side and the expected result on the right side. I’ll run through few common matcher in Matcher section.</p>
+
+<p>If you are familiar with RSpec, you could clearly see the similarity between RSpec and Crystal’s Spec, I am sure that Crystal is heavily inspired by the RSpec syntax.</p>
+
+<p>By convention, spec file lives under <code>spec/</code> folder.</p>
+
+<h2 id="run-a-spec">Run a spec</h2>
+
+<p>To run a spec, simply run <code>crystal spec &lt;spec_path&gt;</code>, for eg:</p>
+
+<p><code>
+crystal spec spec/my_spec.cr
+</code></p>
+
+<p>Furthermore, you could run specific test by providing the line number that the spec case is on, for example:</p>
+
+<p><code>
+crystal spec spec/my_spec.cr:10
+</code></p>
+
+<p>This must be one of the best feature I enjoy with RSpec in Ruby world and I am glad that Crystal implemented it out of the box. I wish that the default Minitest that come with Ruby support this feature too.</p>
+
+<h2 id="structure-a-test-suite">Structure a test suite</h2>
+
+<p>A test suite by convention consists of many spec files that resides under <code>spec</code> folder. Spec files must comply to <code>_spec.cr</code> suffix, eg: <code>spec/greeter_spec.cr</code>.</p>
+
+<p>Crystal CLI <code>crystal spec</code> (without specifying the spec file) runs the whole test suite by recursively run all <code>spec/**/*_spec.cr</code>.</p>
+
+<h3 id="callbackshooks">Callbacks/Hooks</h3>
+
+<p>Spec fixture should be setup with <code>Spec.before_each</code> callback and then tear down with <code>Spec.after_each</code> callback. For example:</p>
+
+<p>```
+describe FetchFilm do
+  describe “#fetch” do
+    Spec.before_each do
+      @@film_title = ‘Hero’
+    end</p>
+
+<pre><code>Spec.before_each do
+  @@film_title = nil
+end
+
+context "when title is provided" do
+  it "should fetch correct movie" do
+    FetchFilm.new.fetch(@@film_title).should be_a(Film)
+  end
+end   end end ```
+</code></pre>
+
+<p>I try to look for equivalent of <code>let</code> and <code>let!</code> in Crystal but I could not any. So if you want to share a fixture, it’d be best to make it a global instance.</p>
+
+<h3 id="spec-helper">Spec helper</h3>
+
+<p>I recommend creating a <code>spec/spec_helper.cr</code> where common spec helpers are shared between specs. At its simplest form, it could just have:</p>
+
+<p>```
+require “spec”</p>
+
+<p>Spec.before_each do
+  # things you want to run before every spec
+end
+```</p>
+
+<p>and every spec should include this helper:</p>
+
+<p>```
+require “./spec_helper”
+require “../lib/greeter” # my greeter class</p>
+
+<p>describe Greeter do
+  # same as above example
+end
+```</p>
+
+<h3 id="load-file-when-required">Load file when required</h3>
+
+<p>Please avoid loading every library files in spec helper like this:</p>
+
+<p><code>
+require "spec"
+require "../lib/*"
+</code></p>
+
+<p>To me this is an anti-pattern, autoloading all only slows down your test suite. Instead you should load the source on demand in the spec file:</p>
+
+<p>```
+require “./spec_helper”
+require “../lib/file_i_want_test”</p>
+
+<p>describe “BlahBlahBlah” do
+  # test code here
+end
+```</p>
+
+<h2 id="expectation-matcher">Expectation matcher</h2>
+
+<p>There are a set of matchers defined in <a href="http://crystal-lang.org/api/Spec/Expectations.html">Spec::Expectation</a>. Matchers must be called after object extension syntax <code>should</code> or <code>should_not</code>.</p>
+
+<p>The most common matcher is <code>eq</code> that test if 2 object have same value:</p>
+
+<p><code>
+a.should eq(b)
+</code></p>
+
+<p>Or you care about the identity of the object, you can test if both share same object_id with <code>be</code> matcher:</p>
+
+<p><code>
+a.should be(b)
+</code></p>
+
+<p>And nothing guarantees that an object can be nil, we have <code>be_nil</code> matcher to test the nil-ness:</p>
+
+<p><code>
+nil.should be_nil
+</code></p>
+
+<p>Well, if you want to test a boolean? there are <code>be_false</code> and <code>be_true</code> matcher:</p>
+
+<p><code>
+true.should be_true
+false.should be_false
+</code></p>
+
+<p>There are also matcher to test Truthy/Falsey <code>be_truthy</code> and <code>be_falsey</code>:</p>
+
+<p><code>
+false.should be_falsey
+nil.should be_falsey
+"anthing other than false or nil".should be_truthy
+</code></p>
+
+<p>Not to mention, we could test inclusion with matcher <code>contain</code>:</p>
+
+<p><code>
+[1,2,3].should contain(1)
+</code></p>
+
+<p>and have you used the unpopular <code>be_close</code> matcher to test if the actual result is equal to expected result plus/minus delta:</p>
+
+<p><code>
+5.2.should be_close(5, 0.5)
+</code></p>
+
+<p>Still want more? regex fan must be raved about <code>match</code> matcher:</p>
+
+<p><code>
+"troll".should match /troll/
+</code></p>
+
+<p>Or you might be wondering how to test the type of an object? look no further than <code>be_a</code> matcher:</p>
+
+<p><code>
+"troll".should be_a(String)
+</code></p>
+
+<p>Last is the <code>expect_raises</code> macro to test a block invocation would raise exception or not:</p>
+
+<p>```
+expect_raises(Exception) do
+  raise “Error”
+end</p>
+
+<p>expect_raises(Exception, “Error”) do
+  raise “Error”
+end</p>
+
+<h1 id="you-can-even-parse-in-regex-to-match-the-exception-message">you can even parse in regex to match the exception message</h1>
+<p>expect_raises(Exception, /Err/) do
+  raise “Error”
+end
+```</p>
+
+<p>As of version 0.9.1, <code>Spec::DSL</code> is not very well documented, however the source is very straight-forward to pick up. I am not going to into details how to write a custom matcher, let’s leave it as a topic for the future writing.</p>
+
+<h2 id="extra-dsl-for-better-spec-writing">Extra DSL for better spec writing</h2>
+
+<h3 id="provide-more-context-with-context-dsl">Provide more context with <code>context</code> DSL</h3>
+
+<p>For most of the cases, you want to provide more context for your spec, you can always use <code>describe</code> for the job like Ruby’s Minitest or you can use <code>context</code> DSL:</p>
+
+<p><code>
+describe String do
+  describe "#to_s" do
+    context "when value is nil" do
+      it "should return empty string" do
+        nil.to_s.should eq("")
+      end
+    end
+  end
+end
+</code></p>
+
+<h3 id="fail-fast">Fail fast</h3>
+
+<p>Spec::DSL provides <code>fail</code> DSL for failing a spec fast:</p>
+
+<p><code>
+describe String do
+  describe "#to_s" do
+    context "when value is nil" do
+      it "should return empty string" do
+        fail "I want it to fail on purpose"
+      end
+    end
+  end
+end
+</code></p>
+
+<p>which would yield <code>Failure/Error: fail</code> when the spec is run.</p>
+
+<h3 id="mark-spec-pending">Mark spec pending</h3>
+
+<p>Spec can be marked pending with <code>pending</code> DSL. It is usually used for quick interface design in TDD style:</p>
+
+<p><code>
+describe String do
+  describe "#to_s" do
+    context "when value is nil" do
+      pending "should return empty string" do
+        #Dude, can you please implement it
+      end
+    end
+  end
+end
+</code></p>
+
+<p>Please be noted that it replaces the <code>it</code> DSL rather than living under the <code>it</code> block.</p>
+
+<h3 id="custom-assertion">Custom assertion</h3>
+
+<p>It is not always that you could test complex logic with default expectation matcher. Do you know that you could define custom assertion with <code>assert</code> syntax? The main assertion logic resides as a block:</p>
+
+<p><code>
+describe String do
+  describe "#to_s" do
+    context "when value is nil" do
+      assert "should return empty string" do
+        nil.to_s == ""
+      end
+    end
+  end
+end
+</code></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Crystal language comes with a full-feature Spec module. The spec follows RSpec-like format with <code>describe</code> and <code>it</code>. Besides, the availability of popular matchers and setup/tear down callbacks makes testing working very pleasant. I’ve yet to figure out how Crystal do mock/stub.</p>
+]]></content>
+  </entry>
+  
+</feed>

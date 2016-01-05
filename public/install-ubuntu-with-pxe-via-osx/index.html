@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Install Ubuntu with PXE via OSX - Ruby Journal</title>
+  <meta name="author" content="Trung Lê">
+
+  
+  <meta name="description" content="In this tutorial, I&#8217;ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts. Introduction The Preboot &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Ruby Journal" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+  
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-54360362-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ruby Journal</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:ruby-journal.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Install Ubuntu With PXE via OSX</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-06T14:21:00+10:00" pubdate data-updated="true">Oct 6<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content">
+<p>In this tutorial, I&#8217;ll guide you through how to to setup OSX as PXE server to install Ubuntu on other hosts.</p>
+
+<!--more-->
+
+<h2 id="introduction">Introduction</h2>
+
+<p><a href="http://en.wikipedia.org/wiki/Preboot_Execution_Environment" title="Preboot Execution Environment on Wikipedia">The Preboot Execution Environment (PXE)</a> is widely used in enterprise environment for mass deployment, however it is not well-known in home and office environment because it is always easier to install Ubuntu Linux using traditional CD/DVD or USB storage devices method.</p>
+
+<p>If your box doesn&#8217;t have CD/DVD or USB storage devices, you can install Ubuntu using PXE. The concept is very simple, a computer that host TFTP server and the to-be-installed host support PXE.</p>
+
+<p>I adapt the concept to OSX to show you that you could achieve the same result with Mac OSX. In this tutorial, I use OSX 10.8.2. However, it should also work with older versions.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li><a href="http://cdimage.ubuntu.com/netboot/">Netboot installer for Ubuntu</a></li>
+  <li>TFTP Server</li>
+  <li>A PC that is to be installed to supports PXE</li>
+  <li>Fast and reliable Internet connection</li>
+  <li>Time and patience</li>
+</ul>
+
+<h2 id="download-ubuntu-netboot-installer">Download Ubuntu Netboot installer</h2>
+
+<p>We only need the netboot installer of Ubuntu, you don&#8217;t have to download a full ISO for the purpose. The file that we need to download is the <code>netboot.tar.gz</code> which can be found at <a href="http://cdimage.ubuntu.com/netboot/">http://cdimage.ubuntu.com/netboot/</a>.</p>
+
+<ol>
+  <li>Open your <em>Terminal.app</em></li>
+  <li>Use <em>curl</em> command to download the netboot installer:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ cd /tmp
+</span><span class="line">$ curl -O http://archive.ubuntu.com/ubuntu/dists/precise/main/installer-i386/current/images/netboot/netboot.tar.gz</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Extract <code>netboot.tar.gz</code> to suitable folder that we are going to use as TFTP root folder</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ mkdir ~/Downloads/tftp
+</span><span class="line">$ tar -xvzf netboot.tar.gz -C ~/Downloads/tftp</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Fix folder permissions:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo chown -R nobody:nogroup ~/Downloads/tftp</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="set-up-tftp-server">Set up TFTP server</h2>
+
+<h3 id="easy-setup-with-tftp-server-software">Easy setup with TFTP Server software</h3>
+
+<p>Though OSX comes with <code>tftp</code> command line, it still takes more steps to setup manually. Alternatively, you can download the TFTP Server. It provides a GUI to configure the built-in tftp server on OSX.</p>
+
+<ol>
+  <li>Download the <a href="http://ww2.unime.it/flr/tftpserver/">TFTP Server</a>.</li>
+  <li>Open the DMG file and drag the application into your Applications folder.</li>
+  <li>Open the <em>TftpServer.app</em>.</li>
+  <li>
+    <p>We will NOT use the default <code>/private/tftpboot</code> as root for TFTP server. From <em>TftpServer.app</em>&#8217;s screen, click on <em>Change Path</em> icon and select <code>Downloads/tftp</code> and you should see the path bar change to <code>/Users/yourusername/Downloads/tftp</code>.</p>
+  </li>
+  <li>
+    <p>Fixing folder permission by click on <em>Fix</em> buttons of both <code>Working path permission</code> and <code>Parentals folders permissions</code>. You should see <code>Attributes OK</code> if all goes well.</p>
+  </li>
+  <li>Start the server by clicking on <em>Start TFTP</em>. You should see <em>Server Status</em> change to <code>Running</code>.</li>
+</ol>
+
+<h3 id="hard-setup-using-built-in-tftp-server">Hard setup using built-in tftp server</h3>
+
+<p>For whom who want to set up the <code>tftp</code> manually via CLI.</p>
+
+<ol>
+  <li>Configure the server by modify the <code>tftp.plist</code> into a suitable folder for modification:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ cp /System/Library/LaunchDaemons/tftp.plist /tmp</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Edit the file <code>/tmp/tftp.plist</code> and change:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;key&gt;Disabled&lt;/key&gt;
+</span><span class="line">&lt;true/&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>to</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;key&gt;Disabled&lt;/key&gt;
+</span><span class="line">&lt;false/&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>also modify your TFTP root folder into the <code>&lt;array&gt;</code> section:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;array&gt;
+</span><span class="line">  &lt;string&gt;/usr/libexec/tftpd&lt;/string&gt;
+</span><span class="line">  &lt;string&gt;-s&lt;/string&gt;
+</span><span class="line">  &lt;string&gt;/Users/yourusername/Downloads/tftp&lt;/string&gt;
+</span><span class="line">&lt;/array&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Backup the existing configuration file:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo mv /System/Library/LaunchDaemons/tftp.plist /System/Library/LaunchDaemons/tftp.plist.backup</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Copy our configuration file into <code>/System/Library/LaunchDaemons/</code>:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo mv /tmp/tftp.plist /System/Library/LaunchDaemons</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Start the server with:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo launchctl load -F /System/Library/LaunchDaemons/tftp.plist</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>OR</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo launchctl start com.apple.tftpd</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Once installation is finished, you could disable it with:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo launchctl unload -F /System/Library/LaunchDaemons/tftp.plist</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>OR</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo launchctl stop com.apple.tftpd</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="set-up-dhcp-server">Set up DHCP server</h2>
+
+<p>In concept, PXE-bootable device will look for DHCP service in order to receive available PXE boot server. If you don&#8217;t have a DHCP servive running locally in router or in your LAN, you have to set up a DHCP server.</p>
+
+<h3 id="with-isc-dchpd">With isc-dchpd</h3>
+
+<ol>
+  <li>Install isc-dhcpd with Homebrew:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ brew install isc-dhcp</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Create configuration file at <code>/usr/local/etc/dhcpd.conf</code>:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">default-lease-time 600;
+</span><span class="line">max-lease-time 7200;
+</span><span class="line">
+</span><span class="line">subnet X.X.X.0 netmask Y.Y.Y.0 {
+</span><span class="line">  range X.X.X.151 X.X.X.205;
+</span><span class="line">}
+</span><span class="line">
+</span><span class="line">option domain-name-servers 8.8.8.8;
+</span><span class="line">
+</span><span class="line">host netbook {
+</span><span class="line">  hardware ethernet ??:??:??:??:??:??;
+</span><span class="line">  filename "pxelinux.0";
+</span><span class="line">  next-server Z.Z.Z.Z; # the IP address of your TFTP server
+</span><span class="line">  fixed-address X.X.X.202;
+</span><span class="line">  option subnet-mask Y.Y.Y.0;
+</span><span class="line">  option broadcast-address X.X.X.255;
+</span><span class="line">  option routers X.X.X.1;
+</span><span class="line">}</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>in which <code>X.X.X</code> is your network address, <code>Y.Y.Y</code> is your subnet mask, <code>??:??:??:??:??:??</code> is the MAC address of the box you want to install to and finally <code>Z.Z.Z.Z</code> is the address of TFTP server.</p>
+
+<ol>
+  <li>Start the server with:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo /usr/local/sbin/dhcpd -f -d -cf /usr/local/etc/dhcpd.conf</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Once the installation finished, clean up with:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ brew uninstall isc-dhcp</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="with-built-in-bootpd">With built-in bootpd</h3>
+
+<p>OSX does come with a built-in BOOTP server called <code>bootpd</code>, which offer also offer DHCP service. This technology is known as NetBoot and used to install OSX on CD/DVD-less machines like MacBook Air or Mac Mini. I adapt instructions at <a href="http://www.jacquesf.com/2011/04/mac-os-x-dhcp-server/" title="Mac OSX DHCP Server">Jacques Fortier&#8217;s blog</a> for this tutorial.</p>
+
+<ol>
+  <li>Create <code>/etc/bootpd.plist</code> with content:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+</span><span class="line">&lt;!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+</span><span class="line">&lt;plist version="1.0"&gt;
+</span><span class="line">&lt;dict&gt;
+</span><span class="line">    &lt;key&gt;bootp_enabled&lt;/key&gt;
+</span><span class="line">    &lt;false/&gt;
+</span><span class="line">    &lt;key&gt;detect_other_dhcp_server&lt;/key&gt;
+</span><span class="line">    &lt;integer&gt;1&lt;/integer&gt;
+</span><span class="line">    &lt;key&gt;dhcp_enabled&lt;/key&gt;
+</span><span class="line">    &lt;array&gt;
+</span><span class="line">        &lt;string&gt;en0&lt;/string&gt;
+</span><span class="line">    &lt;/array&gt;
+</span><span class="line">    &lt;key&gt;reply_threshold_seconds&lt;/key&gt;
+</span><span class="line">    &lt;integer&gt;0&lt;/integer&gt;
+</span><span class="line">    &lt;key&gt;Subnets&lt;/key&gt;
+</span><span class="line">    &lt;array&gt;
+</span><span class="line">        &lt;dict&gt;
+</span><span class="line">            &lt;key&gt;allocate&lt;/key&gt;
+</span><span class="line">            &lt;true/&gt;
+</span><span class="line">            &lt;key&gt;lease_max&lt;/key&gt;
+</span><span class="line">            &lt;integer&gt;86400&lt;/integer&gt;
+</span><span class="line">            &lt;key&gt;lease_min&lt;/key&gt;
+</span><span class="line">            &lt;integer&gt;86400&lt;/integer&gt;
+</span><span class="line">            &lt;key&gt;name&lt;/key&gt;
+</span><span class="line">            &lt;string&gt;192.168.1&lt;/string&gt;
+</span><span class="line">            &lt;key&gt;net_address&lt;/key&gt;
+</span><span class="line">            &lt;string&gt;192.168.1.0&lt;/string&gt;
+</span><span class="line">            &lt;key&gt;net_mask&lt;/key&gt;
+</span><span class="line">            &lt;string&gt;255.255.255.0&lt;/string&gt;
+</span><span class="line">            &lt;key&gt;net_range&lt;/key&gt;
+</span><span class="line">            &lt;array&gt;
+</span><span class="line">                &lt;string&gt;192.168.1.101&lt;/string&gt;
+</span><span class="line">                &lt;string&gt;192.168.1.202&lt;/string&gt;
+</span><span class="line">            &lt;/array&gt;
+</span><span class="line">        &lt;/dict&gt;
+</span><span class="line">    &lt;/array&gt;
+</span><span class="line">&lt;/dict&gt;
+</span><span class="line">&lt;/plist&gt;</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The config file assume that the network address is 192.168.1.0 and the DHCP allocation pool is from .101 to .102.</p>
+
+<ol>
+  <li>To assign static IP address to our to-be-installed host, we create file <code>/etc/bootptab</code>:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">%%
+</span><span class="line"># machine entries have the following format:
+</span><span class="line">#
+</span><span class="line"># hostname      hwtype  hwaddr              ipaddr          bootfile
+</span><span class="line">client1         1       00:1f:16:08:61:96   192.168.1.105   pxelinux.0</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>To start the server, run the following command:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo /bin/launchctl load -w /System/Library/LaunchDaemons/bootps.plist</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<ol>
+  <li>Once done, stop the server with command:</li>
+</ol>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ sudo /bin/launchctl unload -w /System/Library/LaunchDaemons/bootps.plist</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="booting-ubuntu">Booting Ubuntu</h2>
+
+<p>To boot from TFTP, you need to configure your PC to boot from the network interface in the BIOS.</p>
+
+<p>Once booting into the installer, you can install Ubuntu by having sources download for a mirror.</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Trung Lê</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-10-06T14:21:00+10:00" pubdate data-updated="true">Oct 6<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/" data-via="joneslee85" data-counturl="http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/debug-your-failed-test-in-travis-ci/" title="Previous Post: Debug your failed test in Travis CI">&laquo; Debug your failed test in Travis CI</a>
+      
+      
+        <a class="basic-alignment right" href="/how-to-setup-rails-app-with-puma-and-nginx/" title="Next Post: How to setup Rails app with puma and NGINX">How to setup Rails app with puma and NGINX &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>Humble Ruby developer</p>
+  <p>Core dev at <a href="http://spreecommerce.com">Spree Commerce</a> and <a href="http://lotusrb.org">Lotus Framework</a></p>
+  <p>I love art, reading history book, table tennis, golf and my beloved <a href="http://ruby.org.vn">Ruby Vietnam</a></p>
+</section><section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/">Setup Arch Linux to boot UEFI on Asus Z170M-PLUS motherboard</a>
+      </li>
+    
+      <li class="post">
+        <a href="/crystal/testing-whirlwind-tour-in-crystal-lang/">Testing Whirlwind tour in Crystal lang</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-to-create-images-slash-files-upload-form-in-lotus-framework/">How to create images/files upload form in Lotus Framework?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/ruby/what-is-module-function/">How to consolidate module functions?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/lotusrb/how-to-add-basic-authentication-into-lotus-app/">How to add basic authentication into Lotus app</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/joneslee85">@joneslee85</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'joneslee85',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("joneslee85", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/joneslee85" class="twitter-follow-button" data-show-count="false">Follow @joneslee85</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/joneslee85?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Trung Lê -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ruby-journal';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/';
+        var disqus_url = 'http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

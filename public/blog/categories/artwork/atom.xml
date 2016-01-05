@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: artwork | Ruby Journal]]></title>
+  <link href="http://ruby-journal.com/blog/categories/artwork/atom.xml" rel="self"/>
+  <link href="http://ruby-journal.com/"/>
+  <updated>2016-01-05T15:28:10+11:00</updated>
+  <id>http://ruby-journal.com/</id>
+  <author>
+    <name><![CDATA[Trung Lê]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Say Hello to Dr.Indy Cat]]></title>
+    <link href="http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/"/>
+    <updated>2012-02-25T23:24:00+11:00</updated>
+    <id>http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat</id>
+    <content type="html"><![CDATA[<p>{% img left /images/octocat/dr-octocat.png 448 448 ‘Dr. Indy Cat’ %}</p>
+
+<p>{{ post.title }}</p>
+
+<p>I’ve been a fan of Indiana Jones and GitHub. So I made a request for
+my brother <a href="https://github.com/modology">Huey</a> and guess what he gave me. I just hope this artwork could be
+featured in the Octodex.</p>
+
+<p>The Illustrator source file can be found at:</p>
+
+<p><a href="https://github.com/modology/octocats">https://github.com/modology/octocats</a></p>
+
+<p>Please Like or leave comments if you like it.</p>
+
+<!--more-->
+]]></content>
+  </entry>
+  
+</feed>

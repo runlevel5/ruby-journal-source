@@ -1,0 +1,1100 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Spree 1.0 deployment on Heroku - Ruby Journal</title>
+  <meta name="author" content="Trung Lê">
+
+  
+  <meta name="description" content="Spree is without a doubt a de-facto eCommerce stack of Ruby world. Yet to many Spree
+is still a pandora box. In this tutorial, I will try to go &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Ruby Journal" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+  
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-54360362-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Ruby Journal</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:ruby-journal.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Home</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Spree 1.0 Deployment on Heroku</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-21T06:40:00+11:00" pubdate data-updated="true">Feb 21<span>st</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><img class="left" src="/images/spree-1.0.0-release-ribbon.png" /></p>
+
+<p>Spree is without a doubt a de-facto eCommerce stack of Ruby world. Yet to many Spree
+is still a pandora box. In this tutorial, I will try to go through step by step
+from how to set up a Spree sandbox app on a local box to deployment to Heroku.</p>
+
+<p>Please note that all instructions are written for Apple MacOSX 10.7.x system. However I
+believe it applies to other UNIX and Linux systems too (maybe with minor adaptations).</p>
+
+<p><br />
+<br />
+<br />
+<!--more--></p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<h4 id="heroku">Heroku</h4>
+
+<p>Install Heroku toolbelt via Rubygems:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem install heroku</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If you have installed Heroku, please ensure you update to version 2.1.0 or higher for Cedar support:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">heroku update
+</span><span class="line">heroku --version
+</span><span class="line">heroku-toolbelt/2.35.0 (x86_64-darwin10.8.0) ruby/1.9.3</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="ruby">Ruby</h4>
+
+<p>By default, Heroku Cedar stack uses Ruby 1.9.3. And normally it is always the latest minor version, so it is recommended you to install the latest version on your local box:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rvm get stable; rvm install 1.9.3; rvm reload</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>I use RVM to manage rubies versions on my box, you can adapt this technique
+if you use rbenv or precompiled binary package</p>
+
+<h4 id="spree">Spree</h4>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem install spree -v=1.0.7</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Check installed spree gems:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem list | grep 'spree'
+</span><span class="line">spree (1.0.7)
+</span><span class="line">spree_api (1.0.7)
+</span><span class="line">spree_auth (1.0.7)
+</span><span class="line">spree_cmd (1.0.7)
+</span><span class="line">spree_core (1.0.7)
+</span><span class="line">spree_dash (1.0.7)
+</span><span class="line">spree_promo (1.0.7)
+</span><span class="line">spree_sample (1.0.7)</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>spree</code> gem consists of many components, however please note that you only need <code>spree_core</code>
+to build an online store.</p>
+
+<h4 id="postgresql">PostgreSQL</h4>
+
+<p>Heroku only supports PostgreSQL. It is a good practice to have you development
+environment use the same DB.</p>
+
+<p>PostgreSQL can be installed on OSX with either of these methods below:</p>
+
+<h5 id="postgresapp-recommended">1. Postgres.app (RECOMMENDED)</h5>
+
+<p>You can install the Postgres.app from Heroku guys at <a href="http://postgresapp.com/">http://postgresapp.com/</a></p>
+
+<h5 id="homebrew">2. Homebrew</h5>
+
+<p>If you aren’t in a rush, PostgeSQL can be installed with Homebrew:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">brew install postgresql</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Though I do not recommend this method because you might bump into issues with compilation.
+Please make sure you read the Build Notes after the installation.</p>
+
+<h4 id="pg-gem">pg gem</h4>
+
+<p>Now we need to install <code>pg</code> gem too:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem install pg</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="imagemagick">ImageMagick</h4>
+
+<p>Spree uses <code>paperclip</code> gem which in turn require imagemagick. You search on Google
+for binary DMG package or for my case, I install it with Homebrew:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">brew install imagemagick</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="prepare-local-application">Prepare local application</h2>
+
+<p>Create a new rails app default to postgreSQL</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rails _3.1.10_ new fool-man-chew -d postgresql</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>Configure database setting by editing <code>config/database.yml</code>.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">development:
+</span><span class="line">  adapter: postgresql
+</span><span class="line">  encoding: unicode
+</span><span class="line">  database: fool-man-chew_development
+</span><span class="line">  pool: 5
+</span><span class="line">
+</span><span class="line">test:
+</span><span class="line">  adapter: postgresql
+</span><span class="line">  encoding: unicode
+</span><span class="line">  database: fool-man-chew_development
+</span><span class="line">  pool: 5
+</span><span class="line">
+</span><span class="line">production:
+</span><span class="line">  adapter: postgresql
+</span><span class="line">  encoding: unicode
+</span><span class="line">  database: fool-man-chew_development
+</span><span class="line">  pool: 5</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then create the DB tables:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec rake db:create:all</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="bootstraping-on-local-box">Bootstraping on local box</h2>
+
+<p>There are two ways to bootstrap Spree, I prefer the latter method as it gives me
+more control of bootstraping process.</p>
+
+<p>Both ways runs Asset Precompiling rake task which fix an issue where Heroku could
+not precompile asset, you could read more about this issue at <a href="#assets-precompiling">Assets Precompiling section</a></p>
+
+<h4 id="wizard-mode">1. Wizard mode</h4>
+
+<p><code>spree_cmd</code> gem provides the convenient <code>spree</code> command that add the Spree gem, create initializers, copy migrations and optionally generate sample products and orders.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ RAILS_ENV=development spree install fool-man-chew</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You can notice that I explicitly declare <code>RAILS_ENV=development</code> here. If not,
+<code>spree install</code> will assume your <code>RAILS_ENV=production</code></p>
+
+<p>The wizard will guide you through a list of questions, I opt <code>no</code> for Default Gateway
+because I am not going to use skrill gateway for this tutorial.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Would you like to install the default gateways? (yes/no) [yes] no
+</span><span class="line">Would you like to run the migrations? (yes/no) [yes] yes
+</span><span class="line">Would you like to load the seed data? (yes/no) [yes] yes
+</span><span class="line">Would you like to load the sample data? (yes/no) [yes] yes
+</span><span class="line">Admin Email [spree@example.com] fool@man.ch
+</span><span class="line">Admin Password [spree123] foo123</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>if nothing goes wrong, you would see:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">...
+</span><span class="line">     loading  seed data
+</span><span class="line">     loading  sample data
+</span><span class="line">      insert  config/routes.rb
+</span><span class="line">**************************************************
+</span><span class="line">We added the following line to your application's config/routes.rb file:
+</span><span class="line">
+</span><span class="line">    mount Spree::Core::Engine, :at =&gt; '/'
+</span><span class="line">**************************************************
+</span><span class="line">Spree has been installed successfully. You're all ready to go!
+</span><span class="line">
+</span><span class="line">Enjoy!
+</span><span class="line">precompiling  assets</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="manual-mode">2. Manual mode</h4>
+
+<p>You could manually append <code>spree</code> gem into the end of your <code>Gemfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'spree', '~&gt; 1.0.7'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If you have not yet run <code>bundle install</code>, please run it now:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next we invoke Spree install generator to copy migrations, initializers and
+generate sample data:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">rails g spree:install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>OR</p>
+
+<p>Bootstraping manually with command:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec rake spree:install:migrations
+</span><span class="line">bundle exec rake db:migrate
+</span><span class="line">bundle exec rake db:seed
+</span><span class="line">bundle exec rake spree_sample:load</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Once the bootstrap is finished, we need to precompile our assets too:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle exec rake assets:precompile:nondigest</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="deploy-to-heroku">Deploy to Heroku</h2>
+
+<h3 id="configure-web-server">Configure web server</h3>
+
+<p>By default, Heroku use the <code>thin</code> webserver. However in this tutorial, we are going to
+use <code>puma</code> instead, just to show you the great new process types system that
+Cedar support.</p>
+
+<p>Append to <code>Gemfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">group :production do
+</span><span class="line">  gem 'puma'
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and install the gem with:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The great thing about Cedar stack is that Heroku introduces a new way to scale your app,
+that is <a href="http://adam.heroku.com/past/2011/5/9/applying_the_unix_process_model_to_web_apps/" title="Heroku Process Model">Process Model</a>, now you could define a custom list of process type
+that you want to run in the <code>Procfile</code> file.</p>
+
+<p>We configure our unicorn which is of type <code>web</code> by creating new file in <code>Rails.root</code>
+folder <code>Procfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">web: bundle exec rails server puma -p $PORT -e $RACK_ENV</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="assets-storage">Assets Storage</h3>
+
+<p>Because Heroku is disk-less therefore assets like images are not persistently
+stored. The workaround is to use Cloud storage service like Amazon S3.</p>
+
+<h4 id="spree-heroku-extension">spree-heroku extension</h4>
+
+<p>The <code>spree_heroku</code> gem lets you store images and data to Amazon S3, to install it
+we append to <code>Gemfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">gem 'spree_heroku', :git =&gt; 'git://github.com/joneslee85/spree-heroku.git', :branch =&gt; '1-0-stable'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next, we create a new bucket ‘fool-man-chew_production’ under US Standard region via AWS Management Console.</p>
+
+<p>We need to tell Spree how to access our bucket, there are 2 ways to configure S3
+settings.</p>
+
+<p>First one is to create Heroku config vars (recommended way):</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">heroku config:add S3_KEY='your_access_key'
+</span><span class="line">heroku config:add S3_SECRET='secret_access_key'
+</span><span class="line">heroku config:add S3_BUCKET='fool-man-chew_production'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The second is to create a new file under <code>config/s3.yml</code> and modify the key in accordance to your S3 account:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">production:
+</span><span class="line">  bucket: fool-man-chew_production
+</span><span class="line">  access_key_id: your_access_key
+</span><span class="line">  secret_access_key: secret_access_key</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="heroku-boostrap">Heroku boostrap</h4>
+
+<p>We are going to create an Cedar stack app:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">heroku apps:create smooth-autumn-7451</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If success, you would see below output:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">Creating smooth-autumn-7451... done, stack is cedar
+</span><span class="line">http://smooth-autumn-7451.herokuapp.com/ | git@heroku.com:smooth-autumn-7451.git
+</span><span class="line">Git remote heroku added</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and double check git remote you would see heroku remote listed:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git remote show
+</span><span class="line">heroku</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="add-ssl-certificate">Add SSL certificate</h4>
+
+<p>Spree production mode always enforce SSL. This step is very optional,
+please read <a href="#disable-ssl-in-production-mode">Disable SSL in Production</a> section if you want to disable SSL in Production mode.</p>
+
+<p>A Piggyback SSL is a now standard feature on all Heroku apps so you don’t have
+to enable. We are not going to buy a certificate for this test app. Instead, we are
+going to set up a <a href="http://devcenter.heroku.com/articles/ssl-certificate-self" title="Creating a Self-Signed SSL Certificate">Self-Signed SSL Certificate</a>.</p>
+
+<p>A private key and certificate signing request can be generated:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ openssl genrsa -des3 -out site.key 2048
+</span><span class="line">    ...
+</span><span class="line">   Enter pass phrase for site.key:
+</span><span class="line">   Verifying - Enter pass phrase for site.key:
+</span><span class="line">$ mv site.key site.orig.key
+</span><span class="line">$ openssl rsa -in site.orig.key -out site.key
+</span><span class="line">   Enter pass phrase for site.orig.key:
+</span><span class="line">   writing RSA key
+</span><span class="line">$ openssl req -new -key site.key -out site.csr
+</span><span class="line">   ...
+</span><span class="line">   Country Name (2 letter code) [AU]:US
+</span><span class="line">   State or Province Name (full name) [Some-State]:California
+</span><span class="line">   ...</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and now the self-signed SSL certificate is generated from the <code>site.key</code> private key and <code>site.csr</code> files:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ openssl x509 -req -days 365 -in site.csr -signkey site.key -out final.crt</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>final.crt</code> file is your site certificate suitable for use with Heroku’s SSL add-on along with the <code>site.key</code> private key.</p>
+
+<p>Now we upload those two files to Heroku:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku domains:add smooth-autumn-7451.herokuapp.com
+</span><span class="line">$ heroku ssl:add final.crt site.key</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="deploy-spree-to-heroku">Deploy Spree to Heroku</h4>
+
+<p>Now we could push our app to Heroku:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git init
+</span><span class="line">git add -A
+</span><span class="line">git commit -m "Initial commit"
+</span><span class="line">git push heroku master</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><em>OPTIONAL</em>: If you <em>ever</em> bump into issues where Bundler fails to locate gems, the best workaround is to cache the bundle:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">bundle cache
+</span><span class="line">git add -A
+</span><span class="line">git commit -m 'Bundle cache'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If all goes well, you would see following output:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">-----&gt; Heroku receiving push
+</span><span class="line">-----&gt; Ruby/Rails app detected
+</span><span class="line">...
+</span><span class="line">       Detected manifest.yml, assuming assets were compiled locally
+</span><span class="line">-----&gt; Rails plugin injection
+</span><span class="line">       Injecting rails_log_stdout
+</span><span class="line">       Injecting rails3_serve_static_assets
+</span><span class="line">-----&gt; Discovering process types
+</span><span class="line">       Procfile declares types      -&gt; web
+</span><span class="line">       Default types for Ruby/Rails -&gt; console, rake, worker
+</span><span class="line">-----&gt; Compiled slug size is 39.4MB
+</span><span class="line">-----&gt; Launching... done, v9
+</span><span class="line">       http://smooth-autumn-7451.herokuapp.com deployed to Heroku</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next we could repeat the same bootstraping step on our remote heroku:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku run rails g spree:install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now we could open app:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku apps:open</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>However to your surprise you could see that there are no images displayed correctly.
+This is expected behavior and worry not, I have your back covered, please read section
+<a href="#assets-precompiling">Assset Pipeline</a></p>
+
+<h4 id="assets-precompiling">Assets Precompiling</h4>
+
+<p>Heroku would fail precompiling assets in slug compilation. Following output show
+the error:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">   Injecting rails_log_stdout
+</span><span class="line">   Injecting rails3_serve_static_assets
+</span><span class="line">-----&gt; Preparing app for Rails asset pipeline
+</span><span class="line">   Running: rake assets:precompile
+</span><span class="line">   rake aborted!
+</span><span class="line">   could not connect to server: Connection refused
+</span><span class="line">   Is the server running on host "127.0.0.1" and accepting
+</span><span class="line">   TCP/IP connections on port 5432?
+</span><span class="line">
+</span><span class="line">   Tasks: TOP =&gt; environment
+</span><span class="line">   (See full trace by running task with --trace)
+</span><span class="line">   Precompiling assets failed, enabling runtime asset compilation
+</span><span class="line">   Injecting rails31_enable_runtime_asset_compilation
+</span><span class="line">   Please see this article for troubleshooting help:
+</span><span class="line">   http://devcenter.heroku.com/articles/rails31_heroku_cedar#troubleshooting</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>It make some sense though because Spree requires access to DB to complete this task and yet before you push to Heroku the environment config is not present.</p>
+
+<p>So we have to disable precompile on initialization by set <code>config.assets.initialize_on_precompile</code> to <code>false</code> in <code>config/application.rb</code></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/application.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">config</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">initialize_on_precompile</span> <span class="o">=</span> <span class="kp">false</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>To workaround this issue, there are 2 ways:</p>
+
+<h5 id="locally-precompiling-assets">1. Locally Precompiling Assets</h5>
+
+<p>We precompile the assets on localbox:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ RAILS_ENV=production bundle exec rake assets:precompile</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>What will happen next is Sprocket will compile our assets and place them in <code>public/assets</code> folder. What Heroku really care is the <code>public/assets/manifest.yml</code>. This file contains all MD5 checksums of our assets and Heroku will check the existence of the file to tell if we compile our assets locally or not. Make sure you double check your <code>.gitignore</code> and remove the <code>public/assets</code> if there is one so git won’t omit this path.</p>
+
+<p>If we push this file to our server:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ git add -A public/assets
+</span><span class="line">$ git commit -m 'Added precompiled assets'
+</span><span class="line">$ git push heroku master</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>you would see:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">....
+</span><span class="line">-----&gt; Preparing app for Rails asset pipeline
+</span><span class="line">       Detected manifest.yml, assuming assets were compiled locally
+</span><span class="line">...</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You could read more on <a href="http://devcenter.heroku.com/articles/rails31_heroku_cedar/" title="Rails 3.1 Heroku Cedar">Rails 3.1 on Heroku</a></p>
+
+<p>Again, I do not recommend you using this method, because you pollute your source tree
+with precompiled assets. Please avoid this at all cost and instead use a CDN like S3 or Rackspace
+to serve our precompiled assets.</p>
+
+<h5 id="serve-precompiled-assets-on-cdn-recommended">2. Serve precompiled assets on CDN (RECOMMENDED)</h5>
+
+<p>First, we install <code>asset_sync</code> gem by appending to your <code>Gemfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">group :assets do
+</span><span class="line">  # asset_sync is required as needed by application.rb
+</span><span class="line">  gem 'asset_sync', :require =&gt; nil
+</span><span class="line">end
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Then we have to enable <code>user_env_compile</code> plugin first:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">heroku labs:enable user-env-compile</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next, we configure asset_sync to sync with Amazon S3 by adding following variables into Heroku env:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku config:add AWS_ACCESS_KEY_ID=xxxx
+</span><span class="line">$ heroku config:add AWS_SECRET_ACCESS_KEY=xxxx
+</span><span class="line">$ heroku config:add FOG_DIRECTORY=xxxx
+</span><span class="line">$ heroku config:add FOG_PROVIDER=AWS
+</span><span class="line"># and optionally:
+</span><span class="line">$ heroku config:add FOG_REGION=eu-west-1
+</span><span class="line">$ heroku config:add ASSET_SYNC_GZIP_COMPRESSION=true
+</span><span class="line">$ heroku config:add ASSET_SYNC_MANIFEST=true
+</span><span class="line">$ heroku config:add ASSET_SYNC_EXISTING_REMOTE_FILES=keep</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Configure <code>config/environments/production.rb</code> to use Amazon S3 as the asset host and ensure precompiling is enabled:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/environments/production.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">config</span><span class="o">.</span><span class="n">action_controller</span><span class="o">.</span><span class="n">asset_host</span> <span class="o">=</span> <span class="s2">&quot;//</span><span class="si">#{</span><span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;FOG_DIRECTORY&#39;</span><span class="o">]</span><span class="si">}</span><span class="s2">.s3.amazonaws.com&quot;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Also, ensure the following are defined (in <code>production.rb</code> or <code>application.rb</code>)</p>
+
+<ul>
+  <li>config.assets.digest is set to true.</li>
+  <li>config.assets.enabled is set to true.</li>
+</ul>
+
+<p>That’s done. Commit changes and push to remote Heroku:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">git commit -am "Added asset_sync gem and configure asset_host to serve from S3 bucket in production"
+</span><span class="line">git push heroku master</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>asset_sync</code> override <code>rake assets:precompile</code> deploy task and will automatically synchronized all modified and
+new assets to S3.</p>
+
+<p>You should see output like below if success:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">....
+</span><span class="line">Preparing app for Rails asset pipeline
+</span><span class="line">Running: rake assets:precompile
+</span><span class="line">AssetSync: using default configuration from built-in initializer
+</span><span class="line">AssetSync: using default configuration from built-in initializer
+</span><span class="line">AssetSync: Syncing.
+</span><span class="line">Using: Directory Search of /tmp/build_z7t7ti7lk5up/public/assets
+</span><span class="line">Uploading: assets/admin/all-190f577bede460d23825559e6cfdd106.js
+</span><span class="line">Uploading: assets/admin/all-190f577bede460d23825559e6cfdd106.js.gz
+</span><span class="line">AssetSync: Done.
+</span><span class="line">Asset precompilation completed (91.32s)
+</span><span class="line">....</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="custom-domain">Custom Domain</h4>
+
+<p>Now we push a bit further by setting up custom domain for our shop, first we need
+to set up Heroku to respond to requests at custom domains:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku addons:add custom_domains
+</span><span class="line">Adding custom_domains to smooth-autumn-7451...done.</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And inform Heroku our beautiful <code>fool-man-chew.com</code> domain</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ heroku domains:add www.fool-man-chew.com
+</span><span class="line">Added www.example.com as a custom domain name to smooth-autumn-7451.heroku.com
+</span><span class="line">$ heroku domains:add fool-man-chew.com
+</span><span class="line">Added example.com as a custom domain name to smooth-autumn-7451.heroku.com</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Then I point the domain DNS to Heroku. Please read more at <a href="http://devcenter.heroku.com/articles/custom-domains" title="Heroku Custom Domains">Heroku Custom Domain</a></p>
+
+<p>We also need to let Spree know of our custom domain by append <code>site_url</code> in our
+<code>config/initializers/spree.rb</code></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Spree</span><span class="o">.</span><span class="n">config</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class="line">  <span class="n">config</span><span class="o">.</span><span class="n">site_url</span> <span class="o">=</span> <span class="s1">&#39;fool-man-chew.com&#39;</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Add, commit and push again:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ git add config/initializers/spree.rb
+</span><span class="line">$ git commit -m 'Use custom domain'
+</span><span class="line">$ git push heroku master
+</span><span class="line">$ git heroku:restart</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="extra">Extra</h3>
+
+<h4 id="disable-ssl-in-production-mode">Disable SSL in Production mode</h4>
+
+<p>Edit file <code>config/initializers/spree.rb</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>config/initializers/spree.rb </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">Spree</span><span class="o">.</span><span class="n">config</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class="line">  <span class="n">config</span><span class="o">.</span><span class="n">allow_ssl_in_production</span> <span class="o">=</span> <span class="kp">false</span>
+</span><span class="line"><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Make sure you commit the changes to app repository.</p>
+
+<h4 id="deploy-to-heroku-using-herokusan">Deploy to Heroku using heroku_san</h4>
+
+<p>It is much quicker to setup and deploy to Heroku by using heroku_san gem.</p>
+
+<p>Simply install <code>heroku_san</code> by appending to your <code>Gemfile</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">group :development do
+</span><span class="line">  gem 'heroku_san'
+</span><span class="line">end</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bundle install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Configure heroku_san by creating <code>config/heroku.yml</code> file with content:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">production:
+</span><span class="line">  stack: cedar
+</span><span class="line">  app: smooth-autumn-7451
+</span><span class="line">  config:
+</span><span class="line">    BUNDLE_WITHOUT: 'development:test'
+</span><span class="line">  config:
+</span><span class="line">    # vars for asset_sync
+</span><span class="line">    AWS_ACCESS_KEY_ID: xxx
+</span><span class="line">    AWS_SECRET_ACCESS_KEY:xxx
+</span><span class="line">    FOG_DIRECTORY: 'skateshop'
+</span><span class="line">    FOG_PROVIDER: 'AWS'
+</span><span class="line">    # vars for spree_heroku
+</span><span class="line">    S3_KEY='your_access_key'
+</span><span class="line">    S3_SECRET='secret_access_key'
+</span><span class="line">    S3_BUCKET='fool-man-chew_production'</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>We deploy to heroku by running following rake task:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ rake production deploy</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Spree 1.0 is a big major leap. It is faster, more robust and
+much easier to install. Outstanding issue such as ‘Superclass mistmach bug with Calculator::PriceBucket’, ‘Bootstraping migration run failed’ are resolved. Yet
+there are possibly issues that I am not aware of, so please file a ticket on <a href="https://github.com/spree/spree/issues" title="Spree Issues">GitHub Issues</a> and I’ll make sure it has my utmost attention.</p>
+
+<p>I’d like to extend my gratitude to the Spree community for the hardwork.</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Trung Lê</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-21T06:40:00+11:00" pubdate data-updated="true">Feb 21<span>st</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/" data-via="joneslee85" data-counturl="http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/artwork/say-hello-to-doctor-indy-cat/" title="Next Post: Say Hello to Dr.Indy Cat">Say Hello to Dr.Indy Cat &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <p>Humble Ruby developer</p>
+  <p>Core dev at <a href="http://spreecommerce.com">Spree Commerce</a> and <a href="http://lotusrb.org">Lotus Framework</a></p>
+  <p>I love art, reading history book, table tennis, golf and my beloved <a href="http://ruby.org.vn">Ruby Vietnam</a></p>
+</section><section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/">Setup Arch Linux to boot UEFI on Asus Z170M-PLUS motherboard</a>
+      </li>
+    
+      <li class="post">
+        <a href="/crystal/testing-whirlwind-tour-in-crystal-lang/">Testing Whirlwind tour in Crystal lang</a>
+      </li>
+    
+      <li class="post">
+        <a href="/how-to-create-images-slash-files-upload-form-in-lotus-framework/">How to create images/files upload form in Lotus Framework?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/ruby/what-is-module-function/">How to consolidate module functions?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/lotusrb/how-to-add-basic-authentication-into-lotus-app/">How to add basic authentication into Lotus app</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/joneslee85">@joneslee85</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'joneslee85',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("joneslee85", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/joneslee85" class="twitter-follow-button" data-show-count="false">Follow @joneslee85</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/joneslee85?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Trung Lê -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ruby-journal';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/';
+        var disqus_url = 'http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

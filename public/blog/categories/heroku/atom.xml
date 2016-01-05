@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: heroku | Ruby Journal]]></title>
+  <link href="http://ruby-journal.com/blog/categories/heroku/atom.xml" rel="self"/>
+  <link href="http://ruby-journal.com/"/>
+  <updated>2016-01-05T15:28:10+11:00</updated>
+  <id>http://ruby-journal.com/</id>
+  <author>
+    <name><![CDATA[Trung Lê]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Install Ghostscript on Heroku Cedar]]></title>
+    <link href="http://ruby-journal.com/heroku/install-ghostscript-on-heroku/"/>
+    <updated>2012-03-12T16:57:00+11:00</updated>
+    <id>http://ruby-journal.com/heroku/install-ghostscript-on-heroku</id>
+    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+
+<p>In this tutorial, I will show you how to install ghostscript on Heroku Cedar.
+As you might have known that Heroku virtual machine does come with a system-wide
+ghostscript version which is located at <code>/usr/bin/gs</code>. You can find out the
+location of this version:</p>
+
+<p><code>
+$ heroku run bash
+$ /usr/bin/gs --version
+8.71
+</code></p>
+
+<p>However, explicit dependencies is not recommended, you could read 12 Factor Approach
+on dependencies at <a href="http://www.12factor.net/dependencies">http://www.12factor.net/dependencies</a>. Credit to <a href="https://github.com/rwdaigle">Ryan Daigle</a> who pointed it out for me and I agree with him.</p>
+
+<p>To install ghostscript, we fetch the source under heroku console, fetch the source,
+configure and compile the software:</p>
+
+<p><code>
+$ heroku run bash
+$ curl -O http://downloads.ghostscript.com/public/ghostscript-9.05.tar.gz
+$ tar xzvf ghostscript-9.05.tar.gz
+$ cd ghostscript-9.05
+$ ./configure --disable-cups --disable-gtk --with-drivers=FILES
+$ make
+$ cp bin/gs ~/bin
+</code></p>
+
+<p>You might notice that I only specify configuration parameters <code>--with-drivers=FILES</code>.
+It is because I don’t need printer drivers for my app which only does think like
+images and PDF manipulation.</p>
+
+<p>Once the compilation is completed, copy the binary <code>ghostscript-9.05/bin/gs</code> to <code>~/bin</code>.
+All binaries in <code>~/bin</code> will be available for your Heroku app now. You can verify
+if the binary works by:</p>
+
+<p><code>
+$ gs --version
+9.05
+</code></p>
+
+<p>And please do not forget to clean up:</p>
+
+<p><code>
+$ cd ~
+$ rm -rf ghostscript-9.05*
+</code></p>
+
+<p>If you feel lazy, you could download my Ruby-wrapper of gs at <a href="https://github.com/joneslee85/ruby-ghostscript">https://github.com/joneslee85/ruby-ghostscript</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>
