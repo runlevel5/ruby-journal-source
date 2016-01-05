@@ -2,236 +2,236 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://ruby-journal.com/spree-1-0-stable-deployment-on-heroku/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/artwork/say-hello-to-doctor-indy-cat/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/rails/define-fixtures-with-polymorphic-association/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/rails/exposing-activerecord-model-attributes-to-liquid-dynamically/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/heroku/install-ghostscript-on-heroku/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/spree-1-1-stable-deployment-on-heroku/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/install-postgres-dot-app-on-osx-10-dot-7-plus/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/debug-your-failed-test-in-travis-ci/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/install-ubuntu-with-pxe-via-osx/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-setup-rails-app-with-puma-and-nginx/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-block-old-ie-version-with-rails/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-install-ruby-2-dot-0-on-osx-10-dot-7-or-newer/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/minitest-let-is-lazy/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/learn-to-know-myself-better/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-fill-in-fckeditor-with-capybara-2/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-do-jqueryui-autocomplete-with-capybara-2/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-write-rails-view-test-with-rspec/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/how-to-track-changes-with-after-callbacks-in-rails-3-or-newer/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/rails-4-changes-join-table-naming-convention/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/becareful-with-space-in-lambda-hash-rocket-syntax-between-ruby-1-dot-9-and-2-dot-0/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-uninstall-all-ruby-gems/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/faster-travisci-test/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/how-to-import-millions-records-via-activerecord-within-minutes-not-hours/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/digesting-pumactl/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/avoid-unless-method-in-a-chain-of-conditions-statement/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/graceful-fallback-for-not-found-activerecord-lookup-with-nullobject-pattern/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/rails/how-to-update-attributes-with-validations-and-callbacks-skipped/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/speed-up-your-postgresql-dump-restore/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/genereate-gems-dependency-graph-with-bundler/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/create-dummy-controller-for-testing-with-rspec-rails/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/how-to-style-kaminari-pagination-with-twitter-bootstrap-3/
         </loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/liquid-template-in-ruby-done-right/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-dry-your-rails-routes/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-override-default-primary-key-id-in-rails/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/how-to-write-custom-serializer-for-activerecord-number-serialize/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/override-ordering-with-activerecord/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/what-is-the-difference-between-git-rebase-and-git-merge/
         </loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-solve-sss-hiring-challenge/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/how-to-integrate-sidekiq-with-activejob/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/quick-guide-to-activesupport-hashwithindifferentaccess/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/rails/the-difference-between-activerecord-scope-dsl-and-class-method/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/lotusrb/how-to-add-basic-authentication-into-lotus-app/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/ruby/what-is-module-function/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/how-to-create-images-slash-files-upload-form-in-lotus-framework/
         </loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/crystal/testing-whirlwind-tour-in-crystal-lang/</loc>
-        <lastmod>2015-11-27T02:35:04+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>
             http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/
         </loc>
-        <lastmod>2016-01-05T15:27:46+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2016-01-05T15:27:46+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2016-01-05T15:27:46+11:00</lastmod>
+        <lastmod>2016-01-05T15:34:37+11:00</lastmod>
     </url>
 </urlset>
