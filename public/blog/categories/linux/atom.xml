@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: linux | Ruby Journal]]></title>
+  <link href="http://ruby-journal.com/blog/categories/linux/atom.xml" rel="self"/>
+  <link href="http://ruby-journal.com/"/>
+  <updated>2016-01-05T15:28:10+11:00</updated>
+  <id>http://ruby-journal.com/</id>
+  <author>
+    <name><![CDATA[Trung Lê]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Setup Arch Linux to boot UEFI on Asus Z170M-PLUS motherboard]]></title>
+    <link href="http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/"/>
+    <updated>2016-01-05T14:21:00+11:00</updated>
+    <id>http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard</id>
+    <content type="html"><![CDATA[<p>{{ post.title }}</p>
+
+<p>There are many ways to get Arch Linux boot on ASUS Z170M-PLUS, one of which is with EFIStub but sadly it <em>does not</em> work easily like other motherboards I’ve encountered before. The first issue is that the annoying Secure Boot that complicates the set up alot, and the second is the issue with <code>efibootmgr</code>’s newly added entries are not persisted in NVRAM (thus not appearing in UEFI menu). But I did have one succes with using <code>systemd-boot</code> added in UEFI, then it’s just a matter of adding a Arch Linux boot entry with systemd-boot.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>Arch Linux Live USB</li>
+  <li>Internet (via Ethernet cable or Wifi)</li>
+  <li>Time and patience</li>
+  <li>Secure Boot is off</li>
+</ul>
+
+<h2 id="disable-windows-secure-boot">Disable Windows Secure Boot</h2>
+
+<p>Because I don’t run Windows, it’s much better to disable Secure Boot. To do so:</p>
+
+<ul>
+  <li>Get into your BIOS by pressing Del on boot up</li>
+  <li>Then press F7 to get into Advance Mode, move to Boot menu, then select Secure Boot</li>
+  <li>Choose OS Type from Windows to Other type OS</li>
+  <li>Make sure you save this changes, then reboot</li>
+</ul>
+
+<h2 id="partition-structure">Partition Structure</h2>
+
+<p>In my case, I have 2 partitions:</p>
+
+<ul>
+  <li>sda1: <code>/boot</code>: Size 500MB, partition type is EFI System and filesystem is FAT32</li>
+  <li>sda2: <code>/</code>: <whatever you="" like=""></whatever></li>
+</ul>
+
+<p>What we care here is the EFI System Partition (ESP), here is the <code>/boot</code> partition.
+This is the placeholder for my Linux kernel and all EFI-related stuffs.</p>
+
+<h2 id="install-systemd-boot-efi">Install systemd-boot EFI</h2>
+
+<p>Boot into your Arch Linux LiveUSB, then mount your partition to <code>/mnt</code>:</p>
+
+<p><code>
+$ mount /dev/sda2 /mnt
+$ mount /dev/sda1 /mnt/boot
+</code></p>
+
+<p>then change root into it by</p>
+
+<p><code>
+$ arch-chroot /mnt
+</code></p>
+
+<p>now we need to install <code>systemd-boot</code>:</p>
+
+<p><code>
+$ bootctl --path=/mnt install
+</code></p>
+
+<p>It will copy the systemd-boot binary to your EFI System Partition (/mnt/EFI/systemd/systemd-bootx64.efi and /mnt/EFI/Boot/BOOTX64.EFI - both of which are identical - on x64 systems) and add systemd-boot itself as the default EFI application (default boot entry) loaded by the EFI Boot Manager. The next time when you boot up your machine, you would see <code>Linux Boot Manager</code> option appears in UEFI Boot Menu.</p>
+
+<p>Next, we add a new boot entry for our Arch Linux kernel inside systemd-boot. To do so, simple create a new file under `/boot/loader/entries/my_arch_linux.conf with following content:</p>
+
+<p><code>
+title Arch Linux
+linux /vmlinuz-linux
+initrd /initramfs-linux
+options root=/dev/sda2 rw
+</code></p>
+
+<p>All done, now we need to exit out to our Live USB env by typing <code>exit</code> then unmount the mounted sda by <code>umount -R /mnt</code> and reboot with command: <code>reboot</code>.</p>
+
+<p>Upon seeing the Asus logo, press F8 to see UEFI Boot Menu, choose Linux Boot Manager and you now can see the systemd-boot EFI boot manager screen, select Arch Linux and your set to go.</p>
+
+<p>```</p>
+]]></content>
+  </entry>
+  
+</feed>

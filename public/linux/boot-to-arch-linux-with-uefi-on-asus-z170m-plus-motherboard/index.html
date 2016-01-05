@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>How to add new column after existing column with MySQL in Rails? - Ruby Journal</title>
+  <title>Setup Arch Linux to boot UEFI on Asus Z170M-PLUS motherboard - Ruby Journal</title>
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="By default, SQL ADD COLUMN would add new column to the tail of columns. What if you
-want to add a new column and append this new column after an &hellip;">
+  <meta name="description" content="There are many ways to get Arch Linux boot on ASUS Z170M-PLUS, one of which is with EFIStub but sadly it does not work easily like other &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ want to add a new column and append this new column after an &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/">
+  <link rel="canonical" href="http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -79,7 +78,7 @@ want to add a new column and append this new column after an &hellip;">
   
   <header>
     
-      <h1 class="entry-title">How to Add New Column After Existing Column With MySQL in Rails?</h1>
+      <h1 class="entry-title">Setup Arch Linux to Boot UEFI on Asus Z170M-PLUS Motherboard</h1>
     
     
       <p class="meta">
@@ -95,7 +94,7 @@ want to add a new column and append this new column after an &hellip;">
   
 
 
-<time datetime="2014-10-09T15:27:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
+<time datetime="2016-01-05T14:21:00+11:00" pubdate data-updated="true">Jan 5<span>th</span>, 2016</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,50 +104,77 @@ want to add a new column and append this new column after an &hellip;">
 
 
 <div class="entry-content">
-<p>By default, SQL <code>ADD COLUMN</code> would add new column to the tail of columns. What if you
-want to add a new column and append this new column after an existing column? Read on
-and I&#8217;ll show you how to do that with Rails in MySQL</p>
+<p>There are many ways to get Arch Linux boot on ASUS Z170M-PLUS, one of which is with EFIStub but sadly it <em>does not</em> work easily like other motherboards I&#8217;ve encountered before. The first issue is that the annoying Secure Boot that complicates the set up alot, and the second is the issue with <code>efibootmgr</code>&#8217;s newly added entries are not persisted in NVRAM (thus not appearing in UEFI menu). But I did have one succes with using <code>systemd-boot</code> added in UEFI, then it&#8217;s just a matter of adding a Arch Linux boot entry with systemd-boot.</p>
 
-<!--more-->
+<h2 id="prerequisites">Prerequisites</h2>
 
-<h2 id="add-new-column-after-existing-column-in-sql">Add new column after existing column in SQL</h2>
+<ul>
+  <li>Arch Linux Live USB</li>
+  <li>Internet (via Ethernet cable or Wifi)</li>
+  <li>Time and patience</li>
+  <li>Secure Boot is off</li>
+</ul>
 
-<p>MySQL provides <code>AFTER</code> contrainst for <code>ADD COLUMN</code>:</p>
+<h2 id="disable-windows-secure-boot">Disable Windows Secure Boot</h2>
 
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<p>Because I don&#8217;t run Windows, it&#8217;s much better to disable Secure Boot. To do so:</p>
+
+<ul>
+  <li>Get into your BIOS by pressing Del on boot up</li>
+  <li>Then press F7 to get into Advance Mode, move to Boot menu, then select Secure Boot</li>
+  <li>Choose OS Type from Windows to Other type OS</li>
+  <li>Make sure you save this changes, then reboot</li>
+</ul>
+
+<h2 id="partition-structure">Partition Structure</h2>
+
+<p>In my case, I have 2 partitions:</p>
+
+<ul>
+  <li>sda1: <code>/boot</code>: Size 500MB, partition type is EFI System and filesystem is FAT32</li>
+  <li>sda2: <code>/</code>: <whatever you="" like=""></whatever></li>
+</ul>
+
+<p>What we care here is the EFI System Partition (ESP), here is the <code>/boot</code> partition.
+This is the placeholder for my Linux kernel and all EFI-related stuffs.</p>
+
+<h2 id="install-systemd-boot-efi">Install systemd-boot EFI</h2>
+
+<p>Boot into your Arch Linux LiveUSB, then mount your partition to <code>/mnt</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ mount /dev/sda2 /mnt
+</span><span class="line">$ mount /dev/sda1 /mnt/boot</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then change root into it by</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ arch-chroot /mnt</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>now we need to install <code>systemd-boot</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bootctl --path=/mnt install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>It will copy the systemd-boot binary to your EFI System Partition (/mnt/EFI/systemd/systemd-bootx64.efi and /mnt/EFI/Boot/BOOTX64.EFI - both of which are identical - on x64 systems) and add systemd-boot itself as the default EFI application (default boot entry) loaded by the EFI Boot Manager. The next time when you boot up your machine, you would see <code>Linux Boot Manager</code> option appears in UEFI Boot Menu.</p>
+
+<p>Next, we add a new boot entry for our Arch Linux kernel inside systemd-boot. To do so, simple create a new file under `/boot/loader/entries/my_arch_linux.conf with following content:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="sql"><span class="line"><span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">mytable</span>
-</span><span class="line"><span class="k">ADD</span> <span class="k">COLUMN</span>  <span class="n">new_column</span> <span class="o">&lt;</span><span class="k">type</span><span class="o">&gt;</span>
-</span><span class="line"><span class="k">AFTER</span>       <span class="n">existing_column</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">title Arch Linux
+</span><span class="line">linux /vmlinuz-linux
+</span><span class="line">initrd /initramfs-linux
+</span><span class="line">options root=/dev/sda2 rw</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>The example above tell MySQL to create new <code>new_column</code> after <code>existing_column</code>.</p>
+<p>All done, now we need to exit out to our Live USB env by typing <code>exit</code> then unmount the mounted sda by <code>umount -R /mnt</code> and reboot with command: <code>reboot</code>.</p>
 
-<h2 id="doing-it-with-rails-migration">Doing it with Rails migration</h2>
+<p>Upon seeing the Asus logo, press F8 to see UEFI Boot Menu, choose Linux Boot Manager and you now can see the systemd-boot EFI boot manager screen, select Arch Linux and your set to go.</p>
 
-<p>With Rails, we could use ActiveRecord::Migration helper for the job. Let&#8217;s create
-a new migration with content:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">change</span>
-</span><span class="line">  <span class="n">add_column</span> <span class="ss">:mytable</span><span class="p">,</span> <span class="ss">:new_column</span><span class="p">,</span> <span class="ss">after</span><span class="p">:</span> <span class="s1">&#39;existing_column&#39;</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>OR if you prefer the SQL way:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">def</span> <span class="nf">change</span>
-</span><span class="line">  <span class="n">add_column</span> <span class="ss">:mytable</span><span class="p">,</span> <span class="ss">:new_column</span><span class="p">,</span> <span class="s1">&#39;&lt;type&gt; AFTER existing_column&#39;</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>That&#8217;s all for today folks</p>
+<p>&#8220;`</p>
 </div>
 
 
@@ -171,15 +197,21 @@ a new migration with content:</p>
   
 
 
-<time datetime="2014-10-09T15:27:00+11:00" pubdate data-updated="true">Oct 9<span>th</span>, 2014</time>
+<time datetime="2016-01-05T14:21:00+11:00" pubdate data-updated="true">Jan 5<span>th</span>, 2016</time>
       
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/linux/'>linux</a>
+  
+</span>
 
 
     </p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/" data-via="joneslee85" data-counturl="http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/" data-via="joneslee85" data-counturl="http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -192,10 +224,8 @@ a new migration with content:</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/how-to-open-slash-override-slash-monkey-patch-a-class-in-ruby/" title="Previous Post: How to open/override/monkey-patch a class in Ruby?">&laquo; How to open/override/monkey-patch a class in Ruby?</a>
+        <a class="basic-alignment left" href="/crystal/testing-whirlwind-tour-in-crystal-lang/" title="Previous Post: Testing Whirlwind tour in Crystal lang">&laquo; Testing Whirlwind tour in Crystal lang</a>
       
-      
-        <a class="basic-alignment right" href="/rails/the-difference-between-activerecord-scope-dsl-and-class-method/" title="Next Post: The difference between ActiveRecord scope DSL and class method">The difference between ActiveRecord scope DSL and class method &raquo;</a>
       
     </p>
   </footer>
@@ -321,8 +351,8 @@ a new migration with content:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/';
-        var disqus_url = 'http://ruby-journal.com/how-to-add-new-column-after-existing-column-with-mysql-in-rails/';
+        var disqus_identifier = 'http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/';
+        var disqus_url = 'http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/';
         var disqus_script = 'embed.js';
       
     (function () {

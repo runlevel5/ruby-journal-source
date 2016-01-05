@@ -221,11 +221,17 @@
         <lastmod>2015-11-27T02:35:04+11:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/
+        </loc>
+        <lastmod>2016-01-05T15:27:46+11:00</lastmod>
+    </url>
+    <url>
         <loc>http://ruby-journal.com/blog/archives/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:27:46+11:00</lastmod>
     </url>
     <url>
         <loc>http://ruby-journal.com/</loc>
-        <lastmod>2015-11-27T02:45:27+11:00</lastmod>
+        <lastmod>2016-01-05T15:27:46+11:00</lastmod>
     </url>
 </urlset>

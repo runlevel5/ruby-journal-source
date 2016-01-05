@@ -4,7 +4,7 @@
   <title><![CDATA[Ruby Journal]]></title>
   <link href="http://ruby-journal.com/atom.xml" rel="self"/>
   <link href="http://ruby-journal.com/"/>
-  <updated>2016-01-05T14:15:55+11:00</updated>
+  <updated>2016-01-05T15:28:02+11:00</updated>
   <id>http://ruby-journal.com/</id>
   <author>
     <name><![CDATA[Trung Lê]]></name>
@@ -12,6 +12,86 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Setup Arch Linux to boot UEFI on Asus Z170M-PLUS motherboard]]></title>
+    <link href="http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/"/>
+    <updated>2016-01-05T14:21:00+11:00</updated>
+    <id>http://ruby-journal.com/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard</id>
+    <content type="html"><![CDATA[
+<p>There are many ways to get Arch Linux boot on ASUS Z170M-PLUS, one of which is with EFIStub but sadly it <em>does not</em> work easily like other motherboards I&#8217;ve encountered before. The first issue is that the annoying Secure Boot that complicates the set up alot, and the second is the issue with <code>efibootmgr</code>&#8217;s newly added entries are not persisted in NVRAM (thus not appearing in UEFI menu). But I did have one succes with using <code>systemd-boot</code> added in UEFI, then it&#8217;s just a matter of adding a Arch Linux boot entry with systemd-boot.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>Arch Linux Live USB</li>
+  <li>Internet (via Ethernet cable or Wifi)</li>
+  <li>Time and patience</li>
+  <li>Secure Boot is off</li>
+</ul>
+
+<h2 id="disable-windows-secure-boot">Disable Windows Secure Boot</h2>
+
+<p>Because I don&#8217;t run Windows, it&#8217;s much better to disable Secure Boot. To do so:</p>
+
+<ul>
+  <li>Get into your BIOS by pressing Del on boot up</li>
+  <li>Then press F7 to get into Advance Mode, move to Boot menu, then select Secure Boot</li>
+  <li>Choose OS Type from Windows to Other type OS</li>
+  <li>Make sure you save this changes, then reboot</li>
+</ul>
+
+<h2 id="partition-structure">Partition Structure</h2>
+
+<p>In my case, I have 2 partitions:</p>
+
+<ul>
+  <li>sda1: <code>/boot</code>: Size 500MB, partition type is EFI System and filesystem is FAT32</li>
+  <li>sda2: <code>/</code>: <whatever you="" like=""></whatever></li>
+</ul>
+
+<p>What we care here is the EFI System Partition (ESP), here is the <code>/boot</code> partition.
+This is the placeholder for my Linux kernel and all EFI-related stuffs.</p>
+
+<h2 id="install-systemd-boot-efi">Install systemd-boot EFI</h2>
+
+<p>Boot into your Arch Linux LiveUSB, then mount your partition to <code>/mnt</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ mount /dev/sda2 /mnt
+</span><span class="line">$ mount /dev/sda1 /mnt/boot</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then change root into it by</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ arch-chroot /mnt</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>now we need to install <code>systemd-boot</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bootctl --path=/mnt install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>It will copy the systemd-boot binary to your EFI System Partition (/mnt/EFI/systemd/systemd-bootx64.efi and /mnt/EFI/Boot/BOOTX64.EFI - both of which are identical - on x64 systems) and add systemd-boot itself as the default EFI application (default boot entry) loaded by the EFI Boot Manager. The next time when you boot up your machine, you would see <code>Linux Boot Manager</code> option appears in UEFI Boot Menu.</p>
+
+<p>Next, we add a new boot entry for our Arch Linux kernel inside systemd-boot. To do so, simple create a new file under `/boot/loader/entries/my_arch_linux.conf with following content:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">title Arch Linux
+</span><span class="line">linux /vmlinuz-linux
+</span><span class="line">initrd /initramfs-linux
+</span><span class="line">options root=/dev/sda2 rw</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>All done, now we need to exit out to our Live USB env by typing <code>exit</code> then unmount the mounted sda by <code>umount -R /mnt</code> and reboot with command: <code>reboot</code>.</p>
+
+<p>Upon seeing the Asus logo, press F8 to see UEFI Boot Menu, choose Linux Boot Manager and you now can see the systemd-boot EFI boot manager screen, select Arch Linux and your set to go.</p>
+
+<p>&#8220;`</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Testing Whirlwind tour in Crystal lang]]></title>
@@ -4094,168 +4174,6 @@ where the Gemfile file resides then use command:</p>
 <p><img class="left" src="http://ruby-journal.com/images/2014-03-18-genereate-gems-dependency-graph-with-bundler/gem_graph.png" /></p>
 
 <p>That&#8217;s it for today folks! Keep on learning!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to switch between selenium and poltergeist in capybara for Rails integration RSpec test]]></title>
-    <link href="http://ruby-journal.com/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test/"/>
-    <updated>2014-03-14T09:20:00+11:00</updated>
-    <id>http://ruby-journal.com/how-to-switch-between-selenium-and-poltergeist-for-rails-integration-rsped-test</id>
-    <content type="html"><![CDATA[
-<p>Debugging integration is still a pain with headless driver like poltergeist. In this tutorial
-I&#8217;ll show you a good tip how to switch to selenium for debugging with Firefox.</p>
-
-<!--more-->
-
-<p>Testing with selenium-webdriver is always slower than headless poltergeist, abeit easier to debug.
-Debugging with selenium brings up Firefox browser window with CSS and JS correctly loaded whilst
-it&#8217;s not the same case with poltergeist.</p>
-
-<p>I am going to show you to have both of drivers in same Rails app and you could switch to selenium
-for debugging easily!</p>
-
-<p>First thing is to add into your <code>Gemfile</code>:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">group</span> <span class="ss">:test</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">gem</span> <span class="s1">&#39;selenium-webdriver&#39;</span><span class="p">,</span> <span class="nb">require</span><span class="p">:</span> <span class="kp">false</span>
-</span><span class="line">  <span class="n">gem</span> <span class="s1">&#39;poltergeist&#39;</span><span class="p">,</span> <span class="nb">require</span><span class="p">:</span> <span class="kp">false</span>
-</span><span class="line">  <span class="n">gem</span> <span class="s1">&#39;capybara&#39;</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>I want to point out that we explicitly set <code>reauire: false</code> so that capybara won&#8217;t load any driver.
-This help avoid conflicts when two drivers are loaded at same time.</p>
-
-<p>Please make sure you run &#8216;bundle install&#8217;  before moving to the next step.</p>
-
-<p>Now I assume that you are using default RSpec&#8217;s helper <code>spec/spec_helper</code> for your integration test. Please ensure
-that this line is in your file:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="nb">require</span> <span class="s1">&#39;capybara/rspec&#39;</span>
-</span><span class="line">
-</span><span class="line"><span class="no">Dir</span><span class="o">[</span><span class="no">Rails</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;spec/support/**/*.rb&quot;</span><span class="p">)</span><span class="o">].</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="nb">require</span> <span class="n">f</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The above line tells RSpec to pick up any extensions/helpers that we place under <code>spec/support</code> folder.</p>
-
-<p>Next we create new <code>spec/support/feature_spec_extensions.rb</code> with content:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-<span class="line-number">24</span>
-<span class="line-number">25</span>
-<span class="line-number">26</span>
-<span class="line-number">27</span>
-<span class="line-number">28</span>
-<span class="line-number">29</span>
-<span class="line-number">30</span>
-<span class="line-number">31</span>
-<span class="line-number">32</span>
-<span class="line-number">33</span>
-<span class="line-number">34</span>
-<span class="line-number">35</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="k">module</span> <span class="nn">FeatureSpecExtensions</span>
-</span><span class="line">  <span class="k">def</span> <span class="nf">hang</span>
-</span><span class="line">    <span class="nb">print</span> <span class="s2">&quot;Waiting.... Press return if you wanna continue&quot;</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">if</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;FF&#39;</span><span class="o">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span>
-</span><span class="line">      <span class="no">STDIN</span><span class="o">.</span><span class="n">getc</span>
-</span><span class="line">    <span class="k">else</span>
-</span><span class="line">      <span class="n">page</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">debug</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span><span class="line">
-</span><span class="line"><span class="no">RSpec</span><span class="o">.</span><span class="n">configure</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
-</span><span class="line">  <span class="n">config</span><span class="o">.</span><span class="n">include</span> <span class="no">FeatureSpecExtensions</span><span class="p">,</span> <span class="ss">type</span><span class="p">:</span> <span class="ss">:feature</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">config</span><span class="o">.</span><span class="n">before</span> <span class="ss">:suite</span><span class="p">,</span> <span class="ss">type</span><span class="p">:</span> <span class="ss">:feature</span> <span class="k">do</span>
-</span><span class="line">    <span class="k">if</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;FF&#39;</span><span class="o">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span> <span class="c1"># in case you wanna run it with selenium</span>
-</span><span class="line">      <span class="nb">require</span> <span class="s1">&#39;selenium-webdriver&#39;</span>
-</span><span class="line">    <span class="k">else</span>
-</span><span class="line">      <span class="nb">require</span> <span class="s1">&#39;capybara/poltergeist&#39;</span>
-</span><span class="line">      <span class="no">Capybara</span><span class="o">.</span><span class="n">register_driver</span> <span class="ss">:poltergeist</span> <span class="k">do</span> <span class="o">|</span><span class="n">app</span><span class="o">|</span>
-</span><span class="line">        <span class="ss">Capybara</span><span class="p">:</span><span class="ss">:Poltergeist</span><span class="o">::</span><span class="no">Driver</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="p">{</span>
-</span><span class="line">          <span class="n">js_errors</span><span class="p">:</span> <span class="kp">true</span><span class="p">,</span>
-</span><span class="line">          <span class="ss">inspector</span><span class="p">:</span> <span class="kp">true</span><span class="p">,</span>
-</span><span class="line">          <span class="n">phantomjs_options</span><span class="p">:</span> <span class="o">[</span><span class="s1">&#39;--load-images=no&#39;</span><span class="p">,</span> <span class="s1">&#39;--ignore-ssl-errors=yes&#39;</span><span class="o">]</span><span class="p">,</span>
-</span><span class="line">          <span class="ss">timeout</span><span class="p">:</span> <span class="mi">120</span>
-</span><span class="line">        <span class="p">})</span>
-</span><span class="line">      <span class="k">end</span>
-</span><span class="line">    <span class="k">end</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">config</span><span class="o">.</span><span class="n">before</span> <span class="ss">:each</span><span class="p">,</span> <span class="ss">type</span><span class="p">:</span> <span class="ss">:feature</span> <span class="k">do</span>
-</span><span class="line">    <span class="no">Capybara</span><span class="o">.</span><span class="n">current_driver</span> <span class="o">=</span> <span class="no">ENV</span><span class="o">[</span><span class="s1">&#39;FF&#39;</span><span class="o">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span> <span class="p">?</span> <span class="no">Capybara</span><span class="o">.</span><span class="n">javascript_driver</span> <span class="p">:</span> <span class="ss">:poltergeist</span>
-</span><span class="line">  <span class="k">end</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The above RSpec helper sets default driver to poltergeist and should ENV variable FF is set, it will
-switch to selenium-webdriver.</p>
-
-<p>So to run a feature spec in poltergeist, we do:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">bundle</span> <span class="nb">exec</span> <span class="n">rspec</span> <span class="n">spec</span><span class="o">/</span><span class="n">features</span><span class="o">/</span><span class="n">the_uber_spec</span><span class="o">.</span><span class="n">rb</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>and to test with selenium-webdriver, we do:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="no">FF</span><span class="o">=</span><span class="kp">true</span> <span class="n">bundle</span> <span class="nb">exec</span> <span class="n">rspec</span> <span class="n">spec</span><span class="o">/</span><span class="n">features</span><span class="o">/</span><span class="n">the_uber_spec</span><span class="o">.</span><span class="n">rb</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>I also provide a helper method <code>hang</code> which will hang the page. Simply place it to the line
-that you want and Firefox browser will open up if selenium is used. Eg:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="ruby"><span class="line"><span class="n">scenario</span> <span class="s1">&#39;some uber case&#39;</span> <span class="k">do</span>
-</span><span class="line">  <span class="n">click_on</span> <span class="s1">&#39;Sign In&#39;</span>
-</span><span class="line">
-</span><span class="line">  <span class="n">hang</span>
-</span><span class="line">
-</span><span class="line">  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class="line"><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>That&#8217;s it for now folks. Credits to Nikolai Nemshilov, my ex-colleague who came up with this brilliant hybrid idea.</p>
 ]]></content>
   </entry>
   

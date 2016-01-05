@@ -9,7 +9,7 @@
   <meta name="author" content="Trung Lê">
 
   
-  <meta name="description" content="TDD has been part of my development career thanks to Ruby. It is in my nature to try to figure out how to test code with a new language that I learn &hellip;">
+  <meta name="description" content="There are many ways to get Arch Linux boot on ASUS Z170M-PLUS, one of which is with EFIStub but sadly it does not work easily like other &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,115 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/">Setup Arch Linux to Boot UEFI on Asus Z170M-PLUS Motherboard</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-01-05T14:21:00+11:00" pubdate data-updated="true">Jan 5<span>th</span>, 2016</time>
+        
+         | <a href="/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content">
+<p>There are many ways to get Arch Linux boot on ASUS Z170M-PLUS, one of which is with EFIStub but sadly it <em>does not</em> work easily like other motherboards I&#8217;ve encountered before. The first issue is that the annoying Secure Boot that complicates the set up alot, and the second is the issue with <code>efibootmgr</code>&#8217;s newly added entries are not persisted in NVRAM (thus not appearing in UEFI menu). But I did have one succes with using <code>systemd-boot</code> added in UEFI, then it&#8217;s just a matter of adding a Arch Linux boot entry with systemd-boot.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>Arch Linux Live USB</li>
+  <li>Internet (via Ethernet cable or Wifi)</li>
+  <li>Time and patience</li>
+  <li>Secure Boot is off</li>
+</ul>
+
+<h2 id="disable-windows-secure-boot">Disable Windows Secure Boot</h2>
+
+<p>Because I don&#8217;t run Windows, it&#8217;s much better to disable Secure Boot. To do so:</p>
+
+<ul>
+  <li>Get into your BIOS by pressing Del on boot up</li>
+  <li>Then press F7 to get into Advance Mode, move to Boot menu, then select Secure Boot</li>
+  <li>Choose OS Type from Windows to Other type OS</li>
+  <li>Make sure you save this changes, then reboot</li>
+</ul>
+
+<h2 id="partition-structure">Partition Structure</h2>
+
+<p>In my case, I have 2 partitions:</p>
+
+<ul>
+  <li>sda1: <code>/boot</code>: Size 500MB, partition type is EFI System and filesystem is FAT32</li>
+  <li>sda2: <code>/</code>: <whatever you="" like=""></whatever></li>
+</ul>
+
+<p>What we care here is the EFI System Partition (ESP), here is the <code>/boot</code> partition.
+This is the placeholder for my Linux kernel and all EFI-related stuffs.</p>
+
+<h2 id="install-systemd-boot-efi">Install systemd-boot EFI</h2>
+
+<p>Boot into your Arch Linux LiveUSB, then mount your partition to <code>/mnt</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ mount /dev/sda2 /mnt
+</span><span class="line">$ mount /dev/sda1 /mnt/boot</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>then change root into it by</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ arch-chroot /mnt</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>now we need to install <code>systemd-boot</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ bootctl --path=/mnt install</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>It will copy the systemd-boot binary to your EFI System Partition (/mnt/EFI/systemd/systemd-bootx64.efi and /mnt/EFI/Boot/BOOTX64.EFI - both of which are identical - on x64 systems) and add systemd-boot itself as the default EFI application (default boot entry) loaded by the EFI Boot Manager. The next time when you boot up your machine, you would see <code>Linux Boot Manager</code> option appears in UEFI Boot Menu.</p>
+
+<p>Next, we add a new boot entry for our Arch Linux kernel inside systemd-boot. To do so, simple create a new file under `/boot/loader/entries/my_arch_linux.conf with following content:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">title Arch Linux
+</span><span class="line">linux /vmlinuz-linux
+</span><span class="line">initrd /initramfs-linux
+</span><span class="line">options root=/dev/sda2 rw</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>All done, now we need to exit out to our Live USB env by typing <code>exit</code> then unmount the mounted sda by <code>umount -R /mnt</code> and reboot with command: <code>reboot</code>.</p>
+
+<p>Upon seeing the Asus logo, press F8 to see UEFI Boot Menu, choose Linux Boot Manager and you now can see the systemd-boot EFI boot manager screen, select Arch Linux and your set to go.</p>
+
+<p>&#8220;`</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -517,63 +626,6 @@ am going to guide you through how to integrate Sidekiq with ActiveJob, and you w
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/how-to-solve-sss-hiring-challenge/">How to Solve Silicon Straits Saigon Hiring Challenge</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-08-21T17:04:00+10:00" pubdate data-updated="true">Aug 21<span>st</span>, 2014</time>
-        
-         | <a href="/how-to-solve-sss-hiring-challenge/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Hello folks</p>
-
-<p>For whom who might have not heard of Silicon Straits Saigon (SSS), this
-company is one cool company in Vietnam with strong focus in tech such
-as iOS and Web. When I use the word cool, I did not mean it before I
-touch base with their hiring challenge.</p>
-
-<p>SSS is known to have a quite unique way to challenge potential employees.
-They give you a very cryptic page <a href="http://hiring.siliconstraits.vn">http://hiring.siliconstraits.vn</a> and
-asks you to hack them.</p>
-
-<p>Well, today I am going to show you how to solve this problem step by step.
-I hope Mr. An (Director of SSS) won’t hate me for this.</p>
-
-<p>Spoiler alert! Go give the challange a go yourself before reading!</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/how-to-solve-sss-hiring-challenge/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -594,6 +646,10 @@ I hope Mr. An (Director of SSS) won’t hate me for this.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/linux/boot-to-arch-linux-with-uefi-on-asus-z170m-plus-motherboard/">Setup Arch Linux to boot UEFI on Asus Z170M-PLUS motherboard</a>
+      </li>
+    
+      <li class="post">
         <a href="/crystal/testing-whirlwind-tour-in-crystal-lang/">Testing Whirlwind tour in Crystal lang</a>
       </li>
     
@@ -607,10 +663,6 @@ I hope Mr. An (Director of SSS) won’t hate me for this.</p>
     
       <li class="post">
         <a href="/lotusrb/how-to-add-basic-authentication-into-lotus-app/">How to add basic authentication into Lotus app</a>
-      </li>
-    
-      <li class="post">
-        <a href="/rails/the-difference-between-activerecord-scope-dsl-and-class-method/">The difference between ActiveRecord scope DSL and class method</a>
       </li>
     
   </ul>
