@@ -24,7 +24,7 @@ GEM
     liquid (2.3.0)
     maruku (0.7.2)
     posix-spawn (0.3.9)
-    puma (2.15.3)
+    puma (3.12.4)
     pygments.rb (0.3.7)
       posix-spawn (~> 0.3.6)
       yajl-ruby (~> 1.1.0)
@@ -55,7 +55,7 @@ DEPENDENCIES
   haml (~> 3.1.7)
   jekyll (~> 0.12)
   liquid (~> 2.3.0)
-  puma (~> 2.0)
+  puma (~> 3.12)
   pygments.rb (~> 0.3.4)
   rake
   rb-fsevent (~> 0.9)
