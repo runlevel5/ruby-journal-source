@@ -123,50 +123,34 @@ Indexes:
     "products_pkey" PRIMARY KEY, btree (sku)
 ```
 
-The `sku` column is assigned with `integer` datatype, which is not correct. So `primary_key` type must be of `integer` type.
+The `sku` column is assigned with `integer` datatype, which is not correct. So it's seems to me `primary_key` is a `integer` type by default.
 
-Naively, I try other alternatives:
+So what if we convert that to a `string` instead?
 
 ```ruby
 create_table :products, id: false do |t|
-  t.string :sku, primary: true
+  t.primary_key :sku, :string
 
   t.timestamps
 end
 ```
 
-OR
+which would generate following SQL:
 
-```ruby
-create_table :products, id: false do |t|
-  t.string :sku, primary_key: true
-
-  t.timestamps
-end
 ```
-
-which doesn't do anything. Meh :(
-
-It is okay, if Rails doesn't let you do so, because you can still be able to do a workaround:
-
-```ruby
-class CreateProducts < ActiveRecord::Migration
-  def change
-    create_table :products, id: false do |t|
-      t.string :sku, null: false
-
-      t.timestamps
-    end
-
-    execute %Q{ ALTER TABLE "products" ADD PRIMARY KEY ("sku"); }
-  end
-end
+CREATE TABLE public.products
+(
+  sku character varying NOT NULL,
+  CONSTRAINT products_pkey PRIMARY KEY (sku)
+)
 ```
 
 and bravo, it does the job! Hold on, there is a twist!
 
-our `db/schema.rb` says nothing about the contraint addition line, which makes
-sense because we are not using SQL format to preserve it.
+our `db/schema.rb` says nothing about `sku` should be a string. If we
+try to create DB from schema it would create an integer column instead.
+
+We could workaround by enforcing SQL schema format:
 
 ```
 config.active_record.schema_format = :sql
@@ -184,7 +168,7 @@ Let's see how I do it:
 class CreateProducts < ActiveRecord::Migration
   def change
     create_table :products, id: false do |t|
-      t.string :sku, null: false
+      t.string :sku, null: false, index: { unique: true }
 
       t.timestamps
     end
