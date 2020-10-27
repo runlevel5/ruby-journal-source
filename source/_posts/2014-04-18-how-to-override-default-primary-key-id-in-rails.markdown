@@ -343,7 +343,7 @@ bundle exec rake routes
                  DELETE   /products/:sku(.:format)         products#destroy
 ```
 
-Please be noted that you need to modify the `ProductssController` to find Order record
+Please be noted that you need to modify the `ProductsController` to find Order record
 with `params[:sku]` instead of `params[:id]`.
 
 ```ruby
