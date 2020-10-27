@@ -281,7 +281,7 @@ on `id` will stop functioning. If you really want that, you need to override mor
 methods and this seems too much of a pain for me. So I'd highly recommend you to
 leave `#id` as is.
 
-# Routing
+## Routing
 
 Our default rails is:
 
