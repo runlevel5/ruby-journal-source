@@ -19,7 +19,7 @@ group :development do
 end
 
 group :production do
-  gem 'puma', '~> 2.0'
+  gem 'puma', '~> 4.3'
 end
 
 gem 'sinatra', '~> 1.4.2'
