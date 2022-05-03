@@ -22,4 +22,4 @@ group :production do
   gem 'puma', '~> 2.0'
 end
 
-gem 'sinatra', '~> 1.4.2'
+gem 'sinatra', '~> 2.2.0'
